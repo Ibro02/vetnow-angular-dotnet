@@ -19,6 +19,8 @@ export class SignInInputComponent {
   @Input() inputType:string = "text";
   @Input() title:string|null = null;
   @Input() isError = false;
+  @Input() isSettings = false;
+  @Input() size?:number;
 
   errorColor = 'text-red-600'; //tailwind property
   margin = 'mt-10';

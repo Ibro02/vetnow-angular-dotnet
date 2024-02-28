@@ -1,0 +1,29 @@
+<p>vet-station works!</p>
+<div class="mx-5">
+    <div class="my-2 flex gap-3 w-full">
+        <div class="w-2/2 flex flex-col gap-3">
+            <app-box-container title="Naziv">
+                <div class="flex flex-row w-full justify-center items-stretch gap-10">
+                    <app-sign-in-input title="Station Name" [isSettings]="true"></app-sign-in-input>
+                    <app-sign-in-input title="Station Description" [isSettings]="true" [size]="40"></app-sign-in-input>
+                </div>    
+            </app-box-container>
+            <app-box-container title="Naziv">
+                <div class="flex gap-10">
+                    <app-sign-in-input title="Fist Name" [isSettings]="true"></app-sign-in-input>
+                    <app-sign-in-input title="Last Name" [isSettings]="true"></app-sign-in-input>
+                    <app-sign-in-input title="Birthday" [isSettings]="true"></app-sign-in-input>
+                </div>    
+            </app-box-container>
+        </div>
+        <div class="w-1/2">
+            <app-box-container title="Naziv">
+      
+                    <app-sign-in-input title="Fist Name" [isSettings]="true"></app-sign-in-input>
+                    <app-sign-in-input title="Last Name" [isSettings]="true"></app-sign-in-input>
+                    <app-sign-in-input title="Birthday" [isSettings]="true"></app-sign-in-input>
+           
+            </app-box-container>
+        </div>
+    </div>
+</div>

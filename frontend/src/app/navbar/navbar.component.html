@@ -23,10 +23,10 @@
       <p class="LogoMark">VetNow</p>
       <div class="line-clamp-1 w-full bg-black h-[0.01rem] mt-4"></div>
       <ul class="list-none mx-6 my-4 text-cyan-600 flex flex-col justify-between items-center h-40">
-        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2"><fa-icon [icon]="faHome" class="text-xl w-8"></fa-icon><p>Home</p></li>
-        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2"><fa-icon [icon]="faEnvelope"  class="text-xl w-8"></fa-icon><p>Notifications</p></li>
-        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2"><fa-icon [icon]="faShop"  class="text-xl w-8"></fa-icon><p>My Station</p></li>
-        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2"><fa-icon [icon]="faUser"  class="text-xl w-8"></fa-icon><p>Profile Settings</p></li>
+        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2" [routerLink]="['home-page']" ><fa-icon [icon]="faHome" class="text-xl w-8"></fa-icon><p>Home</p></li>
+        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2" [routerLink]="['setting/vet-station']"><fa-icon [icon]="faEnvelope"  class="text-xl w-8"></fa-icon><p>Notifications</p></li>
+        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2" [routerLink]="['setting/vet-station']"><fa-icon [icon]="faShop"  class="text-xl w-8"></fa-icon><p>My Station</p></li>
+        <li class="flex justify-start text-center w-full items-center m-auto link-hover gap-2" [routerLink]="['home-page']"><fa-icon [icon]="faUser"  class="text-xl w-8"></fa-icon><p>Profile Settings</p></li>
       </ul>
         <div class="h-full" title="schedule">
       <div class="line-clamp-1 w-full bg-black h-[0.01rem]"></div>

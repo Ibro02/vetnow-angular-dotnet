@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { OtherSignUpMethodsComponent } from "../other-sign-up-methods/other-sign-up-methods.component";
-import { SignInInputComponent } from "../sign-in-input/sign-in-input.component";
+import { OtherSignUpMethodsComponent } from "../../components/other-sign-up-methods/other-sign-up-methods.component";
+import { SignInInputComponent } from "../../components/common/sign-in-input/sign-in-input.component";
 import { MyAuthService } from '../../services/MyAuth';
 import axios from "axios";
 import {Router, RouterLink} from "@angular/router"; 

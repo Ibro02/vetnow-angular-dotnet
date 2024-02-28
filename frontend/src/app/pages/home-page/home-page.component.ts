@@ -4,8 +4,8 @@ import {ProfileService} from "../../services/ProfileService";
 import {NgForOf, NgIf} from "@angular/common";
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons";
-import {VetCardComponent} from "../../vet-card/vet-card.component";
-import {InputComponent} from "../common/input/input.component";
+import {VetCardComponent} from "../../components/group/vet-card/vet-card.component";
+import {InputComponent} from "../../components/common/input/input.component";
 import {VetStationList,VetStation} from "./VetStation";
 import axios from "axios";
 import {HttpClient} from "@angular/common/http";
@@ -13,6 +13,8 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
 import {VetStationService} from "../../services/VetStationSearch";
 import { Config } from '../../config';
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-home-page',
   standalone: true,
@@ -21,7 +23,8 @@ import { Config } from '../../config';
     FaIconComponent,
     VetCardComponent,
     InputComponent,
-    NgIf
+    NgIf,
+    RouterLink,
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'

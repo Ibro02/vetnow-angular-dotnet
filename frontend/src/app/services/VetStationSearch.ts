@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import {UserProfile} from "./UserProfile";
 import axios from "axios";
 import {MyAuthService} from "./MyAuth";
-import {VetStationList} from "../components/home-page/VetStation";
+import {VetStationList} from "../pages/home-page/VetStation";
 import { Config } from '../config';
 
 
