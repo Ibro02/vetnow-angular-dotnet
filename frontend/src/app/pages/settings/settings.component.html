@@ -1,31 +1,11 @@
-<div class="h-full w-full flex flex-col gap-1">
-    <div class="bg-light-green h-1/5">
-        settings
+<app-page-title-container title="Settings" subtitle="Which settings do you want manage?"></app-page-title-container>
+<div class="flex flex-col items-center w-full gap-20 mt-10">
+    <div class="">
+        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter'] ">Profile settings</h3>
+        <app-settings-card [array]="accountSettingsArr"></app-settings-card>
     </div>
-
-    <div class="bg-light-green h-screen w-1/4 ">
-        <div class="bg-white md:h-36 md:w-36 md:absolute md:top-24 md:left-4 rounded-full static mx-auto my-3 w-3/6 h-1/6"></div>
-
-      <!--CONTENT BELOW WILL BE DYNAMICLY CHANGED-->
-      <div class="my-20 flex flex-col gap-2 w-1/2 mx-auto text-left justify-center text-white">
-        <div>
-            <h2 class="font-thin">Name and surname</h2>
-            <h2 class="text-2xl font-bold">Jhon Doe</h2>
-        </div>
-        <div>
-            <h2 class="font-thin">Profile Role</h2>
-            <h2 class="text-2xl font-bold">Jhon Doe</h2>
-        </div>
-        <div>
-            <h2 class="font-thin">Phone number</h2>
-            <h2 class="text-2xl font-bold">Jhon Doe</h2>
-        </div>
-        <div>
-            <h2 class="font-thin">Name and surname</h2>
-            <h2 class="text-2xl font-bold">Jhon Doe</h2>
-        </div>
-        </div>
-      <!------------------------------------------->
-
+    <div class="">
+        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter']">Workspace settings</h3>
+        <app-settings-card [array]="workspaceSettingsArr"></app-settings-card>
     </div>
 </div>

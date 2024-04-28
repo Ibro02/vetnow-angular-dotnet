@@ -1,29 +1,50 @@
-<p>vet-station works!</p>
-<div class="mx-5">
-    <div class="my-2 flex gap-3 w-full">
-        <div class="w-2/2 flex flex-col gap-3">
-            <app-box-container title="Naziv">
-                <div class="flex flex-row w-full justify-center items-stretch gap-10">
-                    <app-sign-in-input title="Station Name" [isSettings]="true"></app-sign-in-input>
-                    <app-sign-in-input title="Station Description" [isSettings]="true" [size]="40"></app-sign-in-input>
-                </div>    
-            </app-box-container>
-            <app-box-container title="Naziv">
-                <div class="flex gap-10">
-                    <app-sign-in-input title="Fist Name" [isSettings]="true"></app-sign-in-input>
-                    <app-sign-in-input title="Last Name" [isSettings]="true"></app-sign-in-input>
-                    <app-sign-in-input title="Birthday" [isSettings]="true"></app-sign-in-input>
-                </div>    
-            </app-box-container>
+<div class="">
+  <app-page-title-container
+    title="Workspace"
+    subtitle="Vet station settings"
+  ></app-page-title-container>
+  <div class="flex  m-auto justify-evenly gap-3">
+    <div class="flex flex-col w-2/5 gap-3">
+      <app-input type="text" label="Station Name"></app-input>
+      <app-input type="file" label="Station title image"></app-input>
+      <app-input type="description" label="Station Description"></app-input>
+
+      <div class="w-full flex-row flex-wrap gap-1 ">
+        <h2 class="text-2xl">Accessibility</h2>
+        <div class="flex flex-col ml-10">
+          <div *ngFor="let i of accessibilityAndMobilityButtons">
+            <app-input
+              type="checkbox"
+              *ngIf="i.id < 3"
+              [label]="i.name"
+            ></app-input>
+          </div>
         </div>
-        <div class="w-1/2">
-            <app-box-container title="Naziv">
-      
-                    <app-sign-in-input title="Fist Name" [isSettings]="true"></app-sign-in-input>
-                    <app-sign-in-input title="Last Name" [isSettings]="true"></app-sign-in-input>
-                    <app-sign-in-input title="Birthday" [isSettings]="true"></app-sign-in-input>
-           
-            </app-box-container>
+      </div>
+
+      <div class="w-full flex-row flex-wrap gap-2">
+        <h2 class="text-2xl">Mobility</h2>
+        <div class="flex flex-col ml-10">
+          <div *ngFor="let i of accessibilityAndMobilityButtons">
+            <app-input
+              type="checkbox"
+              *ngIf="i.id >= 3"
+              [label]="i.name"
+            ></app-input>
+          </div>
         </div>
+      </div>
+
+      <app-input type="text" label="Station Email"></app-input>
+      <app-input type="text" label="Station Phone"></app-input>
+      <app-input type="text" label="Address"></app-input>
+      <label class="my-auto flex h-4 text-black text-lg font-normal font-['Inter']"
+      >Choose on map:</label
+    >
+<!-- <google-map/> @TODO - make google map work -->
     </div>
+
+
+   
+  </div>
 </div>

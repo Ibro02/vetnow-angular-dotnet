@@ -1,10 +1,10 @@
 <ng-container [ngSwitch]="isError">
   <div class="mt-4">
 <div [className]="isError&&errorColor">
-<h3 class="mb-2 {{isSettings?'text-lg font-normal text-teal-500':''}}" *ngIf="title!=null">{{title}}</h3>
+<h3 class="mb-2 {{isSettings?'text-lg font-normal text-gray-800':''}}" *ngIf="title!=null">{{title}}</h3>
 <ng-container [ngSwitch]="inputType">
-<input class="flex justify-between shadow-3xl transition-all duration-300 outline-1 w-full {{isSettings?'h-10':'h-8'}} rounded-lg {{isSettings?'border-teal-400 border-2 outline-teal-500':'bg-gray-400'}} hover:shadow-none focus:shadow-none" *ngSwitchCase="'text'" type="text" [(ngModel)]="inputValue" (input)="onInputChange()" [size]="size?size:20"/>
-  <input class="flex justify-between shadow-3xl transition-all duration-300 outline-1 w-full {{isSettings?'h-10':'h-8'}} rounded-lg {{isSettings?'border-teal-400 border-2':'bg-gray-400'}} hover:focus:shadow-none" *ngSwitchCase="'password'" type="password" [(ngModel)]="inputValue" (input)="onInputChange()"/>
+<input class="flex justify-between shadow-3xl transition-all duration-300 outline-1 w-full {{isSettings?'h-10':'h-8'}} rounded-md {{isSettings?'border-gray-800 border-1 outline-teal-500':'bg-gray-400'}} hover:shadow-none focus:shadow-none" *ngSwitchCase="'text'" type="text" [(ngModel)]="inputValue" (input)="onInputChange()" [size]="size?size:20"/>
+<input class="flex justify-between shadow-3xl transition-all duration-300 outline-1 w-full {{isSettings?'h-10':'h-8'}} rounded-lg {{isSettings?'border-teal-400 border-2':'bg-gray-400'}} hover:focus:shadow-none" *ngSwitchCase="'password'" type="password" [(ngModel)]="inputValue" (input)="onInputChange()"/>
 </ng-container>
 </div>
   </div>

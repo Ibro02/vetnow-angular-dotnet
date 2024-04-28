@@ -1,6 +1,6 @@
 // google-login.service.ts
 import { Injectable } from '@angular/core';
-import {UserProfile} from "./UserProfile";
+import {UserProfile} from "./interfaces/UserProfile";
 import axios from "axios";
 import {MyAuthService} from "./MyAuth";
 import {VetStationList} from "../pages/home-page/VetStation";

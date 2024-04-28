@@ -5,7 +5,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons";
 import {VetCardComponent} from "../../components/group/vet-card/vet-card.component";
-import {InputComponent} from "../../components/common/input/input.component";
+import {InputComponent} from "../../components/common/search-input/search-input.component";
 import {VetStationList,VetStation} from "./VetStation";
 import axios from "axios";
 import {HttpClient} from "@angular/common/http";
