@@ -1,0 +1,171 @@
+<app-button text="Add new employee" (event)="openModal()"></app-button>
+<!-- The Modal -->
+<div
+  class="modal bg-black bg-opacity-25"
+  tabindex="-1"
+  [ngClass]="{ show: showModal }"
+  [ngStyle]="{ display: showModal ? 'block' : 'none' }"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Employee</h5>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                  id="firstName"
+                  formControlName="firstName"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                  id="lastName"
+                  formControlName="lastName"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  id="email"
+                  formControlName="email"
+                  class="form-control"
+                  type="email"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="phone">Phone</label>
+                <input
+                  id="phone"
+                  formControlName="phone"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="roleId">Role ID</label>
+                <input
+                  id="roleId"
+                  formControlName="roleId"
+                  class="form-control"
+                  type="number"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="birthDate">Birth Date</label>
+                <input
+                  id="birthDate"
+                  formControlName="birthDate"
+                  class="form-control"
+                  type="date"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                  id="username"
+                  formControlName="username"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  id="password"
+                  formControlName="password"
+                  class="form-control"
+                  type="password"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input
+                  id="city"
+                  formControlName="city"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="country">Country</label>
+                <input
+                  id="country"
+                  formControlName="country"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="dateOfEmployment">Date of Employment</label>
+                <input
+                  id="dateOfEmployment"
+                  formControlName="dateOfEmployment"
+                  class="form-control"
+                  type="date"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeModal()"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

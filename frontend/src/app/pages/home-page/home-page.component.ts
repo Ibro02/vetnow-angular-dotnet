@@ -73,6 +73,7 @@ this.searchTextChanged.next(children.target.value);
     this.httpClient.get<VetStation[]>(url).subscribe(async x => {
       let vetStationsArr: VetStation[] =  x
       this.vetStationService.vetStations = {vetStations:[...vetStationsArr]}
+     console.log(this.vetStationService.vetStations?.vetStations);
     });
 
   }

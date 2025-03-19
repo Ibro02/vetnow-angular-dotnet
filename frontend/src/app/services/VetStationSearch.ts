@@ -37,7 +37,7 @@ export class VetStationService {
           },
           {
             'key': 1,
-            'route':'isOnField',
+            'route':'onField',
             'name':'On Field',
             'value': false,
           }

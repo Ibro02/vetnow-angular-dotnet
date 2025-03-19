@@ -1,50 +1,146 @@
-<div class="">
+<div id="background">
   <app-page-title-container
     title="Workspace"
     subtitle="Vet station settings"
   ></app-page-title-container>
-  <div class="flex  m-auto justify-evenly gap-3">
-    <div class="flex flex-col w-2/5 gap-3">
-      <app-input type="text" label="Station Name"></app-input>
-      <app-input type="file" label="Station title image"></app-input>
-      <app-input type="description" label="Station Description"></app-input>
+  <div
+    class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg"
+  >
+    <div class="flex flex-col w-2/3">
+      <form class="md:grid grid-cols-2 gap-8" [formGroup]="vetStationFormGroup">
+        <div>
+        <app-input
+          type="text"
+          label="Station Name"
+          [formControl]="vetStationFormGroup.controls.name"
+          [value]="vetStationFormGroup.value.name?.toString()"
+          name="fieldName"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="file"
+          [formControl]="vetStationFormGroup.controls.stationImage"
+          [value]="vetStationFormGroup.value.stationImage?.toString()"
+          (itemEvent)="receiveImageURL($event)"
+          label="Station title image"
+          name="fileInput"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="description"
+          label="Station Description"
+          [value]="vetStationFormGroup.value.description?.toString()"
+          [formControl]="vetStationFormGroup.controls.description"
+          name="fieldName"
+          ngDefaultControl
+        ></app-input>
 
-      <div class="w-full flex-row flex-wrap gap-1 ">
-        <h2 class="text-2xl">Accessibility</h2>
-        <div class="flex flex-col ml-10">
-          <div *ngFor="let i of accessibilityAndMobilityButtons">
-            <app-input
-              type="checkbox"
-              *ngIf="i.id < 3"
-              [label]="i.name"
-            ></app-input>
+        <div class="w-full flex-row flex-wrap gap-1">
+          <h2 class="text-2xl">Accessibility</h2>
+          <div class="flex flex-col ml-10">
+            <div *ngFor="let i of accessibilityAndMobilityButtons">
+              <app-input
+                type="checkbox"
+                *ngIf="i.id < 3"
+                [label]="i.name"
+                [value]="i.value"
+                [formControl]="
+                  i.id == 0
+                    ? vetStationFormGroup.controls.wifi
+                    : i.id == 1
+                    ? vetStationFormGroup.controls.parking
+                    : vetStationFormGroup.controls.wheelchair
+                "
+                ngDefaultControl
+              ></app-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full flex-row flex-wrap gap-2">
+          <h2 class="text-2xl">Mobility</h2>
+          <div class="flex flex-col ml-10">
+            <div *ngFor="let i of accessibilityAndMobilityButtons">
+              <app-input
+                type="checkbox"
+                *ngIf="i.id >= 3"
+                [label]="i.name"
+                [value]="i.value"
+                [formControl]="
+                  i.id == 3
+                    ? vetStationFormGroup.controls.onField
+                    : vetStationFormGroup.controls.inOffice
+                "
+                ngDefaultControl
+              ></app-input>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="w-full flex-row flex-wrap gap-2">
-        <h2 class="text-2xl">Mobility</h2>
-        <div class="flex flex-col ml-10">
-          <div *ngFor="let i of accessibilityAndMobilityButtons">
-            <app-input
-              type="checkbox"
-              *ngIf="i.id >= 3"
-              [label]="i.name"
-            ></app-input>
-          </div>
-        </div>
-      </div>
-
-      <app-input type="text" label="Station Email"></app-input>
-      <app-input type="text" label="Station Phone"></app-input>
-      <app-input type="text" label="Address"></app-input>
-      <label class="my-auto flex h-4 text-black text-lg font-normal font-['Inter']"
-      >Choose on map:</label
-    >
-<!-- <google-map/> @TODO - make google map work -->
+      <div>
+        <app-input
+          type="text"
+          label="Station Email"
+          [formControl]="vetStationFormGroup.controls.email"
+          [value]="vetStationFormGroup.value.email?.toString()"
+          name="fieldName"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="dropdown"
+          label="Country"
+          [value]="vetStationFormGroup.value.country?.toString()"
+          [formControl]="vetStationFormGroup.controls.country"
+          (change)="countryChange()"
+          [array]="countries"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="dropdown"
+          label="City"
+          [formControl]="vetStationFormGroup.controls.city"
+          [value]="vetStationFormGroup.value.city?.toString()"
+          [array]="cities"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="text"
+          label="Address"
+          [value]="vetStationFormGroup.value.address?.toString()"
+          [formControl]="vetStationFormGroup.controls.address"
+          name="fieldName"
+          ngDefaultControl
+        ></app-input>
+        <app-input
+          type="text"
+          label="Phone"
+          [value]="vetStationFormGroup.value.contactNumber?.toString()"
+          [formControl]="vetStationFormGroup.controls.contactNumber"
+          name="fieldName"
+          ngDefaultControl
+        ></app-input>
     </div>
+    <div>
+        <label
+          class="my-auto flex h-4 mb-4 text-black text-lg font-normal font-['Inter']"
+          >Choose on map:</label
+        >
+        <div class="">
+          <google-map [options]="mapOptions"></google-map>
+        </div>
+      </div>
+      </form>
+    </div>
+    <button
+      class="button-3 bg-emerald-400 border border-emerald-400 rounded-md shadow-sm text-white font-semibold py-2 px-4 inline-block align-middle whitespace-nowrap select-none focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent disabled:bg-emerald-200 disabled:border-emerald-200 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-emerald-600 active:bg-emerald-500 active:bg-opacity-75"
+      (click)="saveChanges()"
+    >
+      Save
+    </button>
 
-
-   
+    <!-- <div class="">
+      <app-button [type]='"cancel"' text="Cancel"></app-button>
+      <app-button [type]='"save"'  text="Save"></app-button>
+    </div> -->
   </div>
 </div>

@@ -24,7 +24,6 @@ export class NavbarComponent implements OnChanges{
   }
   ngOnChanges(changes:SimpleChanges) {
     this.isLogged = this.myAuthService.IsLogged();
-    console.log(changes);
   }
 
 

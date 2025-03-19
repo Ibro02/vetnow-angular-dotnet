@@ -5,9 +5,10 @@ export interface VetStationList {
 export interface VetStation {
   id: number
   name: string
+  stationImage: string;
   contactNumber: string
-  isInOffice: boolean
-  isOnField: boolean
+  inOffice: boolean
+  onField: boolean
   parking: boolean
   wheelchair: boolean
   wifi: boolean

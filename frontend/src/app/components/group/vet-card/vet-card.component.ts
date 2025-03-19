@@ -3,7 +3,7 @@ import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import { faWifi } from '@fortawesome/free-solid-svg-icons';
 import { faWheelchair } from '@fortawesome/free-solid-svg-icons';
 import { faP } from '@fortawesome/free-solid-svg-icons';
-import {VetStation, VetStationList} from "../../../pages/home-page/VetStation";
+import {VetStation} from "../../../pages/home-page/VetStation";
 import {NgIf} from "@angular/common";
 import { RouterLink } from '@angular/router';
 

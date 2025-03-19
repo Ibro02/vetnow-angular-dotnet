@@ -48,9 +48,9 @@ isError:boolean = false;
           'my-auth-token': (!this.myAuthService.rememberMe ?
             window.localStorage.getItem('my-auth-token'):window.sessionStorage.getItem('my-auth-token'))
         }}).then(x=> {
+        console.log(x);
         this.myAuthService.rememberMe ?
         window.localStorage.setItem('my-auth-token',x.data):window.sessionStorage.setItem('my-auth-token',x.data)
-        console.log(x.data);
          this.router.navigate(["home-page"]);
 
       }).catch(err=>console.log(err.message));

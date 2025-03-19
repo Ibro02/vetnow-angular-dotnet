@@ -27,6 +27,6 @@ export class AppComponent implements  OnInit{
 
   test(response:any)
   {
-      console.log(response);
+    console.log(response);
   }
 }

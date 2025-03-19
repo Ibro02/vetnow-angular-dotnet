@@ -1,5 +1,6 @@
 <div class="w-80 h-96 bg-zinc-300 rounded-2xl card-container transition-all duration-150" >
     <div class="w-80 h-36 bg-emerald-800 rounded-t-2xl flex justify-end items-end photo-section">
+      <img *ngIf="vetStation?.stationImage" class="w-full h-full rounded-t-2xl object-cover" src="{{vetStation?.stationImage}}"/>
     </div>
     <div class="w-80 inline-flex items-center bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 cool-shadow">
         <span class="w-72 h-3 text-center text-xs font-normal font-['Inter']">1km</span>
@@ -26,8 +27,8 @@
                 <fa-icon *ngIf="vetStation?.wheelchair" class="w-6 h-5 text-black text-xl font-black font-['Font Awesome 5 Free']" [icon]="this.faWheelchair"></fa-icon>
             </div>
             <div class="flex w-1/2 gap-3 justify-end work-type-sec">
-              <span *ngIf="vetStation?.isInOffice" class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 cool-shadow">In Office</span>
-              <span *ngIf="vetStation?.isOnField" class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 cool-shadow">On Field</span>
+              <span *ngIf="vetStation?.inOffice" class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 cool-shadow">In Office</span>
+              <span *ngIf="vetStation?.onField" class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 cool-shadow">On Field</span>
 
 <!--<div class="w-16 h-7 p-1 bg-lightgreen-modified rounded-lg on-field-button text-center cool-shadow text-xs">On Field</div>-->
             </div>

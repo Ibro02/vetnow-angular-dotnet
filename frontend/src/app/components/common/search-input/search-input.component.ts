@@ -42,7 +42,7 @@ constructor(private elementRef:ElementRef, public vetStationService:VetStationSe
   }
   handleChange(temp: boolean, i:number, j:number) {
     temp = !temp;
-    console.log(this.vetStationService.dropdown)
+
     this.vetStationService.dropdown[i].children[j].value = temp;
     this.vetStationService.setValues();
 //console.log(this.dropdown[i].children[j])
