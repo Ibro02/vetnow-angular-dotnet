@@ -1,0 +1,11 @@
+<app-page-title-container title="Settings" subtitle="Which settings do you want manage?"></app-page-title-container>
+<div class="flex flex-col items-center w-full gap-20 mt-10">
+    <div class="">
+        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter'] ">Profile settings</h3>
+        <app-settings-card [array]="accountSettingsArr"></app-settings-card>
+    </div>
+    <div class="">
+        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter']">Workspace settings</h3>
+        <app-settings-card [array]="workspaceSettingsArr"></app-settings-card>
+    </div>
+</div>

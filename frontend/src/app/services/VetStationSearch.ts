@@ -1,9 +1,9 @@
 // google-login.service.ts
 import { Injectable } from '@angular/core';
-import {UserProfile} from "./UserProfile";
+import {UserProfile} from "./interfaces/UserProfile";
 import axios from "axios";
 import {MyAuthService} from "./MyAuth";
-import {VetStationList} from "../components/home-page/VetStation";
+import {VetStationList} from "../pages/home-page/VetStation";
 import { Config } from '../config';
 
 
@@ -37,7 +37,7 @@ export class VetStationService {
           },
           {
             'key': 1,
-            'route':'isOnField',
+            'route':'onField',
             'name':'On Field',
             'value': false,
           }

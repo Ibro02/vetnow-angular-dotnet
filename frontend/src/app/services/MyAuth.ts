@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import axios from "axios";
-import {LoginRequest} from "../components/login/LoginRequest";
+import {LoginRequest} from "../pages/login/LoginRequest";
 import { Config } from "../config";
 @Injectable({providedIn:"root"})
 export class MyAuthService

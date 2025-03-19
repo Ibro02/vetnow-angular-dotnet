@@ -1,50 +1,63 @@
-import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
-import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {faFilter} from "@fortawesome/free-solid-svg-icons";
-import {FormsModule} from "@angular/forms";
-import {InputButtonComponent} from "../input-button/input-button.component";
-import {NgForOf, NgIf} from "@angular/common";
-import {ElementRef} from "@angular/core";
-import {VetStationService} from "../../../services/VetStationSearch";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-input',
   standalone: true,
-  imports: [
-    FaIconComponent,
-    FormsModule,
-    InputButtonComponent,
-    NgForOf,
-    NgIf
-  ],
+  imports: [NgIf,FormsModule,ReactiveFormsModule,NgFor,NgSwitch,NgSwitchCase,NgSwitchDefault],
   templateUrl: './input.component.html',
-  styleUrl: './input.component.css'
+  styleUrl: "./input.component.css",
+
 })
 export class InputComponent {
+  @Output() public itemEvent = new EventEmitter<string>();
+  @Input() public type:string = 'text';
+  @Input() public label: string = 'Input';
+  @Input() public placeholder?: string = "";
+  @Input() public id: string = 'inputField';
+  @Input() public name: string = 'inputField';
+  @Input() public array: any = [1,2,3,4,5];
+  @Input() public value?: string|boolean;
+  @Input() formControl = new FormControl<string|boolean|null>(false); //add file type
 
-  protected readonly faFilter = faFilter;
 
-  filterIsClicked: boolean = false;
-  @Output() handleChangeFilter = this.vetStationService.dropdown;
-
-constructor(private elementRef:ElementRef, public vetStationService:VetStationService) {
+  // @Input() public value:any;
+test() {
+  console.log(this.formControl.value)
 }
-
-@Output() searchVetStation:EventEmitter<any> = new EventEmitter<any>();
-@Input() searchValue?: string
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-
-    if (!this.elementRef.nativeElement.contains(target)) {
-      this.filterIsClicked = false;
+  /**
+   *
+   */
+  constructor() {
+    if (typeof this.formControl.value === 'boolean') {
+      this.formControl.setValue(false);
+    } else {
+      this.formControl.setValue('');
     }
   }
-  handleChange(temp: boolean, i:number, j:number) {
-    temp = !temp;
-    console.log(this.vetStationService.dropdown)
-    this.vetStationService.dropdown[i].children[j].value = temp;
-    this.vetStationService.setValues();
-//console.log(this.dropdown[i].children[j])
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 2097152) { //2MB
+        window.alert("File is too big!");
+      } else {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.value = reader.result as string;
+        this.itemEvent.emit(this.value);
+      }
+      }
+    }
   }
+//  getValue = (_value:string) =>
+//   {
+// this.value = _value;
+// this.itemEvent.emit(this.value);
+
+// //console.log(_value);
+//   } //another method for state management
+
+
 }

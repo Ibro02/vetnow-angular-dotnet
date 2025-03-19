@@ -4,13 +4,15 @@ import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faHome, faEnvelope, faShop, faUser, faGear} from "@fortawesome/free-solid-svg-icons";
 import {MyAuthService} from "../services/MyAuth";
 import {ChangeDetection} from "@angular/cli/lib/config/workspace-schema";
+import { Router,RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
     NgIf,
-    FaIconComponent
+    FaIconComponent,
+    RouterModule
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
@@ -18,11 +20,10 @@ import {ChangeDetection} from "@angular/cli/lib/config/workspace-schema";
 export class NavbarComponent implements OnChanges{
 
   @Input() public isLogged: boolean = false;
-  constructor(public myAuthService: MyAuthService) {
+  constructor(public myAuthService: MyAuthService, router:Router) {
   }
   ngOnChanges(changes:SimpleChanges) {
     this.isLogged = this.myAuthService.IsLogged();
-    console.log(changes);
   }
 
 
