@@ -4,12 +4,17 @@ using System.Text.Json.Serialization;
 
 namespace VetStat.Models
 {
-    public class Species
+    public class Breed
     {
         [Key]
         public int Id { get; set; }
-        public string? SpeciesName { get; set; }
-        public string? Behavior { get; set; }
-        public string? Diet { get; set; }
+
+        public int Name { get; set; }
+
+        [ForeignKey("Species")]
+        public int? SpeciesId { get; set; }
+
+        [JsonIgnore]
+        public Species? Species { get; set; }
     }
 }

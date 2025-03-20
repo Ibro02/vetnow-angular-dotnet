@@ -39,7 +39,6 @@ namespace VetStat.Data
         public DbSet<Role> Role => Set<Role>();
         public DbSet<Barber> Barber => Set<Barber>();
         public DbSet<Admin> Admin => Set<Admin>();
-        public DbSet<City> City => Set<City>();
         public DbSet<VetStation> VetStation => Set<VetStation>();
         public DbSet<FAQ> FAQ => Set<FAQ>();
         public DbSet<Inventory> Inventory => Set<Inventory>();
@@ -53,6 +52,8 @@ namespace VetStat.Data
         public DbSet<MainVet> MainVet => Set<MainVet>();
         public DbSet<Species> Species => Set<Species>();
         public DbSet<TimeSlot> TimeSlot => Set<TimeSlot>();
+        public DbSet<Breed> Breed => Set<Breed>();
         public DbSet<AuthentificationToken> AuthentificationToken => Set<AuthentificationToken>();
+        
     }
 }

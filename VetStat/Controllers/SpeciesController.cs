@@ -70,10 +70,6 @@ namespace VetStat.Controllers
                     _species.SpeciesName = species.SpeciesName;
                 if (!string.IsNullOrEmpty(species.Behavior))
                     _species.Behavior = species.Behavior;
-                if (!string.IsNullOrEmpty(species.PredatorsAndThreats))
-                    _species.PredatorsAndThreats = species.PredatorsAndThreats;
-                if (!string.IsNullOrEmpty(species.ScientificName))
-                    _species.ScientificName = species.ScientificName;
                 if (!string.IsNullOrEmpty(species.Diet))
                     _species.Diet = species.Diet;
                 

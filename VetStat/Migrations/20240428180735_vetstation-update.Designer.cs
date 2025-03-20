@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VetStat.Data;
 
@@ -11,9 +12,11 @@ using VetStat.Data;
 namespace VetStat.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240428180735_vetstation-update")]
+    partial class vetstationupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace VetStat.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("BreedId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("MedicalFile")
@@ -77,9 +80,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("AnimalSpeciesId");
 
-                    b.HasIndex("BreedId");
-
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Animal");
                 });
@@ -180,27 +181,6 @@ namespace VetStat.Migrations
                     b.ToTable("Availability");
                 });
 
-            modelBuilder.Entity("VetStat.Models.Breed", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SpeciesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SpeciesId");
-
-                    b.ToTable("Breed");
-                });
-
             modelBuilder.Entity("VetStat.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -216,6 +196,31 @@ namespace VetStat.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("VetStat.Models.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Continent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("City");
                 });
 
             modelBuilder.Entity("VetStat.Models.FAQ", b =>
@@ -297,11 +302,8 @@ namespace VetStat.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -337,6 +339,8 @@ namespace VetStat.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("RoleId");
 
@@ -405,6 +409,12 @@ namespace VetStat.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Diet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PredatorsAndThreats")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScientificName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpeciesName")
@@ -483,14 +493,11 @@ namespace VetStat.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ContactNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -500,20 +507,17 @@ namespace VetStat.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("InOffice")
+                    b.Property<bool>("IsInOffice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnField")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("OnField")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Parking")
                         .HasColumnType("bit");
-
-                    b.Property<string>("StationImage")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Wheelchair")
                         .HasColumnType("bit");
@@ -522,6 +526,8 @@ namespace VetStat.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.ToTable("VetStation");
                 });
@@ -600,17 +606,11 @@ namespace VetStat.Migrations
                         .WithMany()
                         .HasForeignKey("AnimalSpeciesId");
 
-                    b.HasOne("VetStat.Models.Breed", "Breed")
+                    b.HasOne("VetStat.Models.Person", "Customer")
                         .WithMany()
-                        .HasForeignKey("BreedId");
+                        .HasForeignKey("CustomerId");
 
-                    b.HasOne("VetStat.Models.Person", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId");
-
-                    b.Navigation("Breed");
-
-                    b.Navigation("Owner");
+                    b.Navigation("Customer");
 
                     b.Navigation("Species");
                 });
@@ -668,15 +668,6 @@ namespace VetStat.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("VetStat.Models.Breed", b =>
-                {
-                    b.HasOne("VetStat.Models.Species", "Species")
-                        .WithMany()
-                        .HasForeignKey("SpeciesId");
-
-                    b.Navigation("Species");
-                });
-
             modelBuilder.Entity("VetStat.Models.FAQ", b =>
                 {
                     b.HasOne("VetStat.Models.VetStation", "VetStation")
@@ -709,9 +700,15 @@ namespace VetStat.Migrations
 
             modelBuilder.Entity("VetStat.Models.Person", b =>
                 {
+                    b.HasOne("VetStat.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
                     b.HasOne("VetStat.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId");
+
+                    b.Navigation("City");
 
                     b.Navigation("Role");
                 });
@@ -744,6 +741,15 @@ namespace VetStat.Migrations
                     b.Navigation("Availability");
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("VetStat.Models.VetStation", b =>
+                {
+                    b.HasOne("VetStat.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("VetStat.Models.Employee", b =>

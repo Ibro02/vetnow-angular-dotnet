@@ -18,9 +18,9 @@ namespace VetStat.Endpoints.VetStationSearch
         public string ContactNumber { get; set; }
 
         //Service types and accommodation
-        public bool IsInOffice { get; set; } = false; //false -> default
+        public bool InOffice { get; set; } = false; //false -> default
 
-        public bool IsOnField { get; set; } = false;
+        public bool OnField { get; set; } = false;
 
         public bool Parking { get; set; } = false;
 

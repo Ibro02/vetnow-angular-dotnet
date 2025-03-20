@@ -12,13 +12,13 @@ namespace VetStat.Models
         [Required]
         public string? Name { get; set; }
 
-        [ForeignKey("Person")]
+        [ForeignKey("Owner")]
         public int? OwnerId { get; set; }
 
         [JsonIgnore]
    
 
-        public Person? Customer { get; set; }
+        public Person? Owner { get; set; }
 
         // public Person Id {get;set;}
         public DateTime BirthDate {get;set; }
@@ -28,6 +28,14 @@ namespace VetStat.Models
         [JsonIgnore]
 
         public Species? Species { get; set; }
+
+        [ForeignKey("Breed")]
+
+        public int? BreedId { get; set; }
+        [JsonIgnore]
+
+        public Breed? Breed { get; set; }
+
         public byte[]? Picture { get; set; }
         public byte[]? MedicalFile { get;set; }
     }
