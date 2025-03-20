@@ -67,7 +67,7 @@ namespace VetStat.Endpoints.ProfileEndpoint
             BirthDate = person.BirthDate;
             Username = person.Username;
             Password = person.Password;
-            CityId = person.CityId;
+  
 
         }
     }

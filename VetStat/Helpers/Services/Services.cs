@@ -51,8 +51,6 @@ namespace VetStat.Helpers.Validators
                 entityToUpdate.Password = updatedEntity.Password;
             if (!string.IsNullOrEmpty(updatedEntity.Phone))
                 entityToUpdate.Phone = updatedEntity.Phone;
-            if (updatedEntity.CityId != null)
-                entityToUpdate.CityId = updatedEntity.CityId;
             if (!string.IsNullOrEmpty(updatedEntity.Username))
                 entityToUpdate.Username = updatedEntity.Username;
             if (updatedEntity.BirthDate != null)
@@ -83,18 +81,6 @@ namespace VetStat.Helpers.Validators
                     nurse.Informations = updatedNurse.Informations;
             }
         }
-        public static void UpdateEntityCity<T>(T entityToUpdate, T updatedEntity) where T : City
-        {
-            if (!string.IsNullOrEmpty(updatedEntity.CityName))
-                entityToUpdate.CityName = updatedEntity.CityName;
-            if (!string.IsNullOrEmpty(updatedEntity.ZipCode))
-                entityToUpdate.ZipCode = updatedEntity.ZipCode;
-            if (!string.IsNullOrEmpty(updatedEntity.Country))
-                entityToUpdate.Country = updatedEntity.Country;
-            if (!string.IsNullOrEmpty(updatedEntity.Continent))
-                entityToUpdate.Continent = updatedEntity.Continent;
-        }
-
          public static string GenerateToken(int length)
     {
         Random random = new Random();

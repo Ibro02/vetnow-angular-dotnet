@@ -37,12 +37,12 @@ namespace VetStat.Endpoints.VetStationSearch
 
                     if (request.isInOffice == true)
                     {
-                        tempQuery = tempQuery.Where(x => x.IsInOffice);
+                        tempQuery = tempQuery.Where(x => x.InOffice);
                     }
 
                     if (request.isOnField == true)
                     {
-                        tempQuery = tempQuery.Where(x => x.IsOnField);
+                        tempQuery = tempQuery.Where(x => x.OnField);
                     }
 
                     query = query.Intersect(tempQuery);
@@ -82,8 +82,8 @@ namespace VetStat.Endpoints.VetStationSearch
                     Id = x.Id,
                     Name = x.Name,
                     ContactNumber = x.ContactNumber,
-                    IsInOffice = x.IsInOffice,
-                    IsOnField = x.IsOnField,
+                    InOffice = x.InOffice,
+                    OnField = x.OnField,
                     Parking = x.Parking,
                     Wheelchair = x.Wheelchair,
                     Wifi = x.Wifi

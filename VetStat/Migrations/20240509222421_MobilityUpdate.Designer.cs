@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VetStat.Data;
 
@@ -11,9 +12,11 @@ using VetStat.Data;
 namespace VetStat.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240509222421_MobilityUpdate")]
+    partial class MobilityUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace VetStat.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("BreedId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("MedicalFile")
@@ -77,9 +80,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("AnimalSpeciesId");
 
-                    b.HasIndex("BreedId");
-
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Animal");
                 });
@@ -178,27 +179,6 @@ namespace VetStat.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Availability");
-                });
-
-            modelBuilder.Entity("VetStat.Models.Breed", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SpeciesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SpeciesId");
-
-                    b.ToTable("Breed");
                 });
 
             modelBuilder.Entity("VetStat.Models.Category", b =>
@@ -407,6 +387,12 @@ namespace VetStat.Migrations
                     b.Property<string>("Diet")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PredatorsAndThreats")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScientificName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SpeciesName")
                         .HasColumnType("nvarchar(max)");
 
@@ -512,9 +498,6 @@ namespace VetStat.Migrations
                     b.Property<bool>("Parking")
                         .HasColumnType("bit");
 
-                    b.Property<string>("StationImage")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Wheelchair")
                         .HasColumnType("bit");
 
@@ -600,17 +583,11 @@ namespace VetStat.Migrations
                         .WithMany()
                         .HasForeignKey("AnimalSpeciesId");
 
-                    b.HasOne("VetStat.Models.Breed", "Breed")
+                    b.HasOne("VetStat.Models.Person", "Customer")
                         .WithMany()
-                        .HasForeignKey("BreedId");
+                        .HasForeignKey("CustomerId");
 
-                    b.HasOne("VetStat.Models.Person", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId");
-
-                    b.Navigation("Breed");
-
-                    b.Navigation("Owner");
+                    b.Navigation("Customer");
 
                     b.Navigation("Species");
                 });
@@ -666,15 +643,6 @@ namespace VetStat.Migrations
                         .HasForeignKey("EmployeeId");
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("VetStat.Models.Breed", b =>
-                {
-                    b.HasOne("VetStat.Models.Species", "Species")
-                        .WithMany()
-                        .HasForeignKey("SpeciesId");
-
-                    b.Navigation("Species");
                 });
 
             modelBuilder.Entity("VetStat.Models.FAQ", b =>

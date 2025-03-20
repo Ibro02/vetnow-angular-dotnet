@@ -26,8 +26,8 @@ namespace VetStat.Controllers
         }
 
         //api/VetStation/Get/:id
-        [HttpGet("{id:int}")]
-        public ActionResult<VetStation> Get(int id)
+        [HttpGet]
+        public ActionResult<VetStation> Get([FromQuery] int id)
         {
             if (!_db.VetStation.Where(x => x.Id == id).IsNullOrEmpty())
                 return Ok(_db.VetStation.Where(x => x.Id == id));
@@ -64,22 +64,39 @@ namespace VetStat.Controllers
             {
                 if (!string.IsNullOrEmpty(vetStation.Name))
                     _vetStation.Name = vetStation.Name;
-                if (vetStation.CityId != null)
-                    _vetStation.CityId = vetStation.CityId;
                 if (!string.IsNullOrEmpty(vetStation.ContactNumber))
                     _vetStation.ContactNumber = vetStation.ContactNumber;
-
-                if (_vetStation.IsInOffice != null)
-                    _vetStation.IsInOffice = vetStation.IsInOffice;
-                if (_vetStation.IsOnField != null)
-                    _vetStation.IsOnField = vetStation.IsOnField;
+                if (_vetStation.InOffice != null)
+                    _vetStation.InOffice = vetStation.InOffice;
+                if (_vetStation.OnField != null)
+                    _vetStation.OnField = vetStation.OnField;
                 if (_vetStation.Parking != null)
                     _vetStation.Parking = vetStation.Parking;
                 if (_vetStation.Wheelchair != null)
                     _vetStation.Wheelchair = vetStation.Wheelchair;
                 if (_vetStation.Wifi != null)
                     _vetStation.Wifi = vetStation.Wifi;
+                if (!string.IsNullOrEmpty(vetStation.City))
+                    _vetStation.City = vetStation.City;
+                if (!string.IsNullOrEmpty(vetStation.Country))
+                    _vetStation.Country = vetStation.Country;
+                if (!string.IsNullOrEmpty(vetStation.Address))
+                    _vetStation.Address = vetStation.Address;
+                if (!string.IsNullOrEmpty(vetStation.Email))
+                    _vetStation.Email = vetStation.Email;
+                if (!string.IsNullOrEmpty(vetStation.Description))
+                    _vetStation.Description = vetStation.Description;
+                if (!string.IsNullOrEmpty(vetStation.Description))
+                {
+                    var imageSize = System.Text.ASCIIEncoding.ASCII.GetByteCount(vetStation.StationImage);
+                    if (imageSize > 2097152) //2MB
+                    {
+                        return BadRequest();
+                    }
+                    _vetStation.StationImage = vetStation.StationImage;
+                }
 
+              
                 _db.SaveChanges();
                 return Ok(vetStation);
             }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VetStat.Data;
 
@@ -11,9 +12,11 @@ using VetStat.Data;
 namespace VetStat.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250226190158_breed")]
+    partial class breed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,6 +63,9 @@ namespace VetStat.Migrations
                     b.Property<int?>("BreedId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("MedicalFile")
                         .HasColumnType("varbinary(max)");
 
@@ -79,7 +85,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("BreedId");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Animal");
                 });
@@ -512,9 +518,6 @@ namespace VetStat.Migrations
                     b.Property<bool>("Parking")
                         .HasColumnType("bit");
 
-                    b.Property<string>("StationImage")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Wheelchair")
                         .HasColumnType("bit");
 
@@ -604,13 +607,13 @@ namespace VetStat.Migrations
                         .WithMany()
                         .HasForeignKey("BreedId");
 
-                    b.HasOne("VetStat.Models.Person", "Owner")
+                    b.HasOne("VetStat.Models.Person", "Customer")
                         .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .HasForeignKey("CustomerId");
 
                     b.Navigation("Breed");
 
-                    b.Navigation("Owner");
+                    b.Navigation("Customer");
 
                     b.Navigation("Species");
                 });
