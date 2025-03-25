@@ -16,13 +16,16 @@ export class ProfileService {
   constructor(private myAuthService:MyAuthService) {
   }
 
- async getUserContent()
+ async getUserContent(): Promise<void>
   {
-    var link = Config.address + "api/ProfileEndpoint/GetUserInfo/"
-    await axios.get(link + this.myAuthService.token,{headers:{'my-auth-token': this.myAuthService.token}}).then(x=> {
-      this.userProfile = x.data
-    //  console.log(this.userProfile);
-    }).catch(x=>console.log(x));
+    var link = Config.address + "api/ProfileEndpoint/GetUserInfo/";
+
+    try{
+    const response = await axios.get(link + this.myAuthService.token,{headers:{'my-auth-token': this.myAuthService.token}});
+    this.userProfile = response?.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 

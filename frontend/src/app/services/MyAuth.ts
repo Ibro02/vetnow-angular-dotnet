@@ -10,6 +10,7 @@ export class MyAuthService
 
   loginValue: LoginRequest =
     {
+      id: 0,
       usernameOrEmail: "",
       password: ""
     };
@@ -23,7 +24,7 @@ export class MyAuthService
     if (this.token != null)
     return this.token != " ";
     else return false;
-
+    //yhI4uzGNV3
   }
 LogOut():void
 {
@@ -40,7 +41,6 @@ LogOut():void
 
 
     let link = Config.address + "api/LoginAuth/Post";
-
     axios.post(link, this.loginValue,{headers:{
         'my-auth-token':  this.token
       }}).then(x=> {

@@ -6,20 +6,20 @@
   <label class="card" for="item-1" id="song-1">
     <div class="rounded-xl bg-[url('https://qph.cf2.quoracdn.net/main-qimg-b53d4494d57c36b30cda9e923974b3fd')] w-full h-full bg-center bg-cover bg-no-repeat flex flex-col justify-center items-center" alt="song">
       <h1 class="text-shadow m-auto text-white font-sans font-bold  lg:text-5xl">Check-up</h1>
-      <button class="mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm">Make an appointment!</button>
+      <button class="mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="makeAnAppointment(checkUp)">Make an appointment!</button>
     </div>
   </label>
   <label class="card" for="item-2" id="song-2">
     <div class="rounded-xl bg-[url('https://www.petsworld.in/blog/wp-content/uploads/2015/11/Vet-Vists.jpg')] w-full h-full bg-center bg-cover bg-no-repeat flex flex-col justify-center items-center" alt="song">
-      <h1 class="text-shadow m-auto text-white font-sans font-bold lg:text-5xl">Operation</h1>
-      <button class=" mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm">Make an appointment!</button>
+      <h1 class="text-shadow m-auto text-white font-sans font-bold lg:text-5xl">Surgery</h1>
+      <button class=" mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="makeAnAppointment(surgery)">Make an appointment!</button>
     </div>
   </label>
   <label class="card" for="item-3" id="song-3">
     <div class="relative w-full h-full">
       <div class=" bg-[url('https://images.squarespace-cdn.com/content/v1/642515ec5782410a10419934/3627be0a-5837-4fe9-90db-cdd563b5b57c/Dog+and+Tools.jpeg?format=1500w')] w-full h-full bg-center bg-cover bg-no-repeat flex flex-col justify-center items-center" alt="song">
         <h1 class="text-shadow m-auto mb-0 text-white font-sans font-bold lg:text-5xl">Barber</h1>
-        <button class="m-auto mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm">Make an appointment!</button>
+        <button class="m-auto mb-2 bg-teal-500 p-2 rounded-md transition-all duration-200 shadow-md shadow-gray-700 text-white font-sans font-bold hover:shadow-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="makeAnAppointment(barber)">Make an appointment!</button>
       </div>
     </div>
   </label>

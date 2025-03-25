@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { SettingsCardComponent } from '../../components/group/settings-card/settings-card.component';
 import { SettingsCardContent } from '../../services/interfaces/SettingsCard';
 import { PageTitleContainerComponent } from "../../components/common/page-title-container/page-title-container.component";
+import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 
 @Component({
     selector: 'app-settings',
     standalone: true,
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.css',
-    imports: [SettingsCardComponent, PageTitleContainerComponent]
+  imports: [SettingsCardComponent, PageTitleContainerComponent, HeaderTitleComponent]
 })
 export class SettingsComponent {
   public accountSettingsArr: SettingsCardContent[] = [

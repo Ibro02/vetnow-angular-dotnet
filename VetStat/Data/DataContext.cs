@@ -30,6 +30,8 @@ namespace VetStat.Data
             .HasForeignKey(e => e.Id)
             .IsRequired(false);
 
+            modelBuilder.Entity<EmployeeWorkingDay>()
+           .HasKey(ewd => new { ewd.EmployeeId, ewd.WorkingDayId });
 
         }
         public DbSet<Person> Person => Set<Person>();
@@ -54,6 +56,14 @@ namespace VetStat.Data
         public DbSet<TimeSlot> TimeSlot => Set<TimeSlot>();
         public DbSet<Breed> Breed => Set<Breed>();
         public DbSet<AuthentificationToken> AuthentificationToken => Set<AuthentificationToken>();
-        
+
+        public DbSet<EmployeeWorkingDay> EmployeeWorkingDays => Set<EmployeeWorkingDay>();
+
+        public DbSet<Holiday> Holidays => Set<Holiday>();
+        public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
+
+
+
+
     }
 }

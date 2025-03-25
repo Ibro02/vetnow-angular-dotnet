@@ -161,14 +161,17 @@ namespace VetStat.Migrations
                     b.Property<int>("AppointmentDuration")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("AvailableFrom")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("AvailableFrom")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime>("AvailableTo")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("AvailableTo")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("BreakFrom")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("BreakTo")
+                        .HasColumnType("time");
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
@@ -218,6 +221,21 @@ namespace VetStat.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("VetStat.Models.EmployeeWorkingDay", b =>
+                {
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WorkingDayId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeeId", "WorkingDayId");
+
+                    b.HasIndex("WorkingDayId");
+
+                    b.ToTable("EmployeeWorkingDays");
+                });
+
             modelBuilder.Entity("VetStat.Models.FAQ", b =>
                 {
                     b.Property<int>("Id")
@@ -242,6 +260,30 @@ namespace VetStat.Migrations
                     b.HasIndex("VetStationId");
 
                     b.ToTable("FAQ");
+                });
+
+            modelBuilder.Entity("VetStat.Models.Holiday", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Holidays");
                 });
 
             modelBuilder.Entity("VetStat.Models.Inventory", b =>
@@ -450,6 +492,9 @@ namespace VetStat.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<TimeSpan>("AppointmentTime")
+                        .HasColumnType("time");
+
                     b.Property<int?>("AvailabilityId")
                         .HasColumnType("int");
 
@@ -524,6 +569,23 @@ namespace VetStat.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VetStation");
+                });
+
+            modelBuilder.Entity("VetStat.Models.WorkingDay", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("DayInAWeek")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("WorkingDays");
                 });
 
             modelBuilder.Entity("VetStat.Models.Employee", b =>
@@ -677,6 +739,25 @@ namespace VetStat.Migrations
                     b.Navigation("Species");
                 });
 
+            modelBuilder.Entity("VetStat.Models.EmployeeWorkingDay", b =>
+                {
+                    b.HasOne("VetStat.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VetStat.Models.WorkingDay", "WorkingDay")
+                        .WithMany()
+                        .HasForeignKey("WorkingDayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("WorkingDay");
+                });
+
             modelBuilder.Entity("VetStat.Models.FAQ", b =>
                 {
                     b.HasOne("VetStat.Models.VetStation", "VetStation")
@@ -686,6 +767,15 @@ namespace VetStat.Migrations
                         .IsRequired();
 
                     b.Navigation("VetStation");
+                });
+
+            modelBuilder.Entity("VetStat.Models.Holiday", b =>
+                {
+                    b.HasOne("VetStat.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("VetStat.Models.Inventory", b =>

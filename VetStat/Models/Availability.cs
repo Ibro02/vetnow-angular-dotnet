@@ -18,12 +18,13 @@ namespace VetStat.Models
         [JsonIgnore]
         public Employee? Employee { get; set; }
 
-        //
+        public TimeSpan BreakFrom { get; set; }
 
-        public DateTime Date { get; set; }
-        public DateTime AvailableFrom { get; set; }
-        public DateTime AvailableTo { get; set; }
-        public int AppointmentDuration { get; set; } // number of minutes or seconds
+        public TimeSpan BreakTo { get; set; }
+
+        public TimeSpan AvailableFrom { get; set; }
+        public TimeSpan AvailableTo { get; set; }
+        public int AppointmentDuration { get; set; } // number of minutes //todo - change to timespam
 
     }
 }
