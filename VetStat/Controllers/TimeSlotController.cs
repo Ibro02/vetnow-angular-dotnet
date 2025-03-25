@@ -29,11 +29,24 @@ namespace VetStat.Controllers
         }
 
         //api/TimeSlot/Get/:id
-        [HttpGet("{id:int}")]
-        public ActionResult<TimeSlot> Get(int id)
+        [HttpGet]
+        public ActionResult<TimeSlot> Get([FromQuery] int employeeid, string? date)
         {
-            if (!_db.TimeSlot.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.TimeSlot.Where(x => x.Id == id));
+            DateTime _date = date != null ? new DateTime(int.Parse(date.Split("-")[0]),
+                int.Parse(date.Split("-")[1]), int.Parse(date.Split("-")[2])) : DateTime.Now;
+
+            if (!_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid).IsNullOrEmpty())
+                return Ok(_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid)
+                    .Where(x => x.SlotDateTime.Day == _date.Day &&
+                        x.SlotDateTime.Month == _date.Month &&
+                        x.SlotDateTime.Day == _date.Day).Where(x => x.IsAvailable).Select(x => new {
+                    x.Id,
+                    appointmentTime = x.AppointmentTime.ToString(@"hh\:mm"),
+                    x.IsAvailable,
+                    x.SlotEmployeeId,
+                    x.AvailabilityId, 
+                    x.SlotDateTime
+                }));
             else
                 return NoContent();
         }
@@ -53,7 +66,72 @@ namespace VetStat.Controllers
                 return BadRequest(ex.InnerException.Message);
             }
         }
+        //api/TimeSlot/GenerateTimeSlots
+        [HttpPost]
+        public ActionResult<TimeSlot> GenerateTimeSlots([FromBody] int employeeId)
+        {
+            try
+            {
+                var employeeAvailability = _db.Availability.Where(x=>employeeId == x.EmployeeId).FirstOrDefault();
+                //_db.SaveChanges();
+                if (employeeAvailability == null)
+                    return BadRequest("An employee does not have availability status set!");
+                var newTimeSlot = new TimeSlot()
+                {
+                    IsAvailable = true,
+                    AvailabilityId = employeeAvailability.Id,
+                    SlotDateTime = DateTime.Now,
+                    SlotEmployeeId = employeeId
+                };
+                TimeSpan start = employeeAvailability.AvailableFrom;
+                TimeSpan end = employeeAvailability.AvailableTo;
 
+                var minutesOfBreak = employeeAvailability.BreakTo.TotalMinutes - employeeAvailability.BreakFrom.TotalMinutes;
+                var minutesOfWork = employeeAvailability.AvailableTo.TotalMinutes - employeeAvailability.AvailableFrom.TotalMinutes;
+                int numberOfAppointments = (int)((minutesOfWork - minutesOfBreak) / employeeAvailability.AppointmentDuration);
+
+                int appointmentDuaration = employeeAvailability.AppointmentDuration;
+                TimeSpan[] timeSlots = new TimeSpan[numberOfAppointments];
+                
+                for (int i = 0; i < numberOfAppointments; i++)
+                { //todo - appointment shouldn't be at the time of a break, consider avoiding break time to the arr
+                    if (i == 0)
+                        timeSlots[i] = start;
+                    else
+                        timeSlots[i] = TimeSpan.FromMinutes(start.TotalMinutes + appointmentDuaration * i);
+                }
+
+                try
+                {
+                    if (!_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeId)
+                        .Where(x => x.SlotDateTime.Date == DateTime.Now.Date).IsNullOrEmpty())
+                        return Conflict("Time slots for the date already exist!");
+                    foreach (var timeSlot in timeSlots)
+                    {
+                        _db.TimeSlot.Add(new TimeSlot()
+                        {
+                            IsAvailable = true,
+                            AvailabilityId = employeeAvailability.Id,
+                            SlotDateTime = DateTime.Now,
+                            SlotEmployeeId = employeeId,
+                            AppointmentTime = timeSlot
+                        });
+                    }
+                }
+                catch (Exception er)
+                {
+                    return BadRequest(er.Message);
+                }
+
+                _db.SaveChanges();
+
+                return Ok(numberOfAppointments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
         //api/TimeSlot/Edit/:id
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] TimeSlot timeslot, int id)

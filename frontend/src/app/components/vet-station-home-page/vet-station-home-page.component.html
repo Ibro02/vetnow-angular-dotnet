@@ -10,10 +10,44 @@
       <app-image-carousel></app-image-carousel>
     </div>
     <div class="h-full my-5">
-      <app-service-swipper></app-service-swipper>
+      <app-service-swipper (onClick)="openEmployeeTablePopUp($event)"></app-service-swipper>
     </div>
     <div class="mb-10">
       <app-about-us-footer [vetStationInfo]=this.vetStationInfo></app-about-us-footer>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Select a vet</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let e of employeeList" class="hover:cursor-pointer" [routerLink]="['/new-appointment',e.id]" [queryParams]="{date: this.date}" data-bs-dismiss="modal">
+            <td>{{e.firstName}}</td>
+            <td>{{e.lastName}}</td>
+            <td>{{e.email}}</td>
+            <td>{{e.phone}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

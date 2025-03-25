@@ -1,0 +1,16 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button (click)="previousMonth()">&#x276E;</button>
+    <span>{{ month }} | {{ year }}</span>
+    <button (click)="nextMonth()">&#x276F;</button>
+  </div>
+  <div class="calendar-grid">
+    <div class="day-label" *ngFor="let day of ['M', 'T', 'W', 'T', 'F', 'S', 'S']">{{ day }}</div>
+    <div *ngFor="let _ of [].constructor(firstDayOfMonth); let i = index" class="empty-day"></div>
+    <div *ngFor="let day of [].constructor(daysInMonth); let i = index"
+         (click)="selectDate(i + 1)"
+         [class.selected]="selectedDate?.getDate() === i + 1">
+      {{ i + 1 }}
+    </div>
+  </div>
+</div>

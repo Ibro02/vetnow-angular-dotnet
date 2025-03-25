@@ -16,6 +16,7 @@ import {
   Validator,
 } from '@angular/forms';
 import { ButtonComponent } from '../../components/common/button/button.component';
+import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 
 @Component({
   selector: 'app-vet-station',
@@ -41,6 +42,7 @@ import { ButtonComponent } from '../../components/common/button/button.component
     InputComponent,
     InputButtonComponent,
     ButtonComponent,
+    HeaderTitleComponent,
   ],
 })
 export class VetStationComponent implements OnInit {

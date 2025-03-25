@@ -1,0 +1,37 @@
+<app-header-title description="Choose date from calendar below">Make an appointment</app-header-title>
+<div class=""></div>
+<app-appointment-layout>
+  <div class="">
+  <app-title>Select date</app-title>
+  <app-calendar (changeDate)="changeDate($event)"></app-calendar>
+  </div>
+
+  <div class="flex flex-wrap gap-5 flex-col h-full">
+    <div class="">
+      <app-title>Select Pet</app-title>
+      <div class="dropdown-center">
+        <button class="btn btn-secondary bg-emerald-500 text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {{selectedPet?.name ?? "Search pet"}}
+        </button>
+        <ul class="dropdown-menu"  >
+          <li [value]="p.id" *ngFor="let p of this.pets">
+            <a class="dropdown-item cursor-pointer" (click)="afterPetSelect(p)">{{p.name}}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <app-title>Select time</app-title>
+      <div class="grid grid-cols-3 gap-5">
+      <div *ngFor="let timeslot of timeSlots" (click)="prepareAnAppointment(timeslot)"
+           class="group bg-gray-200 text-black px-10 py-3 rounded-md shadow-xl border-emerald-400 hover:bg-emerald-400 hover:cursor-pointer transition-all" [class.bg-green-300]="timeslot.id == newAppointment?.timeSlotId">
+        <button class="group-hover:text-white text-xl font-['Inter']" >
+          {{timeslot.appointmentTime}}
+        </button>
+      </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-success" [hidden]="!appointmentTime" (click)="makeAnAppointment()">Make an appointment for {{appointmentTime}}</button>
+  </div>
+</app-appointment-layout>
+

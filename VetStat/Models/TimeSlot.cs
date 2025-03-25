@@ -32,5 +32,7 @@ namespace VetStat.Models
 
         [Required]
         public bool IsAvailable { get; set; }
+
+        public TimeSpan AppointmentTime { get; set; }
     }
 }

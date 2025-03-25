@@ -40,7 +40,19 @@ namespace VetStat.Controllers
             else
                 return NoContent();
         }
+        //api/Animal/Get/:Id
+        [HttpGet]
 
+        public ActionResult<Animal> GetByOwnerId([FromQuery] int id)
+        {
+            try
+            {
+                return Ok(_db.Animal.Where(x => x.OwnerId == id));
+            } catch
+            {
+                return NoContent();
+            }
+        }
         //api/Animal/Add
         [HttpPost]
 

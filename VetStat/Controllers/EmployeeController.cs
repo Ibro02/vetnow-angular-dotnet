@@ -28,7 +28,7 @@ namespace VetStat.Controllers
 
         //api/Employee/Get
         [HttpGet("{id}")]
-        public ActionResult<Employee> Get(int id)
+        public ActionResult<Employee> Delete(int id)
         {
             try
             {
@@ -43,6 +43,30 @@ namespace VetStat.Controllers
                 {
                     return NotFound($"Employee with ID {id} not found.");
                 }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Could not delete: {ex.Message}");
+            }
+        }
+        [HttpGet]
+        public ActionResult<List<Employee>> Get([FromQuery] int id)
+        {
+            try
+            {
+                return Ok(_db.Employee.Where(x => x.Id == id).FirstOrDefault());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Could not find: {ex.Message}");
+            }
+        }
+        [HttpGet]
+        public ActionResult<List<Employee>> GetByVetStationId([FromQuery] int id)
+        {
+            try
+            {
+                return Ok(_db.Employee.Where(x => x.VetStationId == id).ToList());
             }
             catch (Exception ex)
             {

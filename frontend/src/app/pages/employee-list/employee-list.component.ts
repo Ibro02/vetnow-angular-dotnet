@@ -6,11 +6,12 @@ import { PageTitleContainerComponent } from "../../components/common/page-title-
 import { ButtonComponent } from "../../components/common/button/button.component";
 import axios from 'axios';
 import { AddEmployeeComponent } from '../../components/group/add-employee/add-employee.component';
+import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 
 @Component({
   selector: 'app-employee-list',
   standalone: true,
-  imports: [NgClass, NgFor, PageTitleContainerComponent, ButtonComponent, AddEmployeeComponent],
+  imports: [NgClass, NgFor, PageTitleContainerComponent, ButtonComponent, AddEmployeeComponent, HeaderTitleComponent],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css',
   providers: [
@@ -52,7 +53,7 @@ employees: any = null;
    let { data } = await axios.get("https://localhost:44308/api/Person/GetAll");
    return data;
   }
- 
+
   async ngOnInit(): Promise<void> {
    this.employees = await this.fetchEmployee();
    console.log(this.employees);
