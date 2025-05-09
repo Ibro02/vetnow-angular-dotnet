@@ -3,9 +3,12 @@ import {Router} from "@angular/router";
 import axios from "axios";
 import {LoginRequest} from "../pages/login/LoginRequest";
 import { Config } from "../config";
+import {ProfileService} from "./ProfileService";
+import {UserProfile} from "./interfaces/UserProfile";
 @Injectable({providedIn:"root"})
 export class MyAuthService
 {
+  userProfile:UserProfile|null = null;
   rememberMe = false;
 
   loginValue: LoginRequest =
@@ -24,7 +27,20 @@ export class MyAuthService
     if (this.token != null)
     return this.token != " ";
     else return false;
-    //yhI4uzGNV3
+  }
+
+  async IsVerified()
+  {
+    var link = Config.address + "api/ProfileEndpoint/GetUserInfo/";
+    try{
+      const response = await axios.get(link + this.token,{headers:{'my-auth-token': this.token}});
+      this.userProfile = response?.data;
+    } catch (error) {
+      console.log(error);
+    }
+
+
+    return this.userProfile?.verified ?? false;
   }
 LogOut():void
 {

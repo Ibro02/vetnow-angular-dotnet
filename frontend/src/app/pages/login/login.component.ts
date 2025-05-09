@@ -20,9 +20,13 @@ export class LoginComponent implements OnInit{
   constructor(private router:Router,private myAuthService:MyAuthService) {
 
   }
-ngOnInit() {  
-   if (this.myAuthService.IsLogged())
-      this.router.navigate(['home-page']);
+async ngOnInit() {
+   if (this.myAuthService.IsLogged()) {
+     if (await this.myAuthService.IsVerified())
+       this.router.navigate(['home-page']);
+     else
+       this.router.navigate(['verification']);
+   }
 }
 
   public usernameOrEmail = "";
@@ -47,11 +51,15 @@ isError:boolean = false;
        axios.post(link, this.myAuthService.loginValue,{headers:{
           'my-auth-token': (!this.myAuthService.rememberMe ?
             window.localStorage.getItem('my-auth-token'):window.sessionStorage.getItem('my-auth-token'))
-        }}).then(x=> {
+        }}).then(async (x)=> {
         console.log(x);
         this.myAuthService.rememberMe ?
-        window.localStorage.setItem('my-auth-token',x.data):window.sessionStorage.setItem('my-auth-token',x.data)
-         this.router.navigate(["home-page"]);
+        window.localStorage.setItem('my-auth-token',x.data):window.sessionStorage.setItem('my-auth-token',x.data);
+        if (await this.myAuthService.IsVerified())
+          this.router.navigate(["home-page"]);
+        else
+          this.router.navigate(["verification"]);
+//Fabenef337!
 
       }).catch(err=>console.log(err.message));
 

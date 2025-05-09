@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VetStat.Data;
 
@@ -11,9 +12,11 @@ using VetStat.Data;
 namespace VetStat.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250507223747_2way-auth")]
+    partial class _2wayauth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -519,34 +522,6 @@ namespace VetStat.Migrations
                     b.ToTable("TimeSlot");
                 });
 
-            modelBuilder.Entity("VetStat.Models.TwoFaVerificationToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TwoFaVerificationTokens");
-                });
-
             modelBuilder.Entity("VetStat.Models.VetStation", b =>
                 {
                     b.Property<int>("Id")
@@ -865,17 +840,6 @@ namespace VetStat.Migrations
                     b.Navigation("Availability");
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("VetStat.Models.TwoFaVerificationToken", b =>
-                {
-                    b.HasOne("VetStat.Models.Person", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VetStat.Models.Employee", b =>

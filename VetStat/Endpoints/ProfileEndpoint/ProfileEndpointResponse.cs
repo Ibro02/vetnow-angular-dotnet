@@ -30,6 +30,8 @@ namespace VetStat.Endpoints.ProfileEndpoint
 
         public bool isVisitor { get; set; } = false;
 
+        public bool verified { get; set; }
+
         //public byte[]? Picture { get; set; } //Pictures are saved as memory stream
 
         public DateTime BirthDate { get; set; } = DateTime.Now;
@@ -67,6 +69,7 @@ namespace VetStat.Endpoints.ProfileEndpoint
             BirthDate = person.BirthDate;
             Username = person.Username;
             Password = person.Password;
+            verified = person.verified;
   
 
         }
