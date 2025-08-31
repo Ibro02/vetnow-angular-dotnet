@@ -25,7 +25,6 @@ namespace VetStat.Endpoints.Verification
             _cache = cache;
         }
 
-        // POST api/<LoginAuthController>
         [Route("/Verification")]
         [HttpPost]
         public ActionResult Post([FromBody] VerificationRequest loginValue)

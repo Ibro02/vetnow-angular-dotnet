@@ -1,3 +1,8 @@
-<p>Enter verification code</p>
-<input placeholder="XXXXXXXX"/>
-<button class="border-2 p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600" (click)="verifyUser()">Verificate</button>
+<div class="mt-20 flex">
+  <div class="verification-box justify-center items-center h-auto m-auto">
+    <app-title>Enter a verification code</app-title>
+    <p class="text-center text-gray-500">You should receive a verification code at your email address</p>
+    <input type="text" class="border-1 border-solid border-black p-1 rounded-1 m-4 text-lg font-bold text-center" [maxLength]="10" [(ngModel)]="token"/>
+    <app-button text="Verificate account" (event)="verifyUser()"/>
+  </div>
+</div>

@@ -8,6 +8,7 @@ import axios from "axios";
 import {Router, RouterLink} from "@angular/router";
 import {MyAuthService} from "../../services/MyAuth";
 import { Config } from '../../config';
+import {ToasterService} from "../../services/toaster.service";
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -17,7 +18,7 @@ import { Config } from '../../config';
 })
 export class LoginComponent implements OnInit{
 
-  constructor(private router:Router,private myAuthService:MyAuthService) {
+  constructor(private router:Router,private myAuthService:MyAuthService, private toaster:ToasterService) {
 
   }
 async ngOnInit() {
@@ -40,8 +41,6 @@ token :any;
 isError:boolean = false;
 
   signIn = () => {
-
-
     this.myAuthService.loginValue!.usernameOrEmail = this.usernameOrEmail;
     this.myAuthService.loginValue!.password = this.password
     if (this.emailRegex.test(this.usernameOrEmail) || this.passwordRegex.test(this.password) )
@@ -69,7 +68,7 @@ isError:boolean = false;
    else
     {
     this.isError=true;
-     window.alert("Pogresan unos korisnickog imena ili emaila")
+     this.toaster.error("Error", "Incorrect user name or email entry!")
     }
   }
   handleValueChanged($event:string, obj:string) {

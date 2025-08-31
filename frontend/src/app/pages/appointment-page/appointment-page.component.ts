@@ -13,6 +13,7 @@ import {TimeSlot} from "./TimeSlot";
 import {Config} from "../../config";
 import {Animal} from "./Animal";
 import {Appointment} from "./Appointment";
+import {ToasterService} from "../../services/toaster.service";
 @Component({
   selector: 'app-appointment-page',
   standalone: true,
@@ -36,7 +37,7 @@ export class AppointmentPageComponent {
   employee: any;
   appointmentTime?: string | null;
   newAppointment: any;
-  constructor(private route: ActivatedRoute, private router: Router, private profileService: ProfileService) {}
+  constructor(private route: ActivatedRoute, private router: Router, private profileService: ProfileService, private toaster:ToasterService) {}
 async ngOnInit(){
 await this.profileService.getUserContent();
 this.user = this.profileService.userProfile;
@@ -85,20 +86,20 @@ async fetchTimeSlots(date: string = new Date().toJSON()) {
   async makeAnAppointment() {
     const url = "api/Appointment/Add";
     if (this.newAppointment.animalId == null)
-      window.alert("Required Feild: Select Pet!");
+      this.toaster.error("Error", "Required Feild: Select Pet!");
     else if (this.newAppointment.timeSlotId == null)
-      window.alert("Required Feild: Time!");
+      this.toaster.error("Error", "Required Feild: Time!");
     else if (this.newAppointment.vetStationId == null)
-      window.alert("Whops! Restart page and try again");
+        this.toaster.error("Error", "Whops! Restart page and try again");
     else if (this.newAppointment.employeeId == null)
-      window.alert("Whops! Select a vet/barber you want to schedule for an appointment!");
+      this.toaster.error("Error", "Whops! Select a vet/barber you want to schedule for an appointment!");
     else
       await axios.post(Config.address + url, this.newAppointment).then(x=>{
-        window.alert("You have successfully made an appointment for " + this.appointmentTime + "!");
+        this.toaster.success("Succes", "You have successfully made an appointment for " + this.appointmentTime + "!");
         this.ngOnInit();
         this.router.navigate(['/']);
       }).catch(err =>{
-        window.alert("Ups! An error has occurred!");
+        this.toaster.error("Error","Ups! An error has occurred!");
         console.log(err.message);
       });
     this.appointmentTime = null;

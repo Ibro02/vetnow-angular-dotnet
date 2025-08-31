@@ -48,6 +48,8 @@ namespace VetStat.Endpoints.LoginAuth
       
             if (!_authService.IsLogged())
             {
+
+                //solution to problem under: async and await
                 Person? userProfile = _db.Person.FirstOrDefault(user =>
                     (user.Username == loginValue.usernameOrEmail || user.Email == loginValue.usernameOrEmail) &&
                     loginValue.password == user.Password);
