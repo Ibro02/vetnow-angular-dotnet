@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Services;
+using VetStat.Helpers.Services.Email;
 using VetStat.Models;
-
+using VetStat.Helpers.GlobalVariables;
+using Microsoft.Extensions.Caching.Memory;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace VetStat.Endpoints.LoginAuth
@@ -11,12 +13,17 @@ namespace VetStat.Endpoints.LoginAuth
     [ApiController]
     public class LoginAuthController : ControllerBase
     {
+        private readonly IMemoryCache _cache;
         private readonly DataContext _db;
-        private AuthService _authService;
-        public LoginAuthController(DataContext db, AuthService authService)
+        private readonly AuthService _authService;
+        private readonly IEmailSenderService _emailSenderService;
+
+        public LoginAuthController(DataContext db, AuthService authService, IEmailSenderService emailSenderService, IMemoryCache cache)
         {
             _db = db;
             _authService = authService;
+            _emailSenderService = emailSenderService;
+            _cache = cache;
         }
         
 
@@ -42,6 +49,7 @@ namespace VetStat.Endpoints.LoginAuth
             if (!_authService.IsLogged())
             {
 
+                //solution to problem under: async and await
                 Person? userProfile = _db.Person.FirstOrDefault(user =>
                     (user.Username == loginValue.usernameOrEmail || user.Email == loginValue.usernameOrEmail) &&
                     loginValue.password == user.Password);
@@ -49,6 +57,34 @@ namespace VetStat.Endpoints.LoginAuth
                 if (userProfile == null)
                     return NotFound("User does not exist!");
 
+                if (!userProfile.verified)
+                {
+                    //2FA Token
+                    string newVerificationToken = Helpers.Validators.Services.GenerateToken(10);
+                        
+                    var userName = userProfile.Username;
+                    string htmlBody = TwoFactorMailHtmlBody.htmlBody;
+                    htmlBody = htmlBody
+                        .Replace("[[username]]", userName)
+                        .Replace("[[code]]", newVerificationToken)
+                        .Replace("[[year]]", DateTime.UtcNow.Year.ToString());
+
+                    _emailSenderService.Posalji(userProfile.Email, "Verification token", htmlBody, true);
+
+                    TwoFaVerificationToken twoFaVerificationToken = new()
+                    {
+                        Token = newVerificationToken,
+                        UserId = userProfile.Id
+                    };
+
+                    var oldTokens = _db.TwoFaVerificationTokens.Where(x => x.UserId == twoFaVerificationToken.UserId);
+                    if (oldTokens.Any())
+                        _db.TwoFaVerificationTokens.Remove(oldTokens.First()); //Avoids multiple tokens for one user
+
+                    _db.TwoFaVerificationTokens.Add(twoFaVerificationToken);
+;                }
+
+                //USER Token
                 string newToken = Helpers.Validators.Services.GenerateToken(10); //necessary -> rewrite this with dependency injection
 
                 AuthentificationToken log = new AuthentificationToken()

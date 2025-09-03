@@ -14,4 +14,5 @@ export interface UserProfile {
   username: string | null;
   password: string | null;
   cityId: number | null;
+  verified: boolean;
 }

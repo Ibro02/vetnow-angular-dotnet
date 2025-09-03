@@ -40,7 +40,9 @@ namespace VetStat.Models
 
         public DateTime ProfileCreationDate { get; set; }
 
-        public float? MembershipLoyalty { get; set; }  //Discount     
+        public float? MembershipLoyalty { get; set; }  //Discount
+
+        public bool verified { get; set; }
 
     }
 }

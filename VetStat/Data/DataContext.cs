@@ -62,8 +62,7 @@ namespace VetStat.Data
         public DbSet<Holiday> Holidays => Set<Holiday>();
         public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
 
-
-
+        public DbSet<TwoFaVerificationToken> TwoFaVerificationTokens => Set<TwoFaVerificationToken>();
 
     }
 }

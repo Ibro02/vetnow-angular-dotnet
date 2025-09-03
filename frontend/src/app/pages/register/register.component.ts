@@ -3,8 +3,8 @@ import { OtherSignUpMethodsComponent } from "../../components/other-sign-up-meth
 import { SignInInputComponent } from "../../components/common/sign-in-input/sign-in-input.component";
 import { MyAuthService } from '../../services/MyAuth';
 import axios from "axios";
-import {Router, RouterLink} from "@angular/router"; 
-
+import {Router, RouterLink} from "@angular/router";
+import { ToasterService } from '../../services/toaster.service';
 
 @Component({
     selector: 'app-register',
@@ -17,17 +17,17 @@ import {Router, RouterLink} from "@angular/router";
     ]
 })
 export class RegisterComponent implements OnInit{
-    constructor(public router:Router,private myAuthService:MyAuthService) {
+    constructor(public router:Router,private myAuthService:MyAuthService, private toaster: ToasterService) {
 
     }
-ngOnInit(): void {    
+ngOnInit(): void {
 }
 public newUser = {
     Email : "",
     Username : "",
     Password : "",
 }
- 
+
 emailRegex = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 passwordRegex = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{8,}$');
 usernameRegex = new RegExp('.{5,}$');
@@ -41,19 +41,20 @@ isError = false;
             'my-auth-token': (window.sessionStorage.getItem('my-auth-token'))
         }})
         .then(x=> {
-            window.sessionStorage.setItem('my-auth-token',x.data)
-            this.myAuthService.loginValue.password = this.newUser.Password;
-            this.myAuthService.loginValue.usernameOrEmail = this.newUser.Email;
-            this.router.navigate(["home-page"]);
+            // window.sessionStorage.setItem('my-auth-token',x.data)
+            // this.myAuthService.loginValue.password = this.newUser.Password;
+            // this.myAuthService.loginValue.usernameOrEmail = this.newUser.Email;
+          this.router.navigate(["/"]);
+          this.toaster.success('Success!', 'You have been registered successfully! Redirecting to login page.');
         })
         .catch(
             err=>{
                 console.log(err);
                 if(!err.response.data.errors)
-                alert(err.response.data)
+                this.toaster.error("Error", err.response.data);
             else{
                 for(let i in err?.response.data?.errors){
-                    alert(err?.response.data?.errors[i][0])
+                    this.toaster.error("Error",err?.response.data?.errors[i][0])
                 }
             }
         }
@@ -62,7 +63,7 @@ isError = false;
     }
     else{
         this.isError=true;
-        window.alert("Pogresan unos korisnickog imena ili emaila")
+        this.toaster.error("Error","Incorrect user name or email entry")
     }
  }
  handleValueChanged($event:string, obj:string) {
@@ -70,5 +71,5 @@ isError = false;
     this.newUser[obj] = $event;
     console.log($event);
   }
-  
+
 }
