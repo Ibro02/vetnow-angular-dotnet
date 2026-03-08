@@ -30,8 +30,8 @@ async ngOnInit() {
    }
 }
 
-  public usernameOrEmail = "";
-  public password = "";
+  public usernameOrEmail = "Testni";
+  public password = "Dzekson123_123";
 
 placeholder:any
 emailRegex = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');

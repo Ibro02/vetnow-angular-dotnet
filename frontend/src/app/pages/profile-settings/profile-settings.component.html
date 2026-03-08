@@ -1,0 +1,194 @@
+
+<div class="">
+    <app-header-title description="Edit your profile settings">My Profile</app-header-title>
+  <app-box-container>
+    <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3">
+      <div class="flex flex-col w-2/3">
+        <form class="md:grid grid-cols-2 gap-8">
+
+          <!-- Left column -->
+          <div>
+            <app-input
+              type="text"
+              label="First Name"
+              [formControl]="profileSettingsFormGroup.controls.firstName"
+              [value]="profileSettingsFormGroup.value.firstName?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="Last Name"
+              [formControl]="profileSettingsFormGroup.controls.lastName"
+              [value]="profileSettingsFormGroup.value.lastName?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="Phone Number"
+              [formControl]="profileSettingsFormGroup.controls.phone"
+              [value]="profileSettingsFormGroup.value.phone?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="Address"
+              [formControl]="profileSettingsFormGroup.controls.address"
+              [value]="profileSettingsFormGroup.value.address?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="City"
+              [formControl]="profileSettingsFormGroup.controls.city"
+              [value]="profileSettingsFormGroup.value.city?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+
+
+            <app-input
+              type="text"
+              label="Country"
+              [formControl]="profileSettingsFormGroup.controls.country"
+              [value]="profileSettingsFormGroup.value.country?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+          </div>
+
+          <!-- Right column -->
+          <div>
+            <!-- Profile Image -->
+            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Profile Image</p>
+            <div class="flex flex-col items-start gap-2 mb-4">
+              <div class="cursor-pointer" (click)="openCropWizard()">
+                <div class="w-28 h-28 rounded-full border-1 border-black overflow-hidden bg-gray-200 flex items-center justify-center">
+                  <img *ngIf="previewUrl" [src]="previewUrl" alt="Profile" class="w-full h-full object-cover"/>
+                  <fa-icon *ngIf="!previewUrl" [icon]="faUser" class="text-4xl text-gray-400"></fa-icon>
+                </div>
+              </div>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                (change)="onFileSelected($event)"
+              />
+            </div>
+
+            <!-- Crop & Rotate Wizard Modal -->
+            <div *ngIf="showCropWizard" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25">
+              <div class="bg-white rounded-xl shadow-2xl w-[480px] flex flex-col overflow-hidden">
+
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-gray-200">
+                  <h2 class="text-lg font-semibold text-gray-800">Crop image</h2>
+                </div>
+
+                <!-- Crop area -->
+                <div class="relative bg-gray-100 flex items-center justify-center" style="height: 360px;">
+                  <div
+                    #cropArea
+                    class="crop-area relative overflow-hidden w-full h-full cursor-grab active:cursor-grabbing"
+                    (mousedown)="onPanStart($event)"
+                    (wheel)="onZoomWheel($event)"
+                  >
+                    <img
+                      #cropImage
+                      *ngIf="cropImageSrc"
+                      [src]="cropImageSrc"
+                      alt="Crop preview"
+                      class="absolute select-none pointer-events-none"
+                      [style.transform]="'translate(' + cropOffsetX + 'px, ' + cropOffsetY + 'px) scale(' + cropZoom + ')'"
+                      [style.transform-origin]="'center center'"
+                      draggable="false"
+                    />
+                    <!-- Circular overlay mask -->
+                    <div class="crop-overlay absolute inset-0 pointer-events-none"></div>
+                  </div>
+                </div>
+
+                <!-- Zoom slider -->
+                <div class="px-6 py-3 flex items-center gap-3 border-t border-gray-100">
+                  <span class="text-xs text-gray-500">-</span>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="3"
+                    step="0.05"
+                    [value]="cropZoom"
+                    (input)="onZoomSlider($event)"
+                    class="flex-1 accent-emerald-500"
+                  />
+                  <span class="text-xs text-gray-500">+</span>
+                </div>
+
+                <!-- Footer with Cancel / Save -->
+                <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                  <app-button type="cancel" text="Cancel" (event)="closeCropWizard()"></app-button>
+                  <app-button type="save" text="Save" (event)="saveCroppedImage()"></app-button>
+                </div>
+
+              </div>
+            </div>
+
+            <app-input
+              type="text"
+              label="Email"
+              [formControl]="profileSettingsFormGroup.controls.email"
+              [value]="profileSettingsFormGroup.value.email?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="Username"
+              [formControl]="profileSettingsFormGroup.controls.username"
+              [value]="profileSettingsFormGroup.value.username?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+
+            <app-input
+              type="text"
+              label="Password"
+              [formControl]="profileSettingsFormGroup.controls.password"
+              [value]="profileSettingsFormGroup.value.password?.toString()"
+              name="fieldName"
+              ngDefaultControl
+            ></app-input>
+          </div>
+
+          <!-- Leaflet Map - full width below both columns -->
+          <div class="col-span-2 w-1/2" [style.visibility]="showCropWizard ? 'hidden' : 'visible'">
+            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Pick location on map</p>
+            <div #mapContainer class="w-full h-64 rounded-md overflow-hidden border border-gray-200 shadow-sm"></div>
+          </div>
+
+          <!-- City & Country - auto-filled from map, full width row -->
+
+
+
+
+        </form>
+      </div>
+
+    <div class="align-middle">
+      <app-button type="cancel" text="Cancel" (click)="navigateToSettings()"></app-button>
+      <app-button type="save" text="Save" (event)="saveChanges()"></app-button>
+    </div>
+
+    </div>
+
+  </app-box-container>
+</div>

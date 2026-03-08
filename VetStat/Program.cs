@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using VetStat.Endpoints.VetStationSearch;
 using VetStat.Helpers.Services;
 using VetStat.Helpers.Services.Email;
@@ -18,7 +19,30 @@ builder.Services.AddControllers();
 builder.Services.AddHostedService<something>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("my-auth-token", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "my-auth-token",
+        Type = SecuritySchemeType.ApiKey,
+        Description = "Paste your auth token received from api/LoginAuth/Post"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "my-auth-token"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthService>();
 //builder.Services.AddScoped<IVetStationSearchRequest,VetStationSearchResponse>();

@@ -4,7 +4,7 @@
     <div class="">
         <ul class="flex flex-col  items-start  w-96 h-14 text-left" *ngFor="let i of array">
             <div *ngIf="i != array![0]" class="w-full h-px border border-white "></div>
-            <a href={{i?.link}} class="flex my-auto text-black text-md font-semibold font-['Inter'] " ><li class="hover:text-zinc-400">{{i?.text}}</li></a>
+            <a [routerLink]="i?.link" class="flex my-auto text-black text-md font-semibold font-['Inter'] " ><li class="hover:text-zinc-400">{{i?.text}}</li></a>
         </ul>
     </div>
 </div>

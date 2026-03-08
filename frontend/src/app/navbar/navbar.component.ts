@@ -20,12 +20,14 @@ import { Router,RouterModule } from '@angular/router';
 export class NavbarComponent implements OnChanges{
 
   @Input() public isLogged: boolean = false;
-  constructor(public myAuthService: MyAuthService, router:Router) {
+  constructor(
+    public myAuthService: MyAuthService,
+    private router:Router,
+  ) {
   }
   ngOnChanges(changes:SimpleChanges) {
     this.isLogged = this.myAuthService.IsLogged();
   }
-
 
 
   protected readonly faHome = faHome;
@@ -33,4 +35,6 @@ export class NavbarComponent implements OnChanges{
   protected readonly faShop = faShop;
   protected readonly faEnvelope = faEnvelope;
   protected readonly faGear = faGear;
+
+
 }
