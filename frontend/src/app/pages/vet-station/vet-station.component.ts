@@ -12,6 +12,7 @@ import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule } from '@angul
 
 import axios, { AxiosResponse } from 'axios';
 import * as L from 'leaflet';
+import {ToasterService} from "../../services/toaster.service";
 
 @Component({
   selector: 'app-vet-station',
@@ -71,7 +72,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
     stationImage: new FormControl('')
   });
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, public toaster: ToasterService) {
     this.fetchVetStationInfo();
   }
 
@@ -116,15 +117,39 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.map);
 
+    // Click on map -> move marker & reverse geocode
     this.map.on('click', (event: L.LeafletMouseEvent) => {
       const { lat, lng } = event.latlng;
       this.marker.setLatLng([lat, lng]);
+      this.reverseGeocode(lat, lng);
     });
 
+    // Drag marker -> reverse geocode
     this.marker.on('dragend', () => {
       const position = this.marker.getLatLng();
-      console.log('Marker position:', position);
+      this.reverseGeocode(position.lat, position.lng);
     });
+  }
+
+  reverseGeocode(lat: number, lng: number): void {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+    fetch(url, {
+      headers: { 'Accept-Language': 'en' }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.address) {
+          const city = data.address.city || data.address.town || data.address.village || data.address.municipality || '';
+          const country = data.address.country || '';
+
+          this.vetStationFormGroup.controls.city.setValue(city);
+          this.vetStationFormGroup.controls.country.setValue(country);
+        }
+      })
+      .catch(err => {
+        console.error('Reverse geocoding error:', err);
+      });
   }
 
   async saveChanges() {
@@ -134,10 +159,10 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
     await axios
       .put(apiUrl, this.vetStationFormGroup.value)
       .then(() => {
-        window.alert("Success!");
+        this.toaster.success("Changes saved successfully!");
       })
       .catch((err) => {
-        window.alert(err);
+        this.toaster.error("Whops!", err.message);
       });
   }
 
