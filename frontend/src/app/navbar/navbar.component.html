@@ -13,7 +13,6 @@
     <li class="cursor-pointer">Services</li>
     <li class="cursor-pointer">Locations</li>
   </ul>
-  <button *ngIf="myAuthService.IsLogged()" type="button" class="btn btn-outline-danger m-auto" (click)="myAuthService.LogOut()">Sign out</button>
 </div>
   <div class="offcanvas offcanvas-start w-auto" tabindex="-1" id="offcanvasWithBackdrop" aria-labelledby="offcanvasWithBackdropLabel" >
     <div class="side-panel-open" title="sidebar">
@@ -38,6 +37,8 @@
       </div>
 
       </div >
+    <button *ngIf="myAuthService.IsLogged()" type="button" class="btn btn-outline-danger m-auto" (click)="myAuthService.LogOut()">Sign out</button>
+
     <div class="mt-auto w-auto mx-6" title="FAQ">
       <div class="line-clamp-1 w-full bg-gray-600 h-[0.01rem]"></div>
       <p class="Schedule text-center font-extralight text-turquoise-blue my-2 cursor-pointer link-hover">FAQ</p>
