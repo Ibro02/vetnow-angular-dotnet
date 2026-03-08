@@ -1,41 +1,28 @@
-import { Component, OnInit, forwardRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { BoxContainerComponent } from '../../components/common/box-container/box-container.component';
 import { SignInInputComponent } from '../../components/common/sign-in-input/sign-in-input.component';
 import { PageTitleContainerComponent } from '../../components/common/page-title-container/page-title-container.component';
 import { InputComponent } from '../../components/common/input/input.component';
 import { InputButtonComponent } from '../../components/common/input-button/input-button.component';
-import { NgFor, NgIf } from '@angular/common';
-import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
-import axios, { AxiosResponse } from 'axios';
-import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  NG_VALUE_ACCESSOR,
-  Validator,
-} from '@angular/forms';
 import { ButtonComponent } from '../../components/common/button/button.component';
-import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
+import { HeaderTitleComponent } from "../../components/common/header-title/header-title.component";
+
+import { NgFor, NgIf } from '@angular/common';
+import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+import axios, { AxiosResponse } from 'axios';
+import * as L from 'leaflet';
+import {ToasterService} from "../../services/toaster.service";
 
 @Component({
   selector: 'app-vet-station',
   standalone: true,
   templateUrl: './vet-station.component.html',
   styleUrl: './vet-station.component.css',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      multi: true,
-      useExisting: forwardRef(() => VetStationComponent),
-    },
-  ],
   imports: [
     NgFor,
     NgIf,
     ReactiveFormsModule,
-    GoogleMapsModule,
-    GoogleMap,
     BoxContainerComponent,
     SignInInputComponent,
     PageTitleContainerComponent,
@@ -45,23 +32,17 @@ import {HeaderTitleComponent} from "../../components/common/header-title/header-
     HeaderTitleComponent,
   ],
 })
-export class VetStationComponent implements OnInit {
-  id: number = 1; //temporary
+export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public mapOptions: google.maps.MapOptions = {
-    center: {
-      lat: 43.343777,
-      lng: 17.807758,
-    },
-    mapTypeId: 'hybrid',
-    zoomControl: true,
-    scrollwheel: true,
-    disableDoubleClickZoom: true,
-    maxZoom: 15,
-    minZoom: 8,
-  };
+  id: number = 1;
 
-  //public vetStation: IVetStation
+  showCropWizard = false;
+
+  @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
+
+  map!: L.Map;
+  marker!: L.Marker;
+
   public countries: DropbdownArr[] = [];
   public cities: DropbdownArr[] = [];
 
@@ -90,144 +71,154 @@ export class VetStationComponent implements OnInit {
     wifi: new FormControl(false),
     stationImage: new FormControl('')
   });
-  /**
-   *
-   */
-  constructor(private fb: FormBuilder) {
-    this.fetchVetStationInfo(fb);
-  }
-  ngOnInit(): void {
-    this.fetchCountries();
-    //this.fetchCities();
-    // navigator.geolocation.getCurrentPosition((position) => {
-    //     this.mapOptions.center = {
-    //       lat: position?.coords.latitude ?? 46.788,
-    //       lng: position?.coords.longitude ?? -71.3893,
-    //     }
-    //     console.log("what");
-    //   });
+
+  constructor(private fb: FormBuilder, public toaster: ToasterService) {
+    this.fetchVetStationInfo();
   }
 
-  async saveChanges() {
-    const apiUrl = `https://localhost:44308/api/VetStation/Edit/${this.id.toString()}`;
-    await axios
-      .put(apiUrl, this.vetStationFormGroup.value)
-      .then((response: AxiosResponse<any>) => {
-        window.alert("Success!");
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this.initMap();
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove(); // prevents "map already initialized" error
+    }
+  }
+
+  initMap(): void {
+
+    const defaultLat = 43.8563;
+    const defaultLng = 18.4131;
+
+    const iconDefault = L.icon({
+      iconRetinaUrl: 'assets/marker-icon-2x.png',
+      iconUrl: 'assets/marker-icon.png',
+      shadowUrl: 'assets/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      tooltipAnchor: [16, -28],
+      shadowSize: [41, 41]
+    });
+
+    L.Marker.prototype.options.icon = iconDefault;
+
+    this.map = L.map(this.mapContainer.nativeElement, {
+      center: [defaultLat, defaultLng],
+      zoom: 12,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.map);
+
+    // Click on map -> move marker & reverse geocode
+    this.map.on('click', (event: L.LeafletMouseEvent) => {
+      const { lat, lng } = event.latlng;
+      this.marker.setLatLng([lat, lng]);
+      this.reverseGeocode(lat, lng);
+    });
+
+    // Drag marker -> reverse geocode
+    this.marker.on('dragend', () => {
+      const position = this.marker.getLatLng();
+      this.reverseGeocode(position.lat, position.lng);
+    });
+  }
+
+  reverseGeocode(lat: number, lng: number): void {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+    fetch(url, {
+      headers: { 'Accept-Language': 'en' }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.address) {
+          const city = data.address.city || data.address.town || data.address.village || data.address.municipality || '';
+          const country = data.address.country || '';
+
+          this.vetStationFormGroup.controls.city.setValue(city);
+          this.vetStationFormGroup.controls.country.setValue(country);
+        }
       })
-      .catch((err) => {
-        window.alert(err);
+      .catch(err => {
+        console.error('Reverse geocoding error:', err);
       });
   }
 
-  fetchVetStationInfo = async (fb: FormBuilder) => {
-    const apiUrl: string = `https://localhost:44308/api/VetStation/Get?id=${this.id.toString()}`;
+  async saveChanges() {
+
+    const apiUrl = `https://localhost:44308/api/VetStation/Edit/${this.id}`;
+
+    await axios
+      .put(apiUrl, this.vetStationFormGroup.value)
+      .then(() => {
+        this.toaster.success("Changes saved successfully!");
+      })
+      .catch((err) => {
+        this.toaster.error("Whops!", err.message);
+      });
+  }
+
+  fetchVetStationInfo = async () => {
+
+    const apiUrl = `https://localhost:44308/api/VetStation/Get?id=${this.id}`;
 
     await axios
       .get(apiUrl)
       .then((response: AxiosResponse<IVetStation[]>) => {
 
+        const data = response.data[0];
 
-        this.vetStationFormGroup = this.fb.group<IVetStation>({
-          name: response.data[0].name,
-          country: response.data[0].country,
-          city: response.data[0].city,
-          contactNumber: response.data[0].contactNumber,
-          email: response.data[0].email,
-          stationImage: '',
-          address: response.data[0].address,
-          description: response.data[0].description,
-          onField: response.data[0].onField,
-          inOffice: response.data[0].inOffice,
-          parking: response.data[0].parking,
-          wheelchair: response.data[0].wheelchair,
-          wifi: response.data[0].wifi,
+        this.vetStationFormGroup.patchValue({
+          name: data.name,
+          country: data.country,
+          city: data.city,
+          contactNumber: data.contactNumber,
+          email: data.email,
+          address: data.address,
+          description: data.description,
+          onField: data.onField,
+          inOffice: data.inOffice,
+          parking: data.parking,
+          wheelchair: data.wheelchair,
+          wifi: data.wifi,
         });
-    this.fetchCities();
 
       })
       .catch((error: Error) => {
-        console.error('Error fetching cities:', error);
+        console.error('Error fetching vet station:', error);
       });
   };
-
-  fetchCountries = async () => {
-    const apiUrl: string = `https://restcountries.com/v3.1/all`;
-
-    await axios
-      .get(apiUrl)
-      .then((response: AxiosResponse<any[]>) => {
-        let counter = 0;
-        response.data.forEach((_country) => {
-          this.countries[counter] = { id: counter, name: _country.name.common };
-          counter++;
-        });
-        this.countries.sort((a, b) => a.name.localeCompare(b.name));
-      })
-      .catch((error: Error) => {
-        console.error('Error fetching cities:', error);
-      });
-  };
-
-  fetchCities = async () => {
-    const apiUrl: string =
-      'https://countriesnow.space/api/v0.1/countries/cities';
-
-   await axios
-      .post(apiUrl, {
-        country:
-          this.vetStationFormGroup.value.country?.toLowerCase() ??
-          'bosnia and herzegovina',
-      })
-      .then((response: AxiosResponse<{ data: City[] }>) => {
-        const _cities: City[] = response.data.data;
-        let counter = 0;
-        _cities.forEach((city) => {
-          this.cities[counter] = { id: counter, name: city.toString() };
-          counter++;
-        });
-        this.cities.sort((a, b) => a.name.localeCompare(b.name));
-      })
-      .catch((error: Error) => {
-        console.error('Error fetching cities:', error);
-      });
-  };
-
-  countryChange() {
-    this.fetchCities();
-    this.vetStationFormGroup.value.city = null;
-  }
-
-  test() {
-    console.log(this.vetStationFormGroup.value);
-  }
 
   handleChange(id: number) {
     this.accessibilityAndMobilityButtons[id].value =
       !this.accessibilityAndMobilityButtons[id].value;
-    //console.log(this.dropdown[i].children[j])
   }
+
   getInputValue = (value: string) => {
     this.inputValue = value;
-    // console.log(this.name.value); //@todo - fetch data from inputs with FromControls
-    //console.log(this.vetStationFormGroup?.value); //do like this
   };
 
   receiveImageURL(event: string) {
     this.vetStationFormGroup.value.stationImage = event;
   }
 }
+
 export interface DropbdownArr {
   id?: number;
   name: string;
 }
-interface City {
-  city: string;
-}
 
 export interface IVetStation {
   name: string;
-  city: string; //change???
+  city: string;
   country: string;
   contactNumber: string;
   email: string;
@@ -239,21 +230,4 @@ export interface IVetStation {
   parking: boolean;
   wheelchair: boolean;
   wifi: boolean;
-}
-export interface IFacility {
-  id: number;
-  name: string;
-  key: 'onField' | 'inOffice' | 'parking' | 'wheelchair' | 'wifi';
-  value: boolean;
-}
-export class FileValidator implements Validator {
-  static validate(c: FormControl): { [key: string]: any } {
-    return c.value == null || c.value.length == 0
-      ? { required: true }
-      : { required: false };
-  }
-
-  validate(c: FormControl): { [key: string]: any } {
-    return FileValidator.validate(c);
-  }
 }
