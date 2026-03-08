@@ -1,114 +1,187 @@
-import {Component} from '@angular/core';
+import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 import {CalendarComponent} from "../../components/common/calendar/calendar.component";
-import {AppointmentLayoutComponent} from "../../components/layouts/appointment-layout/appointment-layout.component";
-import {TitleComponent} from "../../components/common/title/title.component";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {ProfileService} from "../../services/ProfileService";
 import {UserProfile} from "../../services/interfaces/UserProfile";
 import axios from "axios";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {TimeSlot} from "./TimeSlot";
 import {Config} from "../../config";
 import {Animal} from "./Animal";
-import {Appointment} from "./Appointment";
 import {ToasterService} from "../../services/toaster.service";
+
 @Component({
   selector: 'app-appointment-page',
   standalone: true,
   imports: [
     HeaderTitleComponent,
     CalendarComponent,
-    AppointmentLayoutComponent,
-    TitleComponent,
     NgForOf,
+    NgIf,
     FormsModule
   ],
   templateUrl: './appointment-page.component.html',
   styleUrl: './appointment-page.component.css'
 })
 export class AppointmentPageComponent {
-  user: UserProfile | null = null
-  pets: Animal[] = []; //todo: make interface Pets
-  selectedPet?: any;
-  timeSlots?: TimeSlot[]; //todo: make interface TimeSlots
+  user: UserProfile | null = null;
+  pets: Animal[] = [];
+  selectedPet?: Animal;
+  timeSlots?: TimeSlot[];
   employeeid?: number;
   employee: any;
   appointmentTime?: string | null;
   newAppointment: any;
-  constructor(private route: ActivatedRoute, private router: Router, private profileService: ProfileService, private toaster:ToasterService) {}
-async ngOnInit(){
-await this.profileService.getUserContent();
-this.user = this.profileService.userProfile;
-let date = this.route.snapshot.queryParamMap.get('date') ?? new Date().toJSON();
 
-this.route.params.subscribe((params: Params)=> this.employeeid = params['id']);
-this.fetchPets();
-this.fetchTimeSlots(date);
-this.fetchEmployee();
-}
+  isLoadingSlots: boolean = false;
+  isLoadingPets: boolean = false;
 
-async fetchPets(): Promise<void> {
-    let url: string = "api/Animal/GetByOwnerId";
-    let { data } = await axios.get(Config.address + url + "?id=" + this.user?.id);
-    console.log(data);
-    this.pets = data;
-}
+  // Searchable pet dropdown
+  isPetDropdownOpen: boolean = false;
+  petSearch: string = '';
+  @ViewChild('petSearchInput') petSearchInput?: ElementRef<HTMLInputElement>;
 
-async fetchTimeSlots(date: string = new Date().toJSON()) {
-  let url: string = "api/TimeSlot/Get";
-  let { data } = await axios.get(Config.address + url + `?employeeid=${this.employeeid}&date=${date.split("T")[0]}`);
-  this.timeSlots = data;
-}
-  async fetchEmployee() {
-    let url: string = "api/Employee/Get";
-    let { data } = await axios.get(Config.address + url + `?id=${this.employeeid}`);
-    this.employee = data;
-  }
-  changeDate(value: Date) {
-    //Query for time slots here
-    this.fetchTimeSlots(value.toJSON());
-    this.appointmentTime = null;
-  }
-
-  prepareAnAppointment(timeslot: TimeSlot) {
-    this.appointmentTime = timeslot.slotDateTime.split("T")[0] + " At " + timeslot.appointmentTime;
-    this.newAppointment = {
-      customerId: this.user?.id,
-      vetStationId: this.employee.vetStationId,
-      employeeId: this.employeeid,
-      timeSlotId: timeslot.id,
-      animalId: this.selectedPet?.id
+  // Close dropdown when user clicks anywhere outside the component
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isPetDropdownOpen = false;
     }
   }
 
-  async makeAnAppointment() {
-    const url = "api/Appointment/Add";
-    if (this.newAppointment.animalId == null)
-      this.toaster.error("Error", "Required Feild: Select Pet!");
-    else if (this.newAppointment.timeSlotId == null)
-      this.toaster.error("Error", "Required Feild: Time!");
-    else if (this.newAppointment.vetStationId == null)
-        this.toaster.error("Error", "Whops! Restart page and try again");
-    else if (this.newAppointment.employeeId == null)
-      this.toaster.error("Error", "Whops! Select a vet/barber you want to schedule for an appointment!");
-    else
-      await axios.post(Config.address + url, this.newAppointment).then(x=>{
-        this.toaster.success("Succes", "You have successfully made an appointment for " + this.appointmentTime + "!");
-        this.ngOnInit();
-        this.router.navigate(['/']);
-      }).catch(err =>{
-        this.toaster.error("Error","Ups! An error has occurred!");
-        console.log(err.message);
-      });
+  get filteredPets(): Animal[] {
+    if (!this.petSearch.trim()) return this.pets;
+    const q = this.petSearch.toLowerCase().trim();
+    return this.pets.filter(p => p.name.toLowerCase().includes(q));
+  }
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private profileService: ProfileService,
+    private toaster: ToasterService,
+    private elementRef: ElementRef
+  ) {}
+
+  async ngOnInit() {
+    await this.profileService.getUserContent();
+    this.user = this.profileService.userProfile;
+    const date = this.route.snapshot.queryParamMap.get('date') ?? new Date().toJSON();
+
+    this.route.params.subscribe((params: Params) => this.employeeid = params['id']);
+
+    this.fetchPets();
+    this.fetchTimeSlots(date);
+    this.fetchEmployee();
+  }
+
+  async fetchPets(): Promise<void> {
+    this.isLoadingPets = true;
+    try {
+      const { data } = await axios.get(Config.address + `api/Animal/GetByOwnerId?id=${this.user?.id}`);
+      this.pets = Array.isArray(data) ? data : [];
+    } catch {
+      this.pets = [];
+    } finally {
+      this.isLoadingPets = false;
+    }
+  }
+
+  async fetchTimeSlots(date: string = new Date().toJSON()) {
+    this.isLoadingSlots = true;
+    this.timeSlots = [];
+    try {
+      const { data } = await axios.get(
+        Config.address + `api/TimeSlot/Get?employeeid=${this.employeeid}&date=${date.split("T")[0]}`
+      );
+      // API returns 204 NoContent (empty body) when no slots exist
+      this.timeSlots = Array.isArray(data) ? data : [];
+    } catch {
+      this.timeSlots = [];
+    } finally {
+      this.isLoadingSlots = false;
+    }
+  }
+
+  async fetchEmployee() {
+    try {
+      const { data } = await axios.get(Config.address + `api/Employee/Get?id=${this.employeeid}`);
+      this.employee = data;
+    } catch {
+      this.employee = null;
+    }
+  }
+
+  changeDate(value: Date) {
+    this.fetchTimeSlots(value.toJSON());
     this.appointmentTime = null;
     this.newAppointment = null;
   }
 
+  prepareAnAppointment(timeslot: TimeSlot) {
+    // Format date nicely: "Monday, March 8"
+    const date = new Date(timeslot.slotDateTime);
+    const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    // Format time: "09:00" (trim seconds from TimeSpan string)
+    const timeStr = timeslot.appointmentTime.substring(0, 5);
+
+    this.appointmentTime = `${dateStr} at ${timeStr}`;
+    this.newAppointment = {
+      customerId: this.user?.id,
+      vetStationId: this.employee?.vetStationId,
+      employeeId: this.employeeid,
+      timeSlotId: timeslot.id,
+      animalId: this.selectedPet?.id ?? null
+    };
+  }
+
+  async makeAnAppointment() {
+    if (!this.newAppointment) return;
+
+    if (this.newAppointment.animalId == null)
+      return this.toaster.error("Missing field", "Please select a pet before booking.");
+    if (this.newAppointment.timeSlotId == null)
+      return this.toaster.error("Missing field", "Please select a time slot.");
+    if (this.newAppointment.vetStationId == null)
+      return this.toaster.error("Error", "Something went wrong. Please refresh and try again.");
+    if (this.newAppointment.employeeId == null)
+      return this.toaster.error("Error", "Could not identify the specialist. Please go back and try again.");
+
+    try {
+      await axios.post(Config.address + "api/Appointment/Add", this.newAppointment);
+      this.toaster.success("Appointment booked!", `See you on ${this.appointmentTime}!`);
+      this.router.navigate(['/']);
+    } catch (err: any) {
+      this.toaster.error("Booking failed", "Something went wrong. Please try again.");
+      console.error(err?.message);
+    } finally {
+      this.appointmentTime = null;
+      this.newAppointment = null;
+    }
+  }
+
+  togglePetDropdown() {
+    this.isPetDropdownOpen = !this.isPetDropdownOpen;
+    if (this.isPetDropdownOpen) {
+      // Wait one tick for *ngIf to render the input, then focus it
+      setTimeout(() => this.petSearchInput?.nativeElement?.focus(), 50);
+    } else {
+      this.petSearch = '';
+    }
+  }
+
+  selectPet(p: Animal) {
+    this.afterPetSelect(p);
+    this.isPetDropdownOpen = false;
+    this.petSearch = '';
+  }
+
   afterPetSelect(p: Animal) {
     this.selectedPet = p;
-    this.newAppointment.animalId = p.id;
-
+    if (this.newAppointment) {
+      this.newAppointment.animalId = p.id;
+    }
   }
 }
