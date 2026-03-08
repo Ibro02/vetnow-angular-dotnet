@@ -19,6 +19,8 @@ namespace VetStat.Models
         [Required]
         public DateTime DateOfEmployment { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         [JsonIgnore]
         public Person? Person { get; set; }
     }

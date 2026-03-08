@@ -1,0 +1,322 @@
+/* ─── Container ────────────────────────────────────────────── */
+.table-container {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  font-family: inherit;
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Search ───────────────────────────────────────────────── */
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.search-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  outline: none;
+  width: 190px;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  border-color: #4ade80;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 7px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.icon-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* ─── Export button ────────────────────────────────────────── */
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.84rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.export-btn:hover {
+  background: #f3f4f6;
+}
+
+/* ─── Add button ───────────────────────────────────────────── */
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #4ade80;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.add-btn:hover {
+  background: #22c55e;
+}
+
+/* ─── Table ────────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table thead th {
+  text-align: left;
+  padding: 11px 18px;
+  color: #9ca3af;
+  font-weight: 500;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid #f5f5f5;
+  transition: filter 0.1s;
+}
+
+.data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  filter: brightness(0.97);
+}
+
+.data-table tbody td {
+  padding: 13px 18px;
+  color: #374151;
+  vertical-align: middle;
+}
+
+/* ─── Row color variants ───────────────────────────────────── */
+.row-green  { background-color: #f0fdf4; }
+.row-red    { background-color: #fff1f2; }
+.row-purple { background-color: #f5f3ff; }
+.row-blue   { background-color: #eff6ff; }
+.row-yellow { background-color: #fefce8; }
+
+/* ─── Avatar ───────────────────────────────────────────────── */
+.avatar-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.avatar-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.avatar-sub {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+/* ─── Badge ────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 13px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-green {
+  background: transparent;
+  border: 1.5px solid #22c55e;
+  color: #16a34a;
+}
+
+.badge-red {
+  background: #ef4444;
+  color: #fff;
+}
+
+.badge-purple {
+  background: #a78bfa;
+  color: #fff;
+}
+
+.badge-blue {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.badge-yellow {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.badge-default {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* ─── Actions (3-dot menu) ─────────────────────────────────── */
+.actions-th,
+.actions-td {
+  width: 48px;
+  text-align: center;
+}
+
+.menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 5px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menu-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  min-width: 130px;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 9px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.84rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.dropdown-item:hover {
+  background: #f9fafb;
+}
+
+.dropdown-item-danger {
+  color: #ef4444;
+}
+
+.dropdown-item-danger:hover {
+  background: #fff1f2;
+}
+
+/* ─── Empty state ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}

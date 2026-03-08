@@ -1,62 +1,59 @@
-import { Component, forwardRef, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { VetStationComponent } from '../vet-station/vet-station.component';
-import { NgClass, NgFor } from '@angular/common';
-import { PageTitleContainerComponent } from "../../components/common/page-title-container/page-title-container.component";
-import { ButtonComponent } from "../../components/common/button/button.component";
-import axios from 'axios';
+import { Component, OnInit } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { TableComponent, TableColumn } from '../../components/common/table/table.component';
 import { AddEmployeeComponent } from '../../components/group/add-employee/add-employee.component';
-import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
+import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
+import axios from 'axios';
+import {environment} from "../../../enviroment";
+import {provideToastr} from "ngx-toastr";
+import {ToasterService} from "../../services/toaster.service";
 
 @Component({
   selector: 'app-employee-list',
   standalone: true,
-  imports: [NgClass, NgFor, PageTitleContainerComponent, ButtonComponent, AddEmployeeComponent, HeaderTitleComponent],
+  imports: [NgIf, TableComponent, AddEmployeeComponent, HeaderTitleComponent],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      multi: true,
-      useExisting: forwardRef(() => VetStationComponent),
-    },
-  ],
 })
-export class EmployeeListComponent implements OnInit{
-test(a: any) {
-console.log(a)
-}
-employees: any = null;
-  exportToCSV(): void {
-    const csvData = this.convertToCSV(this.employees);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'employees.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+export class EmployeeListComponent implements OnInit {
+  employees: any[] = [];
+  showAddEmployee = false;
+
+  columns: TableColumn[] = [
+    {
+      key: 'firstName',
+      key2: 'lastName',
+      label: 'Name',
+      type: 'avatar',
+      subtitleKey: 'email',
+    },
+    { key: 'username', label: 'Username', type: 'text' },
+    { key: 'phone',    label: 'Phone',    type: 'text' },
+    { key: 'city',     label: 'City',     type: 'text' },
+    { key: 'country',  label: 'Country',  type: 'text' },
+  ];
+
+  constructor(public toaster:ToasterService) {
   }
-
-  private convertToCSV(objArray: any[]): string {
-    const array = [Object.keys(objArray[0])].concat(objArray);
-
-    return array.map(it => {
-      return Object.values(it).toString();
-    }).join('\n');
-  }
-  async fetchEmployee() //for now it fetches every person in database
-  {
-
-   let { data } = await axios.get("https://localhost:44308/api/Person/GetAll");
-   return data;
-  }
-
   async ngOnInit(): Promise<void> {
-   this.employees = await this.fetchEmployee();
-   console.log(this.employees);
+    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAll`);
+    this.employees = data;
+  }
+
+  onAction(event: { action: string; row: any }): void {
+    if (event.action === 'edit') {
+      console.log('Edit employee:', event.row);
+    } else if (event.action === 'delete') {
+      let url:string = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
+      axios.delete(url, {headers:{
+          'my-auth-token': (window.sessionStorage.getItem('my-auth-token'))
+        }}).then(()=> {
+        this.toaster.success("Success", "Employee deleted successefully!");
+        this.ngOnInit();
+      })
+        .catch((er) => this.toaster.error("Whops!", `Something went wrong!\n ${er.message}`));
+      console.log('Delete employee:', event.row);
+    }
   }
 }
 
@@ -66,7 +63,7 @@ export interface IEmployee {
   lastName: string;
   email: string;
   phone: string | null;
-  roleId: number | null; //this should be in a title
+  roleId: number | null;
   birthDate: string;
   username: string;
   password: string;
@@ -75,5 +72,3 @@ export interface IEmployee {
   profileCreationDate: string;
   membershipLoyalty: string | null;
 }
-
-//@todo - > add new fields in employee DB (status, title), fetch emloyees instead of persons

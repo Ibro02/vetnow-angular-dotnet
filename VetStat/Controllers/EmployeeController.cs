@@ -22,27 +22,23 @@ namespace VetStat.Controllers
         public ActionResult<List<Employee>> GetAll()
         {
             if (!_db.Employee.IsNullOrEmpty())
-                return Ok(_db.Employee.ToList());
+                return Ok(_db.Employee.Where(e => !e.IsDeleted).ToList());
             return NoContent();
         }
 
-        //api/Employee/Get
-        [HttpGet("{id}")]
-        public ActionResult<Employee> Delete(int id)
+        //api/Employee/Delete
+        [HttpDelete]
+        public ActionResult<Employee> Delete([FromQuery] int id)
         {
             try
             {
-                var employeeToDelete = _db.Employee.SingleOrDefault(x => x.Id == id);
-                if (employeeToDelete != null)
-                {
-                    _db.Employee.Remove(employeeToDelete);
-                    _db.SaveChanges();
-                    return Ok("Object deleted!");
-                }
-                else
-                {
+                var employee = _db.Employee.SingleOrDefault(x => x.Person.Id == id);
+                if (employee == null)
                     return NotFound($"Employee with ID {id} not found.");
-                }
+
+                employee.IsDeleted = true;
+                _db.SaveChanges();
+                return Ok("Employee deleted.");
             }
             catch (Exception ex)
             {
@@ -54,7 +50,7 @@ namespace VetStat.Controllers
         {
             try
             {
-                return Ok(_db.Employee.Where(x => x.Id == id).FirstOrDefault());
+                return Ok(_db.Employee.Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault());
             }
             catch (Exception ex)
             {
@@ -66,7 +62,7 @@ namespace VetStat.Controllers
         {
             try
             {
-                return Ok(_db.Employee.Where(x => x.VetStationId == id).ToList());
+                return Ok(_db.Employee.Where(x => x.VetStationId == id && !x.IsDeleted).ToList());
             }
             catch (Exception ex)
             {

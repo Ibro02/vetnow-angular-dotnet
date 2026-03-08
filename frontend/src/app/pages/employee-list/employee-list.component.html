@@ -1,65 +1,12 @@
-<app-header-title description="List of employees">
-  Employees
-</app-header-title>
-<div class="flex">
-  <app-add-employee (event)="ngOnInit()"></app-add-employee>
-  <app-button
-    text="Export CSV"
-    type="secondary"
-    (event)="exportToCSV()"
-  ></app-button>
-</div>
-<table class="table align-middle mb-0 bg-white border-1">
-  <thead class="bg-light">
-    <tr>
-      <th>Name</th>
-      <th>Title</th>
-      <th>Status</th>
-      <th>Position</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let employee of employees">
-      <td>
-        <div class="d-flex align-items-center">
-          <img
-            src="https://via.placeholder.com/45"
-            alt="Profile Image"
-            style="width: 45px; height: 45px"
-            class="rounded-circle"
-          />
-          <div class="ms-3">
-            <p class="fw-bold mb-1">
-              {{ employee.firstName }} {{ employee.lastName }}
-            </p>
-            <p class="text-muted mb-0">{{ employee.email }}</p>
-          </div>
-        </div>
-      </td>
-      <td>
-        <p class="fw-normal mb-1">{{ employee.position || "N/A" }}</p>
-        <p class="text-muted mb-0">{{ employee.department || "N/A" }}</p>
-      </td>
-      <td>
-        <span
-          class="badge"
-          [ngClass]="{
-            'badge-success': employee.status === 'Active',
-            'badge-primary': employee.status === 'Onboarding',
-            'badge-warning': employee.status === 'Awaiting'
-          }"
-          class="rounded-pill d-inline"
-          >{{ employee.status || "Pending" }}</span
-        >
-      </td>
-      <td>{{ employee.level || "Junior" }}</td>
-      <td>
-        <button type="button" class="btn btn-link btn-sm btn-rounded">
-          Edit
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<button (click)="test(employees)">Eha</button>
+<app-header-title title="Employees" description="List of employees" />
+
+<app-add-employee *ngIf="showAddEmployee" (event)="ngOnInit(); showAddEmployee = false" />
+
+<app-table
+  title="Employees"
+  [columns]="columns"
+  [data]="employees"
+  addButtonText="Add Employee"
+  (addClick)="showAddEmployee = true"
+  (actionClick)="onAction($event)"
+/>
