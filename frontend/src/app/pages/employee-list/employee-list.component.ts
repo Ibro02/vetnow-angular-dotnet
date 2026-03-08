@@ -36,7 +36,7 @@ export class EmployeeListComponent implements OnInit {
   constructor(public toaster:ToasterService) {
   }
   async ngOnInit(): Promise<void> {
-    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAll`);
+    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`);
     this.employees = data;
   }
 
