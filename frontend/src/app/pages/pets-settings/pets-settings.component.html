@@ -12,18 +12,35 @@
       <p *ngIf="viewMode === 'table'" class="text-sm text-gray-400 mt-1">Table view of your pets of all employees</p>
     </div>
 
-    <!-- Toolbar: Search | Toggle + Export + Add -->
+    <!-- Toolbar: Filters | Toggle + Export + Add -->
     <div class="toolbar flex items-center justify-between px-6 py-3">
 
-      <!-- Search (design only) -->
-      <div class="search-box flex items-center border border-gray-300 rounded-lg px-3 py-2 gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" placeholder="Search here..." disabled
-               class="bg-transparent outline-none text-sm text-gray-500 w-36"/>
+      <!-- Left side: Status filter + Search -->
+      <div class="flex items-center gap-3">
+
+        <!-- Status filter dropdown -->
+        <select
+          class="status-filter-select"
+          [ngModel]="statusFilter"
+          (ngModelChange)="onStatusFilterChange($event)">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">
+            {{ opt.label }}
+          </option>
+        </select>
+
+        <!-- Search input (functional) -->
+        <div class="search-box flex items-center border border-gray-300 rounded-lg px-3 py-2 gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" placeholder="Search here..."
+                 [ngModel]="searchQuery"
+                 (input)="onSearchInput($event)"
+                 class="bg-transparent outline-none text-sm text-gray-700 w-36"/>
+        </div>
+
       </div>
 
       <!-- Right side controls -->
@@ -33,7 +50,7 @@
 
         <!-- Toggle view mode button -->
         <button (click)="toggleViewMode()" class="toggle-btn" [title]="viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'">
-          <!-- Table icon when in card view -->
+          <!-- Grid icon when in card view -->
           <svg *ngIf="viewMode === 'card'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round">
@@ -42,7 +59,7 @@
             <rect x="3" y="14" width="7" height="7" rx="1"/>
             <rect x="14" y="14" width="7" height="7" rx="1"/>
           </svg>
-          <!-- Card icon when in table view -->
+          <!-- List icon when in table view -->
           <svg *ngIf="viewMode === 'table'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round">
@@ -88,13 +105,67 @@
         [age]="calculateAge(pet.birthDate)"
         [picture]="getPetPictureUrl(pet)"
         [petId]="pet.id"
+        [isDeleted]="pet.isDeleted === true"
         (onDelete)="deletePet($event)"
+        (onRestore)="restorePet($event)"
         (onDownloadPdf)="downloadPdf($event)"
         (onEdit)="editPet($event)"
       />
 
       <div *ngIf="pets.length === 0" class="empty-state text-center text-gray-400 py-12 w-full">
         No pets found. Click "Add pet" to add your first pet.
+      </div>
+    </div>
+
+    <!-- Card View Pagination -->
+    <div *ngIf="viewMode === 'card' && totalCount > 0" class="card-pagination flex items-center justify-between px-6 py-4 border-t border-gray-100 mt-4">
+      <!-- Rows per page -->
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">Rows per page:</span>
+        <select class="page-size-select"
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageChange({ pageNumber: 1, pageSize: $event })">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+        </select>
+      </div>
+
+      <!-- Range display -->
+      <span class="text-sm text-gray-500">
+        {{ ((currentPage - 1) * pageSize) + 1 }}–{{ currentPage * pageSize > totalCount ? totalCount : currentPage * pageSize }} of {{ totalCount }}
+      </span>
+
+      <!-- Page navigation -->
+      <div class="flex items-center gap-1">
+        <button class="page-btn" [disabled]="currentPage <= 1"
+                (click)="onPageChange({ pageNumber: 1, pageSize: pageSize })" title="First page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage <= 1"
+                (click)="onPageChange({ pageNumber: currentPage - 1, pageSize: pageSize })" title="Previous page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage * pageSize >= totalCount"
+                (click)="onPageChange({ pageNumber: currentPage + 1, pageSize: pageSize })" title="Next page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage * pageSize >= totalCount"
+                (click)="onPageChange({ pageNumber: totalPages, pageSize: pageSize })" title="Last page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -106,9 +177,23 @@
         [data]="tableData"
         [showSearch]="false"
         [showExportCsv]="false"
+        [showPagination]="true"
+        [totalCount]="totalCount"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        [pageSizeOptions]="[5, 10, 20]"
+        (pageChange)="onPageChange($event)"
         (actionClick)="onTableAction($event)"
       />
     </div>
 
   </div>
+
+  <!-- Pet Add/Edit Popup -->
+  <app-pet-add-card
+    [visible]="showPetForm"
+    [editPetData]="editingPetData"
+    (onSave)="onPetSave($event)"
+    (onCancel)="onPetCancel()"
+  />
 </div>

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
 using VetStat.Models;
-using static VetStat.Endpoints.PetsEndpoints.PetsGetByIdEndpoint;
 
 namespace VetStat.Endpoints.PetsEndpoints;
 
@@ -21,16 +21,18 @@ public class PetsGetByIdEndpoint : MyEndpointBase
     }
 
     [HttpGet("Get")]
-    public ActionResult<IEnumerable<PetsGetByIdResponse>> HandleAsync([FromQuery] int? id)
+    public async Task<ActionResult<MyPagedList<PetsGetByIdResponse>>> HandleAsync(
+        [FromQuery] PetsGetByIdRequest request,
+        CancellationToken cancellationToken = default)
     {
         if (!_authService.IsLogged())
             return BadRequest("You are not logged in!");
 
         int ownerId;
 
-        if (id.HasValue)
+        if (request.Id.HasValue)
         {
-            ownerId = id.Value;
+            ownerId = request.Id.Value;
         }
         else
         {
@@ -44,20 +46,78 @@ public class PetsGetByIdEndpoint : MyEndpointBase
 
         try
         {
-            var animals = _db.Animal
+            var query = _db.Animal
                 .Where(x => x.OwnerId == ownerId)
                 .Include(x => x.Species)
                 .Include(x => x.Breed)
-                .ToList();
+                .AsQueryable();
 
-            var response = animals.Select(a => new PetsGetByIdResponse(a)).ToList();
+            // Apply IsDeleted status filter
+            // null and false both mean "active" (existing records default to null)
+            switch (request.StatusFilter.ToLower())
+            {
+                case "deleted":
+                    query = query.Where(x => x.IsDeleted == true);
+                    break;
+                case "all":
+                    // no filter — return everything
+                    break;
+                default: // "active"
+                    query = query.Where(x => x.IsDeleted == null || x.IsDeleted == false);
+                    break;
+            }
 
-            return Ok(response);
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.Q))
+            {
+                var q = request.Q.ToLower();
+                query = query.Where(x =>
+                    (x.Name != null && x.Name.ToLower().Contains(q)) ||
+                    (x.Species != null && x.Species.SpeciesName != null && x.Species.SpeciesName.ToLower().Contains(q)) ||
+                    (x.Breed != null && x.Breed.Name != null && x.Breed.Name.ToLower().Contains(q))
+                );
+            }
+
+            // Project to response DTO
+            var projectedQuery = query.Select(a => new PetsGetByIdResponse
+            {
+                Id = a.Id,
+                Name = a.Name,
+                OwnerId = a.OwnerId,
+                BirthDate = a.BirthDate,
+                AnimalSpeciesId = a.AnimalSpeciesId,
+                SpeciesName = a.Species != null ? a.Species.SpeciesName : null,
+                Diet = a.Species != null ? a.Species.Diet : null,
+                BreedId = a.BreedId,
+                BreedName = a.Breed != null ? a.Breed.Name : null,
+                Picture = a.Picture,
+                MedicalFile = a.MedicalFile,
+                IsFavourite = a.IsFavourite,
+                IsDeleted = a.IsDeleted
+            });
+
+            var result = await MyPagedList<PetsGetByIdResponse>.CreateAsync(projectedQuery, request, cancellationToken);
+
+            return Ok(result);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
+    }
+
+    public class PetsGetByIdRequest : MyPagedRequest
+    {
+        public int? Id { get; set; }
+        public string? Q { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Filter by deletion status.
+        /// "active"  → IsDeleted is null or false  (default)
+        /// "deleted" → IsDeleted is true
+        /// "all"     → no filter
+        /// </summary>
+        public string StatusFilter { get; set; } = "active";
     }
 
     public class PetsGetByIdResponse
@@ -68,25 +128,12 @@ public class PetsGetByIdEndpoint : MyEndpointBase
         public DateTime BirthDate { get; set; }
         public int? AnimalSpeciesId { get; set; }
         public string? SpeciesName { get; set; }
+        public string? Diet { get; set; }
         public int? BreedId { get; set; }
         public string? BreedName { get; set; }
         public byte[]? Picture { get; set; }
         public byte[]? MedicalFile { get; set; }
         public bool? IsFavourite { get; set; }
-
-        public PetsGetByIdResponse(Animal animal)
-        {
-            Id = animal.Id;
-            Name = animal.Name;
-            OwnerId = animal.OwnerId;
-            BirthDate = animal.BirthDate;
-            AnimalSpeciesId = animal.AnimalSpeciesId;
-            SpeciesName = animal.Species?.SpeciesName;
-            BreedId = animal.BreedId;
-            BreedName = animal.Breed?.Name;
-            Picture = animal.Picture;
-            MedicalFile = animal.MedicalFile;
-            IsFavourite = animal.IsFavourite;
-        }
+        public bool? IsDeleted { get; set; }
     }
 }

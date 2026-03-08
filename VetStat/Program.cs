@@ -6,6 +6,7 @@ using VetStat.Endpoints.VetStationSearchEndpoints;
 using VetStat.Helpers.Services;
 using VetStat.Helpers.Services.Email;
 using VetStat.Helpers.Validators;
+using VetStat.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    try
+    {
+        await app.SeedPetDataAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error seeding pet data: {ex.Message}");
+    }
+
 }
 
 app.UseCors(

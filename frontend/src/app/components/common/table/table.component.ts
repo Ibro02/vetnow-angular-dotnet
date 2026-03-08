@@ -29,19 +29,34 @@ export class TableComponent {
   @Input() rowColorKey?: string;
   @Input() rowColorMap?: Record<string, string>;
 
+  // Pagination inputs
+  @Input() showPagination: boolean = false;
+  @Input() totalCount: number = 0;
+  @Input() pageSize: number = 10;
+  @Input() currentPage: number = 1;
+  @Input() pageSizeOptions: number[] = [5, 10, 20];
+
   @Output() addClick = new EventEmitter<void>();
   @Output() actionClick = new EventEmitter<{ action: string; row: any }>();
+  @Output() pageChange = new EventEmitter<{ pageNumber: number; pageSize: number }>();
 
   searchQuery: string = '';
   searchVisible: boolean = false;
   openMenuIndex: number | null = null;
 
   get filteredData(): any[] {
+    // When server-side pagination is active, don't filter client-side
+    if (this.showPagination) return this.data;
     if (!this.searchQuery.trim()) return this.data;
     const q = this.searchQuery.toLowerCase();
     return this.data.filter(row =>
       this.columns.some(col => this.getCellValue(row, col).toLowerCase().includes(q))
     );
+  }
+
+  get totalPages(): number {
+    if (!this.showPagination) return 1;
+    return Math.ceil(this.totalCount / this.pageSize) || 1;
   }
 
   getCellValue(row: any, col: TableColumn): string {
@@ -87,6 +102,27 @@ export class TableComponent {
   onAction(action: string, row: any): void {
     this.actionClick.emit({ action, row });
     this.openMenuIndex = null;
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.pageChange.emit({ pageNumber: this.currentPage, pageSize: this.pageSize });
+  }
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 1;
+    this.pageChange.emit({ pageNumber: 1, pageSize: this.pageSize });
+  }
+
+  get paginationStart(): number {
+    return (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get paginationEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.totalCount);
   }
 
   exportToCSV(): void {
