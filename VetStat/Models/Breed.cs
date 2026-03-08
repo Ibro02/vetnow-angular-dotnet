@@ -9,7 +9,7 @@ namespace VetStat.Models
         [Key]
         public int Id { get; set; }
 
-        public int Name { get; set; }
+        public string Name { get; set; }
 
         [ForeignKey("Species")]
         public int? SpeciesId { get; set; }

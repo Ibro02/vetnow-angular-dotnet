@@ -38,5 +38,7 @@ namespace VetStat.Models
 
         public byte[]? Picture { get; set; }
         public byte[]? MedicalFile { get;set; }
+
+        public bool? IsFavourite { get; set; }
     }
 }
