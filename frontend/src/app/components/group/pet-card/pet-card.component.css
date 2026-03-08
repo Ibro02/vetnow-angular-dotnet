@@ -1,0 +1,14 @@
+.card-container {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.5s ease all;
+}
+
+.card-container:hover {
+  box-shadow: rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.2) 0px 3px 7px -3px;
+}
+
+.gradient-header {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 30%, #c084fc 70%, #e9d5ff 100%);
+}

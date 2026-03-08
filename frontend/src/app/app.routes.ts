@@ -10,6 +10,7 @@ import { EmployeeListComponent } from './pages/employee-list/employee-list.compo
 import {AppointmentPageComponent} from "./pages/appointment-page/appointment-page.component";
 import {VerificationPageComponent} from "./pages/verification-page/verification-page.component";
 import {ProfileSettingsComponent} from "./pages/profile-settings/profile-settings.component";
+import {PetsSettingsComponent} from "./pages/pets-settings/pets-settings.component";
 
 export const routes: Routes = [{ path: '', component: LoginComponent},
   { path: 'register', component: RegisterComponent, },
@@ -17,6 +18,7 @@ export const routes: Routes = [{ path: '', component: LoginComponent},
   { path: 'home-page/vet-station-home/:id', component: VetStationHomePageComponent, canActivate: [AuthorizationGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [AuthorizationGuard]},
   { path: 'settings/profile-settings', component: ProfileSettingsComponent, canActivate: [AuthorizationGuard]},
+  { path: 'settings/my-pets', component: PetsSettingsComponent, canActivate: [AuthorizationGuard]},
   { path: 'settings/vet-station', component: VetStationComponent, canActivate: [AuthorizationGuard]},
   { path: 'new-appointment/:id', component: AppointmentPageComponent, canActivate: [AuthorizationGuard]}, //new-appointment/:vetStationId:serviceId
   { path: 'settings/employees', component: EmployeeListComponent, canActivate: [AuthorizationGuard]},
