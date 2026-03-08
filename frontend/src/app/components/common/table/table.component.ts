@@ -2,6 +2,12 @@ import { Component, Input, Output, EventEmitter, HostListener } from '@angular/c
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+export interface TableAction {
+  key: string;
+  label: string;
+  isDanger?: boolean;
+}
+
 export interface TableColumn {
   key: string;
   key2?: string;         // for avatar: concatenate with key (e.g. lastName)
@@ -28,6 +34,10 @@ export class TableComponent {
   @Input() addButtonText?: string;
   @Input() rowColorKey?: string;
   @Input() rowColorMap?: Record<string, string>;
+  @Input() actions: TableAction[] = [
+    { key: 'edit', label: 'Edit' },
+    { key: 'delete', label: 'Delete', isDanger: true }
+  ];
 
   // Pagination inputs
   @Input() showPagination: boolean = false;

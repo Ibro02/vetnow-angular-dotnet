@@ -1,40 +1,72 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {NgIf} from "@angular/common";
+import {NgIf, NgFor, DatePipe} from "@angular/common";
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faHome, faEnvelope, faShop, faUser, faGear} from "@fortawesome/free-solid-svg-icons";
 import {MyAuthService} from "../services/MyAuth";
-import {ChangeDetection} from "@angular/cli/lib/config/workspace-schema";
-import { Router,RouterModule } from '@angular/router';
+import {ProfileService} from "../services/ProfileService";
+import {AppointmentService, AppointmentDto} from "../services/AppointmentService";
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
     NgIf,
+    NgFor,
+    DatePipe,
     FaIconComponent,
     RouterModule
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent implements OnChanges{
+export class NavbarComponent implements OnChanges, OnInit {
 
   @Input() public isLogged: boolean = false;
+  upcomingAppointments: AppointmentDto[] = [];
+  isStaff: boolean = false;
+  isLoadingSchedule: boolean = false;
+
   constructor(
     public myAuthService: MyAuthService,
-    private router:Router,
-  ) {
+    private profileService: ProfileService,
+    private appointmentService: AppointmentService,
+    private router: Router,
+  ) {}
+
+  async ngOnInit() {
+    await this.loadSchedule();
   }
-  ngOnChanges(changes:SimpleChanges) {
+
+  ngOnChanges(changes: SimpleChanges) {
     this.isLogged = this.myAuthService.IsLogged();
   }
 
+  async loadSchedule() {
+    if (!this.myAuthService.IsLogged()) return;
+    this.isLoadingSchedule = true;
+    try {
+      await this.profileService.getUserContent();
+      const user = this.profileService.userProfile;
+      if (!user) return;
+
+      this.isStaff = user.isVet || user.isNurse || user.isBarber || user.isMainVet;
+
+      if (this.isStaff) {
+        this.upcomingAppointments = (await this.appointmentService.getByEmployeeId(user.id)).slice(0, 3);
+      } else {
+        this.upcomingAppointments = (await this.appointmentService.getByCustomerId(user.id)).slice(0, 3);
+      }
+    } catch {
+      this.upcomingAppointments = [];
+    } finally {
+      this.isLoadingSchedule = false;
+    }
+  }
 
   protected readonly faHome = faHome;
   protected readonly faUser = faUser;
   protected readonly faShop = faShop;
   protected readonly faEnvelope = faEnvelope;
   protected readonly faGear = faGear;
-
-
 }

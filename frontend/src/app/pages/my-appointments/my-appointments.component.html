@@ -1,0 +1,242 @@
+<app-header-title
+  [title]="isStaff ? 'My Schedule' : 'My Appointments'"
+  [description]="isStaff ? 'Manage your upcoming patient appointments' : 'You can cancel an appointment at least 48 hours in advance'" />
+
+
+<!-- ═══════════════════════════════════════════════
+     STAFF VIEW — Table
+════════════════════════════════════════════════ -->
+<div *ngIf="isStaff" class="max-w-6xl mx-auto px-4 py-6">
+  <app-table
+    title="Upcoming Appointments"
+    [columns]="staffColumns"
+    [data]="staffTableData"
+    [actions]="staffActions"
+    [showSearch]="true"
+    [showExportCsv]="true"
+    (actionClick)="onStaffAction($event)">
+  </app-table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     REGULAR USER VIEW — Cards
+════════════════════════════════════════════════ -->
+<div *ngIf="!isStaff" class="max-w-6xl mx-auto px-4 py-6">
+  <div class="grid md:grid-cols-5 gap-6 items-start">
+
+    <!-- LEFT (3 cols): Calendar + Appointment cards -->
+    <div class="md:col-span-3 flex flex-col gap-4">
+
+      <!-- Calendar -->
+      <div class="bg-white rounded-2xl shadow-custom border border-gray-100 p-5">
+        <div class="flex justify-center">
+          <app-calendar (changeDate)="onDateChange($event)"></app-calendar>
+        </div>
+      </div>
+
+      <!-- Date heading -->
+      <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+        {{ selectedDate | date:'EEEE, MMMM d, y' }}
+      </p>
+
+      <!-- Loading skeleton -->
+      <div *ngIf="isLoading" class="flex flex-col gap-3">
+        <div *ngFor="let _ of [1,2]" class="h-20 bg-gray-100 rounded-xl animate-pulse"></div>
+      </div>
+
+      <!-- Appointment cards -->
+      <div *ngIf="!isLoading && filteredByDate.length > 0" class="flex flex-col gap-3">
+        <div *ngFor="let appt of filteredByDate"
+          class="bg-white rounded-xl shadow-sm border-2 p-4 cursor-pointer transition-all hover:shadow-md"
+          [ngClass]="selectedAppointment?.id === appt.id
+            ? 'border-turquoise-blue'
+            : 'border-gray-100'"
+          (click)="selectAppointment(appt)">
+
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <p class="text-sm text-gray-500 mb-1">
+                🐾 <span class="font-medium text-gray-700">{{ appt.animalName }}</span>
+                <span *ngIf="appt.speciesName" class="text-gray-400 ml-1">({{ appt.speciesName }})</span>
+              </p>
+              <p class="text-xs text-gray-400">
+                {{ appt.vetStationName }}
+              </p>
+              <p class="text-xs text-gray-400">
+                👨‍⚕️ {{ appt.employeeFirstName }} {{ appt.employeeLastName }}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 text-gray-600 shrink-0 ml-4">
+              <span class="text-lg">🕐</span>
+              <span class="text-xl font-bold tabular-nums">{{ appt.appointmentTime }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!isLoading && filteredByDate.length === 0"
+           class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl select-none">📅</div>
+        <p class="font-semibold text-gray-600">No appointments on this date</p>
+        <p class="text-sm text-gray-400 max-w-xs">Try selecting a different day from the calendar.</p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT (2 cols): Detail panel -->
+    <div class="md:col-span-2">
+      <div class="sticky top-24">
+
+        <!-- Detail card when appointment is selected -->
+        <div *ngIf="selectedAppointment"
+             class="bg-white rounded-2xl shadow-custom border border-gray-100 p-6">
+
+          <h3 class="font-bold text-lg text-gray-800 mb-5">Appointment Details</h3>
+
+          <div class="flex flex-col gap-4 text-sm">
+
+            <div>
+              <p class="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Date</p>
+              <p class="font-medium text-gray-800">
+                {{ selectedAppointment.slotDateTime | date:'fullDate' }}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Time</p>
+              <p class="font-semibold text-gray-800 text-lg">{{ selectedAppointment.appointmentTime }}</p>
+            </div>
+
+            <div class="h-px bg-gray-100"></div>
+
+            <div>
+              <p class="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Pet</p>
+              <p class="font-medium text-gray-800">
+                🐾 {{ selectedAppointment.animalName }}
+                <span *ngIf="selectedAppointment.speciesName" class="text-gray-400 font-normal">
+                  — {{ selectedAppointment.speciesName }}
+                </span>
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Specialist</p>
+              <p class="font-medium text-gray-800">
+                👨‍⚕️ {{ selectedAppointment.employeeFirstName }} {{ selectedAppointment.employeeLastName }}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Location</p>
+              <p class="font-medium text-gray-800">{{ selectedAppointment.vetStationName }}</p>
+            </div>
+          </div>
+
+          <!-- Cancel button -->
+          <div class="mt-6">
+            <button *ngIf="canCancel(selectedAppointment)"
+              (click)="openCancelModal(selectedAppointment)"
+              class="w-full py-2.5 rounded-xl bg-red-500 hover:bg-red-600 active:scale-[0.98]
+                     text-white font-semibold transition-all shadow-sm">
+              Cancel Appointment
+            </button>
+            <p *ngIf="!canCancel(selectedAppointment)"
+               class="text-xs text-gray-400 text-center py-2">
+              Cancellation unavailable — less than 48 hours before appointment.
+            </p>
+          </div>
+        </div>
+
+        <!-- Placeholder when nothing selected -->
+        <div *ngIf="!selectedAppointment"
+             class="bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-8 text-center">
+          <p class="text-gray-400 text-sm">Select an appointment to view details</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     CANCEL CONFIRMATION MODAL
+════════════════════════════════════════════════ -->
+<div class="modal bg-black bg-opacity-25" tabindex="-1"
+     [ngClass]="{ show: showCancelModal }"
+     [ngStyle]="{ display: showCancelModal ? 'block' : 'none' }">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title font-bold">Cancel Appointment</h5>
+        <button type="button" class="btn-close" (click)="closeCancelModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-gray-600">
+          Are you sure you want to cancel this appointment? This will free the time slot.
+        </p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-light" (click)="closeCancelModal()">No, keep it</button>
+        <button class="btn btn-danger" (click)="confirmCancel()">Yes, cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     RESCHEDULE MODAL (Staff only)
+════════════════════════════════════════════════ -->
+<div class="modal bg-black bg-opacity-25" tabindex="-1"
+     [ngClass]="{ show: showRescheduleModal }"
+     [ngStyle]="{ display: showRescheduleModal ? 'block' : 'none' }">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title font-bold">Reschedule Appointment</h5>
+        <button type="button" class="btn-close" (click)="closeRescheduleModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-gray-500 text-sm mb-3">Select a new time slot for this appointment:</p>
+
+        <!-- Loading slots -->
+        <div *ngIf="isLoadingSlots" class="flex flex-col gap-2">
+          <div *ngFor="let _ of [1,2,3]" class="h-10 bg-gray-100 rounded-lg animate-pulse"></div>
+        </div>
+
+        <!-- Slot list -->
+        <div *ngIf="!isLoadingSlots && availableSlots.length > 0" class="flex flex-col gap-1.5 max-h-60 overflow-y-auto">
+          <label *ngFor="let slot of availableSlots"
+                 class="flex items-center gap-3 py-2.5 px-3 rounded-lg cursor-pointer transition-colors"
+                 [ngClass]="selectedNewSlotId === slot.id ? 'bg-emerald-50 border border-emerald-300' : 'hover:bg-gray-50 border border-transparent'">
+            <input type="radio" name="newSlot" [value]="slot.id"
+                   class="accent-emerald-500"
+                   (change)="selectedNewSlotId = slot.id" />
+            <span class="text-sm font-medium text-gray-700">{{ slot.appointmentTime }}</span>
+          </label>
+        </div>
+
+        <!-- No slots -->
+        <div *ngIf="!isLoadingSlots && availableSlots.length === 0"
+             class="text-center py-6 text-gray-400 text-sm">
+          No available time slots for this date.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-light" (click)="closeRescheduleModal()">Cancel</button>
+        <button class="btn text-white"
+                style="background-color: #3FCA93;"
+                [disabled]="!selectedNewSlotId"
+                (click)="confirmReschedule()">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
