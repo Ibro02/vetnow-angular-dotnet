@@ -1,0 +1,120 @@
+<div class="table-container">
+
+  <!-- Header -->
+  <div class="table-header">
+    <h2 class="table-title">{{ title }}</h2>
+    <div class="header-actions">
+
+      <!-- Search -->
+      <div *ngIf="showSearch" class="search-wrapper">
+        <input
+          *ngIf="searchVisible"
+          [(ngModel)]="searchQuery"
+          class="search-input"
+          placeholder="Search..."
+          autofocus
+        />
+        <button class="icon-btn" (click)="toggleSearch()" title="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Export CSV -->
+      <button *ngIf="showExportCsv" class="export-btn" (click)="exportToCSV()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export CSV
+      </button>
+
+      <!-- Add Button -->
+      <button *ngIf="addButtonText" class="add-btn" (click)="addClick.emit()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        {{ addButtonText }}
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th *ngFor="let col of columns">{{ col.label }}</th>
+          <th class="actions-th"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of filteredData; let i = index" [ngClass]="getRowClass(row)">
+
+          <td *ngFor="let col of columns">
+
+            <!-- Avatar -->
+            <div *ngIf="col.type === 'avatar'" class="avatar-cell">
+              <div *ngIf="!col.imageKey || !row[col.imageKey]" class="avatar-placeholder">
+                {{ getInitials(row, col) }}
+              </div>
+              <img
+                *ngIf="col.imageKey && row[col.imageKey]"
+                [src]="row[col.imageKey]"
+                [alt]="getCellValue(row, col)"
+                class="avatar-img"
+              />
+              <div class="avatar-info">
+                <span class="avatar-name">{{ getCellValue(row, col) }}</span>
+                <span *ngIf="col.subtitleKey" class="avatar-sub">{{ row[col.subtitleKey] }}</span>
+              </div>
+            </div>
+
+            <!-- Badge -->
+            <span *ngIf="col.type === 'badge'" class="badge" [ngClass]="getBadgeClass(col, row[col.key])">
+              {{ row[col.key] }}
+            </span>
+
+            <!-- Text / Date -->
+            <span *ngIf="col.type === 'text' || col.type === 'date'">
+              {{ getCellValue(row, col) || '—' }}
+            </span>
+
+          </td>
+
+          <!-- Row actions (3-dot menu) -->
+          <td class="actions-td">
+            <div class="menu-wrapper">
+              <button class="menu-btn" (click)="toggleMenu(i, $event)" title="More actions">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="1.5"/>
+                  <circle cx="12" cy="12" r="1.5"/>
+                  <circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+              <div *ngIf="openMenuIndex === i" class="dropdown">
+                <button class="dropdown-item" (click)="onAction('edit', row)">Edit</button>
+                <button class="dropdown-item dropdown-item-danger" (click)="onAction('delete', row)">Delete</button>
+              </div>
+            </div>
+          </td>
+
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="filteredData.length === 0">
+          <td [attr.colspan]="columns.length + 1" class="empty-state">
+            No records found.
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
