@@ -126,10 +126,6 @@
   margin: auto;
 }
 
-
-
-
-
 .navigationList li{
   width: 90px;
   margin-bottom: 20px;
@@ -168,3 +164,18 @@
 }
 
 
+.signout-icon-btn {
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.signout-icon-btn:hover {
+  color: #e53935;
+}
+
+.signout-btn:hover {
+  color: #e53935;
+}
