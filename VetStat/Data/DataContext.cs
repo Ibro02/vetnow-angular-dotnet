@@ -30,6 +30,42 @@ namespace VetStat.Data
             .HasForeignKey(e => e.Id)
             .IsRequired(false);
 
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Employee)
+                .WithMany()
+                .HasForeignKey(a => a.EmployeeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.TimeSlot)
+                .WithMany()
+                .HasForeignKey(a => a.TimeSlotId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<Availability>()
+                .HasOne(a => a.Employee)
+                .WithMany()
+                .HasForeignKey(a => a.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TimeSlot>()
+                .HasOne(t => t.Employee)
+                .WithMany()
+                .HasForeignKey(t => t.SlotEmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Holiday>()
+                .HasOne(h => h.Employee)
+                .WithMany()
+                .HasForeignKey(h => h.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EmployeeWorkingDay>()
+                .HasOne(ewd => ewd.Employee)
+                .WithMany()
+                .HasForeignKey(ewd => ewd.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<EmployeeWorkingDay>()
            .HasKey(ewd => new { ewd.EmployeeId, ewd.WorkingDayId });
 
