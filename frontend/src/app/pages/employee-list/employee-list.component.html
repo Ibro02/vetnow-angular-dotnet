@@ -1,11 +1,9 @@
-<app-header-title description="List of employees">
-  Employees
-</app-header-title>
+<app-header-title description="List of employees" title="Employees"/>
 <div class="flex">
   <app-add-employee (event)="ngOnInit()"></app-add-employee>
   <app-button
     text="Export CSV"
-    type="secondary"
+    type="tertiary"
     (event)="exportToCSV()"
   ></app-button>
 </div>
