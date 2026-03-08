@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(dotnet build)",
-      "Bash(npx ng build --configuration development)"
+      "Bash(npx ng build --configuration development)",
+      "Bash(xargs grep -l \"UserProfile\\\\|ProfileService\")",
+      "Bash(xargs grep -l \"showModal\\\\|isOpen\\\\|isVisible\")",
+      "Bash(xargs grep -l \"app-toaster\")"
     ]
   }
 }
