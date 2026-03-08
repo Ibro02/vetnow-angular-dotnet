@@ -1,0 +1,39 @@
+using Microsoft.AspNetCore.Mvc;
+using VetStat.Data;
+using VetStat.Helpers.Api;
+using VetStat.Models;
+using static VetStat.Endpoints.EmployeeEndpoints.EmployeeGetByIdEndpoint;
+
+namespace VetStat.Endpoints.EmployeeEndpoints;
+
+[Route("api/Employee")]
+public class EmployeeGetByIdEndpoint : MyEndpointBaseAsync
+    .WithRequest<EmployeeGetByIdRequest>
+    .WithActionResult<Employee>
+{
+    private readonly DataContext _db;
+
+    public EmployeeGetByIdEndpoint(DataContext db)
+    {
+        _db = db;
+    }
+
+    [HttpGet("Get")]
+    public override async Task<ActionResult<Employee>> HandleAsync(
+        [FromQuery] EmployeeGetByIdRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(_db.Employee.Where(x => x.Id == request.Id).FirstOrDefault());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Could not find: {ex.Message}");
+        }
+    }
+
+    public class EmployeeGetByIdRequest
+    {
+        public int Id { get; set; }
+    }
+}
