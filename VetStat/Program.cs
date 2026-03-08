@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using VetStat.Endpoints.VetStationSearch;
+using VetStat.Endpoints.VetStationSearchEndpoints;
 using VetStat.Helpers.Services;
 using VetStat.Helpers.Services.Email;
 using VetStat.Helpers.Validators;
