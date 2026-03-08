@@ -1,0 +1,199 @@
+<div id="background">
+  <app-header-title
+    description="Edit your pets settings"
+    title="My Pets"
+  />
+
+  <div class="pets-container bg-white flex flex-col w-4/5 m-auto border-1 rounded-lg pb-6">
+
+    <!-- Page Title -->
+    <div class="flex flex-col items-center pt-6 pb-2">
+      <p *ngIf="viewMode === 'card'" class="text-sm text-gray-400 mt-1">Card list view of your pets</p>
+      <p *ngIf="viewMode === 'table'" class="text-sm text-gray-400 mt-1">Table view of your pets of all employees</p>
+    </div>
+
+    <!-- Toolbar: Filters | Toggle + Export + Add -->
+    <div class="toolbar flex items-center justify-between px-6 py-3">
+
+      <!-- Left side: Status filter + Search -->
+      <div class="flex items-center gap-3">
+
+        <!-- Status filter dropdown -->
+        <select
+          class="status-filter-select"
+          [ngModel]="statusFilter"
+          (ngModelChange)="onStatusFilterChange($event)">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">
+            {{ opt.label }}
+          </option>
+        </select>
+
+        <!-- Search input (functional) -->
+        <div class="search-box flex items-center border border-gray-300 rounded-lg px-3 py-2 gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" placeholder="Search here..."
+                 [ngModel]="searchQuery"
+                 (input)="onSearchInput($event)"
+                 class="bg-transparent outline-none text-sm text-gray-700 w-36"/>
+        </div>
+
+      </div>
+
+      <!-- Right side controls -->
+      <div class="flex items-center gap-3">
+
+        <span class="text-sm text-gray-500">Toggle view mode:</span>
+
+        <!-- Toggle view mode button -->
+        <button (click)="toggleViewMode()" class="toggle-btn" [title]="viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'">
+          <!-- Grid icon when in card view -->
+          <svg *ngIf="viewMode === 'card'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <!-- List icon when in table view -->
+          <svg *ngIf="viewMode === 'table'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </button>
+
+        <!-- Export All Medical Files (design only, shown in table view) -->
+        <button *ngIf="viewMode === 'table'" class="export-medical-btn" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export All Medical Files
+        </button>
+
+        <!-- Add pet button -->
+        <button (click)="addPet()" class="add-pet-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add pet
+        </button>
+      </div>
+    </div>
+
+    <!-- Card List View (default) -->
+    <div *ngIf="viewMode === 'card'" class="card-grid px-6 pt-4">
+      <app-pet-card
+        *ngFor="let pet of pets"
+        [name]="pet.name"
+        [species]="pet.speciesName ?? ''"
+        [breed]="pet.breedName ?? ''"
+        [age]="calculateAge(pet.birthDate)"
+        [picture]="getPetPictureUrl(pet)"
+        [petId]="pet.id"
+        [isDeleted]="pet.isDeleted === true"
+        (onDelete)="deletePet($event)"
+        (onRestore)="restorePet($event)"
+        (onDownloadPdf)="downloadPdf($event)"
+        (onEdit)="editPet($event)"
+      />
+
+      <div *ngIf="pets.length === 0" class="empty-state text-center text-gray-400 py-12 w-full">
+        No pets found. Click "Add pet" to add your first pet.
+      </div>
+    </div>
+
+    <!-- Card View Pagination -->
+    <div *ngIf="viewMode === 'card' && totalCount > 0" class="card-pagination flex items-center justify-between px-6 py-4 border-t border-gray-100 mt-4">
+      <!-- Rows per page -->
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">Rows per page:</span>
+        <select class="page-size-select"
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageChange({ pageNumber: 1, pageSize: $event })">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+        </select>
+      </div>
+
+      <!-- Range display -->
+      <span class="text-sm text-gray-500">
+        {{ ((currentPage - 1) * pageSize) + 1 }}–{{ currentPage * pageSize > totalCount ? totalCount : currentPage * pageSize }} of {{ totalCount }}
+      </span>
+
+      <!-- Page navigation -->
+      <div class="flex items-center gap-1">
+        <button class="page-btn" [disabled]="currentPage <= 1"
+                (click)="onPageChange({ pageNumber: 1, pageSize: pageSize })" title="First page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage <= 1"
+                (click)="onPageChange({ pageNumber: currentPage - 1, pageSize: pageSize })" title="Previous page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage * pageSize >= totalCount"
+                (click)="onPageChange({ pageNumber: currentPage + 1, pageSize: pageSize })" title="Next page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+        <button class="page-btn" [disabled]="currentPage * pageSize >= totalCount"
+                (click)="onPageChange({ pageNumber: totalPages, pageSize: pageSize })" title="Last page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Table View -->
+    <div *ngIf="viewMode === 'table'" class="px-6 pt-2">
+      <app-table
+        [title]="''"
+        [columns]="tableColumns"
+        [data]="tableData"
+        [showSearch]="false"
+        [showExportCsv]="false"
+        [showPagination]="true"
+        [totalCount]="totalCount"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        [pageSizeOptions]="[5, 10, 20]"
+        (pageChange)="onPageChange($event)"
+        (actionClick)="onTableAction($event)"
+      />
+    </div>
+
+  </div>
+
+  <!-- Pet Add/Edit Popup -->
+  <app-pet-add-card
+    [visible]="showPetForm"
+    [editPetData]="editingPetData"
+    (onSave)="onPetSave($event)"
+    (onCancel)="onPetCancel()"
+  />
+</div>

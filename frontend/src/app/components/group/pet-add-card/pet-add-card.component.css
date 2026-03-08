@@ -1,0 +1,19 @@
+/* Pet add/edit card modal styles */
+:host {
+  display: contents;
+}
+
+
+.photo-upload{
+  border:2px dashed #d1d5db;
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.photo-upload:hover{
+  border-color:#6366f1;
+  background:#f8fafc;
+}

@@ -40,5 +40,7 @@ namespace VetStat.Models
         public byte[]? MedicalFile { get;set; }
 
         public bool? IsFavourite { get; set; }
+
+        public bool? IsDeleted { get; set; }
     }
 }

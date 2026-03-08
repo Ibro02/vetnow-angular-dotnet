@@ -1,0 +1,24 @@
+.card-container {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.5s ease all;
+}
+
+.card-container:hover {
+  box-shadow: rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.2) 0px 3px 7px -3px;
+}
+
+.gradient-header {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 30%, #c084fc 70%, #e9d5ff 100%);
+}
+
+/* Deleted card styles */
+.card-deleted {
+  background-color: #f3f4f6;
+  opacity: 0.75;
+}
+
+.gradient-header-deleted {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 30%, #9ca3af 70%, #d1d5db 100%);
+}

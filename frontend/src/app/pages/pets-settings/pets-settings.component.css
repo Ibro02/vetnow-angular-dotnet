@@ -1,0 +1,155 @@
+/* Card grid layout */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: flex-start;
+}
+
+/* Search box */
+.search-box {
+  background: #fff;
+  min-width: 200px;
+}
+
+.search-box input::placeholder {
+  color: #9ca3af;
+}
+
+/* Toggle view mode button */
+.toggle-btn {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 7px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggle-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* Export medical files button */
+.export-medical-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.84rem;
+  color: #374151;
+  cursor: not-allowed;
+  opacity: 0.6;
+  font-family: inherit;
+}
+
+/* Add pet button */
+.add-pet-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #4ade80;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.add-pet-btn:hover {
+  background: #22c55e;
+}
+
+/* Status filter dropdown */
+.status-filter-select {
+  height: 38px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 32px 0 12px;
+  font-size: 0.84rem;
+  font-family: inherit;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+}
+
+.status-filter-select:focus {
+  border-color: #4ade80;
+}
+
+/* Toolbar responsive */
+.toolbar {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Empty state */
+.empty-state {
+  font-size: 0.9rem;
+}
+
+/* Card view pagination */
+.card-pagination {
+  border-top: 1px solid #f0f0f0;
+}
+
+.page-size-select {
+  height: 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0 24px 0 8px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.page-btn {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 5px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

@@ -1,0 +1,47 @@
+<div class="w-72 rounded-2xl card-container transition-all duration-150 overflow-hidden"
+     [class.bg-white]="!isDeleted"
+     [class.card-deleted]="isDeleted">
+
+  <!-- Gradient header -->
+  <div class="w-full h-20" [class.gradient-header]="!isDeleted" [class.gradient-header-deleted]="isDeleted"></div>
+
+  <!-- Pet image overlapping the header -->
+  <div class="flex justify-center -mt-10">
+    <div class="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
+      <img *ngIf="picture" [src]="picture" alt="Pet photo" class="w-full h-full object-cover"/>
+      <fa-icon *ngIf="!picture" [icon]="faPaw" class="text-3xl text-gray-400"></fa-icon>
+    </div>
+  </div>
+
+  <!-- Pet info -->
+  <div class="flex flex-col items-center px-4 pt-3 pb-2 gap-1">
+    <h2 class="text-black text-xl font-semibold font-['Inter']">{{ name }}</h2>
+    <p class="text-gray-600 text-sm font-normal font-['Inter']">Specie: {{ species }}</p>
+    <p class="text-gray-600 text-sm font-normal font-['Inter']">Breed: {{ breed }}</p>
+    <p class="text-gray-600 text-sm font-normal font-['Inter']">Age: {{ age }}</p>
+  </div>
+
+  <!-- Divider -->
+  <div class="w-full h-px bg-gray-200 mt-1"></div>
+
+  <!-- Action buttons -->
+  <div class="flex justify-between items-center px-4 py-3">
+    <!-- Delete button (active pets) -->
+    <button *ngIf="!isDeleted" (click)="delete()" class="text-gray-400 hover:text-red-500 transition-colors duration-200">
+      <fa-icon [icon]="faTrash" class="text-lg"></fa-icon>
+    </button>
+    <!-- Restore button (deleted pets) -->
+    <button *ngIf="isDeleted" (click)="restore()" class="text-gray-400 hover:text-emerald-500 transition-colors duration-200">
+      <fa-icon [icon]="faRotateLeft" class="text-lg"></fa-icon>
+    </button>
+    <div class="flex gap-3">
+      <button (click)="downloadPdf()" class="text-gray-400 hover:text-emerald-500 transition-colors duration-200">
+        <fa-icon [icon]="faFilePdf" class="text-lg"></fa-icon>
+      </button>
+      <button (click)="edit()" class="text-gray-400 hover:text-emerald-500 transition-colors duration-200">
+        <fa-icon [icon]="faPenToSquare" class="text-lg"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+</div>
