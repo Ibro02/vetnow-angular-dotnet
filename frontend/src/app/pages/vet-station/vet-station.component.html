@@ -88,16 +88,15 @@
           ngDefaultControl
         ></app-input>
         <app-input
-          type="dropdown"
+          type="text"
           label="Country"
           [value]="vetStationFormGroup.value.country?.toString()"
           [formControl]="vetStationFormGroup.controls.country"
-          (change)="countryChange()"
           [array]="countries"
           ngDefaultControl
         ></app-input>
         <app-input
-          type="dropdown"
+          type="text"
           label="City"
           [formControl]="vetStationFormGroup.controls.city"
           [value]="vetStationFormGroup.value.city?.toString()"
@@ -127,7 +126,11 @@
           >Choose on map:</label
         >
         <div class="">
-          <google-map [options]="mapOptions"></google-map>
+          <!-- Leaflet Map - full width below both columns -->
+          <div class="col-span-2 w-1/2" [style.visibility]="showCropWizard ? 'hidden' : 'visible'">
+            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Pick location on map</p>
+            <div #mapContainer class="w-full h-64 rounded-md overflow-hidden border border-gray-200 shadow-sm"></div>
+          </div>
         </div>
       </div>
       </form>
