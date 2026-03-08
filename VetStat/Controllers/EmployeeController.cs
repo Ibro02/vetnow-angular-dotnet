@@ -26,9 +26,9 @@ namespace VetStat.Controllers
             return NoContent();
         }
 
-        //api/Employee/Get
-        [HttpGet("{id}")]
-        public ActionResult<Employee> Delete(int id)
+        //api/Employee/Delete
+        [HttpDelete("{id}")]
+        public ActionResult<Employee> Delete([FromQuery] int id)
         {
             try
             {

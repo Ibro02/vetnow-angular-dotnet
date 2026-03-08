@@ -17,13 +17,13 @@ export class ButtonComponent implements OnInit {
 
   ngOnInit(): void {
     switch (this.type) {
-      case 'save':
+      case 'primary':
         this.color = 'bg-emerald-400';
         break;
-      case 'cancel':
+      case 'secondary':
         this.color = 'bg-neutral-600';
         break;
-      case 'secondary':
+      case 'tertiary':
         this.color = 'bg-neutral-100';
         this.textColor = 'text-secondary';
         break;
@@ -39,5 +39,5 @@ export class ButtonComponent implements OnInit {
 }
 
 export interface IButtonType {
-  [key: string]: 'save' | 'cancel'; // Extend as needed
+  [key: string]: 'primary' | 'secondary' | 'tertiary' // Extend as needed
 }
