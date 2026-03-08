@@ -18,6 +18,9 @@ builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddHostedService<something>();
+// DEV ENVIRONMENT: Generates time slots on startup and every 24h.
+// For production, replace with a proper scheduler (Hangfire, Quartz.NET, Azure Timer Trigger, etc.)
+builder.Services.AddHostedService<AppointmentGeneratorService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
