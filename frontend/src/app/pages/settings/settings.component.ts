@@ -55,15 +55,16 @@ export class SettingsComponent implements OnInit{
     { link: '/settings/subscriptions',    text: 'Subscriptions', icon: faCreditCard },
   ];
 
-  // Employee+ sees: My VetStation (readonly), Employees (readonly for Employee, editable for MainVet+), Availability
+  // MainVet+ only: manage the workspace and employee roster
   public workspaceSettingsArr: SettingsCardContent[] = [
     { link: '/settings/vet-station', text: 'Workspace', icon: faBriefcase },
     { link: '/settings/employees',   text: 'Employees', icon: faUsers     },
-    { link: '/settings/posts',       text: 'Posts',     icon: faNewspaper },
   ];
 
+  // Employee+ sees: Posts and Availability
   public employeeExtrasArr: SettingsCardContent[] = [
-    { link: '/settings/availability', text: 'Availability', icon: faClock },
+    { link: '/settings/posts',        text: 'Posts',        icon: faNewspaper },
+    { link: '/settings/availability', text: 'Availability', icon: faClock     },
   ];
 
   public adminSettingsArr: SettingsCardContent[] = [

@@ -5,13 +5,13 @@
         <app-settings-card [array]="accountSettingsArr"></app-settings-card>
     </div>
 
-    <!-- Workspace settings: visible to Employee+ (permission level >= 2) -->
-    <div class="" *ngIf="auth.isAtLeastEmployee()">
+    <!-- Workspace settings: MainVet+ only (Workspace & Employees management) -->
+    <div class="" *ngIf="auth.isAtLeastMainVet()">
         <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Workspace settings</h3>
         <app-settings-card [array]="workspaceSettingsArr"></app-settings-card>
     </div>
 
-    <!-- Employee extras: Availability -->
+    <!-- Employee extras: Posts & Availability (all employees) -->
     <div class="" *ngIf="auth.isAtLeastEmployee()">
         <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Employee</h3>
         <app-settings-card [array]="employeeExtrasArr"></app-settings-card>
