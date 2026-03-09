@@ -1,10 +1,12 @@
-<div  class="flex flex-row rounded-2xl bg-zinc-300 shadow-custom">
-    <div class="flex flex-col h-full w-16 m-auto">
-    </div>
+<div class="flex flex-row rounded-2xl bg-zinc-300 shadow-custom">
     <div class="">
-        <ul class="flex flex-col  items-start  w-96 h-14 text-left" *ngFor="let i of array">
-            <div *ngIf="i != array![0]" class="w-full h-px border border-white "></div>
-            <a [routerLink]="i?.link" class="flex my-auto text-black text-md font-semibold font-['Inter'] " ><li class="hover:text-zinc-400">{{i?.text}}</li></a>
+        <ul class="flex flex-col items-start w-96 h-14 text-left" *ngFor="let i of array">
+            <div *ngIf="i != array![0]" class="w-full h-px border border-white"></div>
+            <a [routerLink]="i?.link" class="flex items-center gap-3 px-5 my-auto text-black text-md font-semibold font-['Inter']">
+                <fa-icon *ngIf="i?.icon" [icon]="i!.icon!" class="text-zinc-500 w-5 text-center"></fa-icon>
+                <div *ngIf="!i?.icon" class="w-5"></div>
+                <li class="hover:text-zinc-400 list-none">{{i?.text}}</li>
+            </a>
         </ul>
     </div>
 </div>

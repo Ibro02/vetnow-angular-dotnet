@@ -3,6 +3,8 @@ import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../common/button/button.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { faPaw } from '@fortawesome/free-solid-svg-icons';
 
 // ─── Public Interfaces ────────────────────────────────────────────────────────
 
@@ -48,7 +50,7 @@ const PAW_COLORS = [
 @Component({
   selector: 'app-dynamic-form-card',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, FormsModule, ButtonComponent, DragDropModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, FormsModule, ButtonComponent, DragDropModule, FaIconComponent],
   templateUrl: './pet-add-card.component.html',
   styleUrl: './pet-add-card.component.css'
 })
@@ -68,6 +70,7 @@ export class DynamicFormCardComponent implements OnChanges {
 
   isEditMode: boolean = false;
   pawColor: string = '#9ca3af';
+  readonly faPaw = faPaw;
 
   // ── Photo helpers ──────────────────────────────────────────────────────────
 

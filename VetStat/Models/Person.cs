@@ -46,5 +46,10 @@ namespace VetStat.Models
 
         public bool verified { get; set; }
 
+        /// <summary>
+        /// Google OAuth subject ID. When set, this user registered/logged in via Google.
+        /// </summary>
+        public string? GoogleProviderId { get; set; }
+
     }
 }

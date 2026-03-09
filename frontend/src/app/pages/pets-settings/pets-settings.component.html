@@ -98,7 +98,8 @@
     <!-- Card List View (default) -->
     <div *ngIf="viewMode === 'card'" class="card-grid px-6 pt-4">
       <app-pet-card
-        *ngFor="let pet of pets"
+        *ngFor="let pet of pets; let i = index"
+        [cardIndex]="i"
         [name]="pet.name"
         [species]="pet.speciesName ?? ''"
         [breed]="pet.breedName ?? ''"
