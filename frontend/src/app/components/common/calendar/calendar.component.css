@@ -70,7 +70,36 @@ button {
   color: white;
 }
 
+/* Persistent "today" ring — always visible regardless of selection */
 .current-date {
-  background: #97fbd3 !important;
-  color: black;
+  border: 2px solid #06701b !important;
+  font-weight: 700;
+}
+
+/* Day cell — relative so the dot can be positioned inside */
+.day-cell {
+  position: relative;
+  flex-direction: column;
+}
+
+/* Small dot under the day number for days with appointments */
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3FCA93;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* When the day is selected, make the dot white so it stays visible */
+.selected .dot {
+  background: white;
+}
+
+/* Subtle font weight bump for highlighted days */
+.has-appointment {
+  font-weight: 600;
 }

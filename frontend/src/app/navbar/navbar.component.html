@@ -31,7 +31,58 @@
       <div class="line-clamp-1 w-full bg-black h-[0.01rem]"></div>
       <p class="Schedule text-center font-bold text-turquoise-blue my-3">My Schedule</p>
       <div class="line-clamp-1 mx-auto my-1 w-2/3 bg-gray-400 h-[0.01rem]"></div>
-      <div class="rounded-2xl w-full h-60 my-3 bg-turquoise-blue"></div>
+      <!-- Mini-schedule widget -->
+      <div class="w-full my-3">
+
+        <!-- Loading skeleton -->
+        <div *ngIf="isLoadingSchedule" class="flex flex-col gap-2">
+          <div class="h-14 bg-gray-100 rounded-xl animate-pulse"></div>
+          <div class="h-14 bg-gray-100 rounded-xl animate-pulse"></div>
+        </div>
+
+        <!-- Appointment mini-cards -->
+        <div *ngIf="!isLoadingSchedule && upcomingAppointments.length > 0" class="flex flex-col gap-2">
+          <div *ngFor="let appt of upcomingAppointments"
+               class="rounded-xl bg-white shadow-sm p-3 cursor-pointer border border-gray-100
+                      hover:border-turquoise-blue transition-all"
+               [routerLink]="['/my-appointments']"
+               data-bs-dismiss="offcanvas">
+            <!-- Regular user: date, time, pet -->
+            <div *ngIf="!isStaff">
+              <p class="text-[0.65rem] text-gray-400 mb-0.5">
+                {{ appt.slotDateTime | date:'EEE, MMM d' }}
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-semibold text-gray-700">{{ appt.appointmentTime }}</span>
+                <span class="text-xs text-turquoise-blue font-medium truncate ml-2">🐾 {{ appt.animalName }}</span>
+              </div>
+            </div>
+            <!-- Staff: date, time, species -->
+            <div *ngIf="isStaff">
+              <p class="text-[0.65rem] text-gray-400 mb-0.5">
+                {{ appt.slotDateTime | date:'EEE, MMM d' }}
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-semibold text-gray-700">{{ appt.appointmentTime }}</span>
+                <span class="text-xs text-turquoise-blue font-medium truncate ml-2">{{ appt.speciesName ?? '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoadingSchedule && upcomingAppointments.length === 0"
+             class="rounded-xl bg-turquoise-blue bg-opacity-10 py-6 px-3 text-center">
+          <p class="text-sm text-gray-400">No upcoming appointments</p>
+        </div>
+
+        <!-- View all link -->
+        <a [routerLink]="['/my-appointments']"
+           data-bs-dismiss="offcanvas"
+           class="text-xs text-turquoise-blue font-semibold cursor-pointer link-hover block text-center mt-2.5">
+          View all →
+        </a>
+      </div>
         </div>
         <h3 class="Schedule text-center text-turquoise-blue my-3 w-full flex justify-center items-center gap-1 cursor-pointer link-hover" [routerLink]="['settings']"><fa-icon [icon]="faGear"  class="text-xl w-8"></fa-icon>Manage</h3>
       </div>

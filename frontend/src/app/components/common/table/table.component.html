@@ -98,8 +98,12 @@
                 </svg>
               </button>
               <div *ngIf="openMenuIndex === i" class="dropdown">
-                <button class="dropdown-item" (click)="onAction('edit', row)">Edit</button>
-                <button class="dropdown-item dropdown-item-danger" (click)="onAction('delete', row)">Delete</button>
+                <button *ngFor="let action of actions"
+                        class="dropdown-item"
+                        [ngClass]="{ 'dropdown-item-danger': action.isDanger }"
+                        (click)="onAction(action.key, row)">
+                  {{ action.label }}
+                </button>
               </div>
             </div>
           </td>

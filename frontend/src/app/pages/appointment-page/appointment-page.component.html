@@ -1,37 +1,227 @@
-<app-header-title description="Choose date from calendar below" title="Make an appointment"/>
-<div class=""></div>
-<app-appointment-layout>
-  <div class="">
-  <app-title>Select date</app-title>
-  <app-calendar (changeDate)="changeDate($event)"></app-calendar>
-  </div>
+<app-header-title description="Book your appointment in just a few steps" title="Make an Appointment"/>
 
-  <div class="flex flex-wrap gap-5 flex-col h-full">
-    <div class="">
-      <app-title>Select Pet</app-title>
-      <div class="dropdown-center">
-        <button class="btn btn-secondary bg-emerald-500 text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          {{selectedPet?.name ?? "Search pet"}}
-        </button>
-        <ul class="dropdown-menu"  >
-          <li [value]="p.id" *ngFor="let p of this.pets">
-            <a class="dropdown-item cursor-pointer" (click)="afterPetSelect(p)">{{p.name}}</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div>
-      <app-title>Select time</app-title>
-      <div class="grid grid-cols-3 gap-5">
-      <div *ngFor="let timeslot of timeSlots" (click)="prepareAnAppointment(timeslot)"
-           class="group bg-gray-200 text-black px-10 py-3 rounded-md shadow-xl border-emerald-400 hover:bg-emerald-400 hover:cursor-pointer transition-all" [class.bg-green-300]="timeslot.id == newAppointment?.timeSlotId">
-        <button class="group-hover:text-white text-xl font-['Inter']" >
-          {{timeslot.appointmentTime}}
-        </button>
-      </div>
-      </div>
-    </div>
-    <button type="button" class="btn btn-success" [hidden]="!appointmentTime" (click)="makeAnAppointment()">Make an appointment for {{appointmentTime}}</button>
-  </div>
-</app-appointment-layout>
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="grid md:grid-cols-2 gap-6 items-start">
 
+    <!-- ═══════════════════════════════════════
+         LEFT — Employee card + Calendar
+    ══════════════════════════════════════════ -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Employee info card -->
+      <div *ngIf="employee"
+           class="bg-white rounded-2xl border border-gray-100 shadow-custom p-4 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center
+                    text-emerald-600 text-xl font-extrabold shrink-0 select-none">
+          {{ (employee.firstName ?? '?').charAt(0).toUpperCase() }}
+        </div>
+        <div>
+          <p class="font-semibold text-gray-800 text-lg leading-tight">
+            {{ employee.firstName }} {{ employee.lastName }}
+          </p>
+          <p class="text-sm text-gray-400 mt-0.5">Your appointment specialist</p>
+        </div>
+      </div>
+
+      <!-- Skeleton while employee loads -->
+      <div *ngIf="!employee"
+           class="bg-white rounded-2xl border border-gray-100 shadow-custom p-4 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-gray-100 animate-pulse shrink-0"></div>
+        <div class="flex flex-col gap-2 w-full">
+          <div class="h-4 bg-gray-100 rounded-full animate-pulse w-2/3"></div>
+          <div class="h-3 bg-gray-100 rounded-full animate-pulse w-1/3"></div>
+        </div>
+      </div>
+
+      <!-- Calendar card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-custom p-5">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Pick a date</p>
+        <div class="flex justify-center">
+          <app-calendar (changeDate)="changeDate($event)"></app-calendar>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         RIGHT — Booking steps
+    ══════════════════════════════════════════ -->
+    <div class="flex flex-col gap-5">
+
+      <!-- ─── Step 1: Select pet ─────────────── -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-custom p-5">
+
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-7 h-7 rounded-full bg-emerald-500 text-white text-sm font-bold
+                       flex items-center justify-center shrink-0">1</span>
+          <p class="font-semibold text-gray-700">Select your pet</p>
+        </div>
+
+        <!-- Loading skeleton -->
+        <div *ngIf="isLoadingPets" class="flex gap-3">
+          <div class="h-10 w-full bg-gray-100 rounded-xl animate-pulse"></div>
+        </div>
+
+        <!-- No pets warning -->
+        <div *ngIf="!isLoadingPets && pets.length === 0"
+             class="flex items-center gap-3 py-3 px-4 bg-amber-50 border border-amber-200
+                    rounded-xl text-amber-700 text-sm">
+          <span class="text-lg shrink-0">⚠️</span>
+          <span>No pets on your profile yet. Add one before booking an appointment.</span>
+        </div>
+
+        <!-- Searchable dropdown -->
+        <div *ngIf="!isLoadingPets && pets.length > 0" class="relative">
+
+          <!-- Trigger button -->
+          <button type="button" (click)="togglePetDropdown()"
+            [class]="isPetDropdownOpen
+              ? 'w-full flex items-center justify-between px-4 py-2.5 rounded-xl border-2 border-emerald-500 bg-white text-left transition-all shadow-sm'
+              : 'w-full flex items-center justify-between px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-gray-50 text-left hover:border-emerald-400 transition-all'">
+            <span class="flex items-center gap-2">
+              <span>🐾</span>
+              <span [class]="selectedPet ? 'text-gray-800 font-medium text-sm' : 'text-gray-400 text-sm'">
+                {{ selectedPet?.name ?? 'Search or select a pet...' }}
+              </span>
+            </span>
+            <!-- Chevron — rotates when open -->
+            <svg [class]="isPetDropdownOpen ? 'w-4 h-4 text-emerald-500 transition-transform rotate-180' : 'w-4 h-4 text-gray-400 transition-transform'"
+                 fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+            </svg>
+          </button>
+
+          <!-- Dropdown panel -->
+          <div *ngIf="isPetDropdownOpen"
+               class="absolute z-20 top-full mt-1.5 w-full bg-white border border-gray-200
+                      rounded-xl shadow-lg overflow-hidden">
+
+            <!-- Search input -->
+            <div class="p-2 border-b border-gray-100">
+              <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                </svg>
+                <input #petSearchInput
+                       type="text"
+                       [(ngModel)]="petSearch"
+                       placeholder="Search by name…"
+                       class="flex-1 bg-transparent text-sm outline-none text-gray-700 placeholder-gray-400"
+                       (click)="$event.stopPropagation()"/>
+              </div>
+            </div>
+
+            <!-- Options list -->
+            <ul class="max-h-52 overflow-y-auto py-1">
+
+              <!-- No results -->
+              <li *ngIf="filteredPets.length === 0"
+                  class="px-4 py-3 text-sm text-gray-400 text-center">
+                No pets match "<span class="italic">{{ petSearch }}</span>"
+              </li>
+
+              <!-- Pet rows -->
+              <li *ngFor="let p of filteredPets"
+                (click)="selectPet(p)"
+                [class]="selectedPet?.id === p.id
+                  ? 'flex items-center justify-between px-4 py-2.5 cursor-pointer bg-emerald-50 text-emerald-700'
+                  : 'flex items-center justify-between px-4 py-2.5 cursor-pointer hover:bg-gray-50 text-gray-700 transition-colors'">
+                <span class="flex items-center gap-2 text-sm font-medium">
+                  <span>🐾</span>
+                  <span>{{ p.name }}</span>
+                </span>
+                <!-- Tick for the currently selected option -->
+                <svg *ngIf="selectedPet?.id === p.id"
+                     class="w-4 h-4 text-emerald-500 shrink-0"
+                     fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                </svg>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── Step 2: Select time slot ──────── -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-custom p-5">
+
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-7 h-7 rounded-full bg-emerald-500 text-white text-sm font-bold
+                       flex items-center justify-center shrink-0">2</span>
+          <p class="font-semibold text-gray-700">Select a time slot</p>
+        </div>
+
+        <!-- Loading skeleton -->
+        <div *ngIf="isLoadingSlots" class="grid grid-cols-3 gap-3">
+          <div *ngFor="let _ of [1,2,3,4,5,6]"
+               class="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+        </div>
+
+        <!-- ── Empty state ── -->
+        <div *ngIf="!isLoadingSlots && (!timeSlots || timeSlots.length === 0)"
+             class="flex flex-col items-center justify-center py-10 gap-3 text-center">
+          <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl select-none">
+            📅
+          </div>
+          <p class="font-semibold text-gray-600 text-base">No slots available</p>
+          <p class="text-sm text-gray-400 max-w-xs leading-relaxed">
+            There are no open appointment slots for the selected day.
+            <br>Try choosing a different date from the calendar.
+          </p>
+        </div>
+
+        <!-- Time slot grid -->
+        <div *ngIf="!isLoadingSlots && timeSlots && timeSlots.length > 0"
+             class="grid grid-cols-3 gap-3">
+          <button *ngFor="let timeslot of timeSlots"
+            (click)="prepareAnAppointment(timeslot)"
+            [class]="newAppointment?.timeSlotId === timeslot.id
+              ? 'flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 font-bold text-sm transition-all shadow-sm'
+              : 'flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl border-2 border-gray-200 text-gray-500 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700 transition-all'">
+            <span class="text-base leading-none">🕐</span>
+            <span class="tabular-nums">{{ timeslot.appointmentTime.substring(0, 5) }}</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ─── Step 3: Booking summary ────────── -->
+      <div *ngIf="appointmentTime"
+           class="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-5">
+
+        <p class="font-bold text-emerald-800 mb-3 text-base">📋 Booking Summary</p>
+
+        <div class="flex flex-col gap-2 text-sm text-emerald-800 mb-5">
+          <div class="flex items-start gap-2">
+            <span class="shrink-0 mt-0.5">📅</span>
+            <span><span class="font-semibold">When:</span> {{ appointmentTime }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="shrink-0">🐾</span>
+            <span><span class="font-semibold">Pet:</span> {{ selectedPet?.name ?? '—' }}</span>
+          </div>
+          <div *ngIf="employee" class="flex items-center gap-2">
+            <span class="shrink-0">👨‍⚕️</span>
+            <span>
+              <span class="font-semibold">Specialist:</span>
+              {{ employee.firstName }} {{ employee.lastName }}
+            </span>
+          </div>
+        </div>
+
+        <button
+          (click)="makeAnAppointment()"
+          class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white
+                 font-semibold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg">
+          ✔&nbsp; Confirm Appointment
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>

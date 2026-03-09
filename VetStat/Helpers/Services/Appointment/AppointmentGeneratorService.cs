@@ -1,46 +1,230 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
-using System;
 using VetStat.Data;
+using VetStat.Models;
 
 namespace VetStat.Helpers.Services
 {
+    /// <summary>
+    /// Background service that generates time slots 30 days in advance for all employees
+    /// and cleans up old/passed unused time slots.
+    ///
+    /// DEV ENVIRONMENT: This runs on app startup and then every 24 hours via BackgroundService.
+    /// For production, replace this with a proper scheduled job (e.g., Hangfire, Quartz.NET, or Azure Functions Timer Trigger).
+    /// </summary>
     public class AppointmentGeneratorService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<AppointmentGeneratorService> _logger;
         private readonly TimeSpan _interval = TimeSpan.FromDays(1);
-        public AppointmentGeneratorService(IServiceProvider serviceProvider)
+        private const int DaysInAdvance = 30;
+
+        public AppointmentGeneratorService(IServiceProvider serviceProvider, ILogger<AppointmentGeneratorService> logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            // Run immediately on startup (DEV ENVIRONMENT - for production use a proper scheduler)
+            await GenerateAndCleanup();
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                await AppointmentGenerator();
                 await Task.Delay(_interval, stoppingToken);
+                await GenerateAndCleanup();
             }
         }
-        private async Task AppointmentGenerator()
+
+        private async Task GenerateAndCleanup()
         {
-            using var scope = _serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-            var now = DateTime.UtcNow;
-            var expiredTokens = await dbContext.TimeSlot
-                .Where(t => t.SlotDateTime < now)
+                await CleanupOldTimeSlots(db);
+                await GenerateTimeSlotsForAllEmployees(db);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in AppointmentGeneratorService");
+            }
+        }
+
+        /// <summary>
+        /// Deletes old time slots that have passed.
+        /// First detaches any appointments referencing these slots (sets TimeSlotId = null),
+        /// since the FK uses ClientSetNull which doesn't cascade on the DB side.
+        /// </summary>
+        private async Task CleanupOldTimeSlots(DataContext db)
+        {
+            var today = DateTime.Now.Date;
+
+            var expiredSlotIds = await db.TimeSlot
+                .Where(t => t.SlotDateTime.Date < today)
+                .Select(t => t.Id)
                 .ToListAsync();
-            var employees = await dbContext.Employee.ToListAsync();
 
-            foreach ( var employee in employees)
-            {
+            if (!expiredSlotIds.Any())
+                return;
 
-            }
-            if (expiredTokens.Any())
+            // Detach appointments from expired time slots (set FK to null)
+            var appointmentsToDetach = await db.Appointment
+                .Where(a => a.TimeSlotId != null && expiredSlotIds.Contains(a.TimeSlotId.Value))
+                .ToListAsync();
+
+            foreach (var appointment in appointmentsToDetach)
             {
-                dbContext.TimeSlot.RemoveRange(expiredTokens);
-                await dbContext.SaveChangesAsync();
+                appointment.TimeSlotId = null;
             }
+
+            // Now safe to delete the expired time slots
+            var expiredSlots = await db.TimeSlot
+                .Where(t => expiredSlotIds.Contains(t.Id))
+                .ToListAsync();
+
+            db.TimeSlot.RemoveRange(expiredSlots);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("Cleaned up {Count} expired time slots, detached {AppCount} appointments.",
+                expiredSlots.Count, appointmentsToDetach.Count);
+        }
+
+        /// <summary>
+        /// Generates time slots 30 days in advance for all active employees that have availability set.
+        /// Skips non-working days, holidays, break times, and days that already have slots generated.
+        ///
+        /// NOTE: We loop over Availability records instead of Employee records because
+        /// Employee.Id (which hides Person.Id) is not reliably populated by EF due to
+        /// the TPT inheritance setup. Availability.EmployeeId is a proper FK and always correct.
+        /// </summary>
+        private async Task GenerateTimeSlotsForAllEmployees(DataContext db)
+        {
+            // Get all availabilities for active (non-deleted) employees
+            var availabilities = await db.Availability
+                .Include(a => a.Employee)
+                .Where(a => a.EmployeeId != null && a.Employee != null && !a.Employee.IsDeleted)
+                .ToListAsync();
+
+            foreach (var availability in availabilities)
+            {
+                try
+                {
+                    await GenerateTimeSlotsForEmployee(db, availability);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error generating time slots for employee {EmployeeId}", availability.EmployeeId);
+                }
+            }
+        }
+
+        private async Task GenerateTimeSlotsForEmployee(DataContext db, Availability availability)
+        {
+            var employeeId = availability.EmployeeId!.Value;
+
+            // Get employee's working days (e.g., "Monday", "Tuesday", ...)
+            var workingDayNames = await db.EmployeeWorkingDays
+                .Where(ewd => ewd.EmployeeId == employeeId)
+                .Join(db.WorkingDays,
+                    ewd => ewd.WorkingDayId,
+                    wd => wd.id,
+                    (ewd, wd) => wd.DayInAWeek)
+                .ToListAsync();
+
+            // Get employee's holidays
+            var holidays = await db.Holidays
+                .Where(h => h.EmployeeId == employeeId)
+                .ToListAsync();
+
+            // Get dates that already have time slots generated
+            var today = DateTime.Now.Date;
+            var endDate = today.AddDays(DaysInAdvance);
+
+            var existingSlotDates = await db.TimeSlot
+                .Where(ts => ts.SlotEmployeeId == employeeId
+                    && ts.SlotDateTime.Date >= today
+                    && ts.SlotDateTime.Date <= endDate)
+                .Select(ts => ts.SlotDateTime.Date)
+                .Distinct()
+                .ToListAsync();
+
+            // Calculate the time slot times (skip break period)
+            var slotTimes = CalculateSlotTimes(availability);
+
+            int totalSlotsGenerated = 0;
+
+            for (var date = today; date <= endDate; date = date.AddDays(1))
+            {
+                // Skip if slots already exist for this date
+                if (existingSlotDates.Contains(date))
+                    continue;
+
+                // Skip if it's not a working day
+                //var dayName = date.DayOfWeek.ToString();
+                //if (!workingDayNames.Any(wd => wd.Equals(dayName, StringComparison.OrdinalIgnoreCase)))
+                //    continue;
+
+                // Skip if employee is on holiday
+                if (holidays.Any(h => date >= h.StartDate.Date && date <= h.EndDate.Date))
+                    continue;
+
+                // Generate time slots for this date
+                foreach (var slotTime in slotTimes)
+                {
+                    db.TimeSlot.Add(new TimeSlot
+                    {
+                        IsAvailable = true,
+                        AvailabilityId = availability.Id,
+                        SlotDateTime = date,
+                        SlotEmployeeId = employeeId,
+                        AppointmentTime = slotTime
+                    });
+                }
+
+                totalSlotsGenerated += slotTimes.Count;
+            }
+
+            if (totalSlotsGenerated > 0)
+            {
+                await db.SaveChangesAsync();
+                _logger.LogInformation("Generated {Count} time slots for employee {EmployeeId}.",
+                    totalSlotsGenerated, employeeId);
+            }
+        }
+
+        /// <summary>
+        /// Calculates all appointment time slots for a day based on availability,
+        /// skipping the break period.
+        /// </summary>
+        private List<TimeSpan> CalculateSlotTimes(Availability availability)
+        {
+            var slots = new List<TimeSpan>();
+
+            var current = availability.AvailableFrom;
+            var end = availability.AvailableTo;
+            var breakFrom = availability.BreakFrom;
+            var breakTo = availability.BreakTo;
+            int duration = availability.AppointmentDuration;
+
+            while (current.Add(TimeSpan.FromMinutes(duration)) <= end)
+            {
+                // Skip slots that overlap with break time
+                var slotEnd = current.Add(TimeSpan.FromMinutes(duration));
+
+                bool overlapWithBreak = current < breakTo && slotEnd > breakFrom;
+
+                if (!overlapWithBreak)
+                {
+                    slots.Add(current);
+                }
+
+                current = current.Add(TimeSpan.FromMinutes(duration));
+            }
+
+            return slots;
         }
     }
 }
