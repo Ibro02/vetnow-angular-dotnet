@@ -26,7 +26,7 @@ public class PetDataSeeder
     /// </summary>
     public async Task SeedAsync()
     {
-        
+
         if (_context.Species.Any() || _context.Breed.Any() || _context.Animal.Any())
         {
             Console.WriteLine("Seed data already exists. Skipping...");

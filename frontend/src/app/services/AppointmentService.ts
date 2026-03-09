@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import axios from 'axios';
 import { Config } from '../config';
 import { MyAuthService } from './MyAuth';
@@ -24,6 +25,9 @@ export interface AppointmentDto {
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {
+
+  /** Emits whenever appointments are modified (cancel, reschedule) */
+  changed$ = new Subject<void>();
 
   constructor(private authService: MyAuthService) {}
 
@@ -52,6 +56,7 @@ export class AppointmentService {
       Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`,
       { headers: this.headers }
     );
+    this.changed$.next();
   }
 
   async reschedule(appointmentId: number, newTimeSlotId: number): Promise<void> {
@@ -60,6 +65,7 @@ export class AppointmentService {
       { appointmentId, newTimeSlotId },
       { headers: this.headers }
     );
+    this.changed$.next();
   }
 
   /** Returns true if the appointment is >= 48 hours away (cancellable by regular user) */

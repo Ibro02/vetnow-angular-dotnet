@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import {NgForOf} from "@angular/common";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {NgForOf, NgIf, NgClass} from "@angular/common";
 import {ActivatedRoute, Route, Router, RouterLink} from "@angular/router";
 
 @Component({
@@ -7,6 +7,8 @@ import {ActivatedRoute, Route, Router, RouterLink} from "@angular/router";
   standalone: true,
   imports: [
     NgForOf,
+    NgIf,
+    NgClass,
     RouterLink
   ],
   templateUrl: './calendar.component.html',
@@ -14,6 +16,7 @@ import {ActivatedRoute, Route, Router, RouterLink} from "@angular/router";
 })
 export class CalendarComponent {
   @Output() changeDate = new EventEmitter<Date>();
+  @Input() highlightedDates: Date[] = [];
   currentDate: Date = new Date();
   selectedDate: Date | null = null;
   constructor(public router: Router, private route: ActivatedRoute) {
@@ -57,6 +60,16 @@ export class CalendarComponent {
     });
 
     //this.router.navigate([{date: this.selectedDate.toISOString()}]);
+  }
+
+  isHighlighted(day: number): boolean {
+    return this.highlightedDates.some(d => {
+      const hd = new Date(d);
+      // Use UTC to avoid timezone shifting the date forward by one day
+      return hd.getUTCFullYear() === this.year
+        && hd.getUTCMonth() === this.currentDate.getMonth()
+        && hd.getUTCDate() === day;
+    });
   }
 
   protected readonly Date = Date;

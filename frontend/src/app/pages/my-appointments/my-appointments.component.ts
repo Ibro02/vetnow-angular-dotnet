@@ -89,15 +89,25 @@ export class MyAppointmentsComponent implements OnInit {
     }
   }
 
+  // ── Dates that have at least one appointment (for calendar highlighting) ──
+  get appointmentDates(): Date[] {
+    return this.appointments.map(a => new Date(a.slotDateTime));
+  }
+
   // ── Regular user: filter by selected date ──
   get filteredByDate(): AppointmentDto[] {
     return this.appointments.filter(a => {
       const d = new Date(a.slotDateTime);
-      return d.toDateString() === this.selectedDate.toDateString();
+      // Use UTC for the appointment date to avoid timezone shift
+      return d.getUTCFullYear() === this.selectedDate.getFullYear()
+        && d.getUTCMonth() === this.selectedDate.getMonth()
+        && d.getUTCDate() === this.selectedDate.getDate();
     });
   }
 
   onDateChange(date: Date) {
+    // Calendar emits day+1 for URL query-param compat; undo the offset for filtering
+    date.setDate(date.getDate() - 1);
     this.selectedDate = date;
     this.selectedAppointment = null;
   }
@@ -178,11 +188,13 @@ export class MyAppointmentsComponent implements OnInit {
 
   // ── Staff table 3-dot menu handler ──
   onStaffAction(event: { action: string; row: any }) {
-    const appt = event.row as AppointmentDto;
+    // Look up the original appointment (staffTableData formats slotDateTime for display)
+    const original = this.appointments.find(a => a.id === event.row.id);
+    if (!original) return;
     if (event.action === 'cancel') {
-      this.openCancelModal(appt);
+      this.openCancelModal(original);
     } else if (event.action === 'reschedule') {
-      this.openRescheduleModal(appt);
+      this.openRescheduleModal(original);
     }
   }
 

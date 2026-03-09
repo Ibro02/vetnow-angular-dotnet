@@ -9,8 +9,11 @@
     <div *ngFor="let _ of [].constructor(firstDayOfMonth); let i = index" class="empty-day"></div>
     <div *ngFor="let day of [].constructor(daysInMonth); let i = index"
          (click)="selectDate(i + 1)"
-         [class.selected]="selectedDate?.getDate() === i + 1">
+         [class.selected]="selectedDate?.getDate() === i + 1 && selectedDate?.getMonth() === currentDate.getMonth() && selectedDate?.getFullYear() === year"
+         [ngClass]="{ 'has-appointment': isHighlighted(i + 1) }"
+         class="day-cell">
       {{ i + 1 }}
+      <span *ngIf="isHighlighted(i + 1)" class="dot"></span>
     </div>
   </div>
 </div>
