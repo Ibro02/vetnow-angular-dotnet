@@ -1,0 +1,330 @@
+<app-header-title title="Admin Panel" description="Manage users and vet stations" />
+
+<!-- Tabs -->
+<div class="flex justify-center gap-4 mt-6 mb-6">
+  <button class="tab-btn" [ngClass]="{ 'tab-active': activeTab === 'users' }" (click)="switchTab('users')">Users</button>
+  <button class="tab-btn" [ngClass]="{ 'tab-active': activeTab === 'vetstations' }" (click)="switchTab('vetstations')">Vet Stations</button>
+</div>
+
+<!-- ═══════════════════════ USERS TAB ═══════════════════════ -->
+<div *ngIf="activeTab === 'users'">
+  <app-table
+    title="Users"
+    [columns]="userColumns"
+    [data]="users"
+    [actions]="userActions"
+    addButtonText="Add User"
+    [showPagination]="true"
+    [totalCount]="usersTotalCount"
+    [pageSize]="usersPageSize"
+    [currentPage]="usersPage"
+    (pageChange)="onUsersPageChange($event)"
+    (searchChange)="onUsersSearch($event)"
+    (actionClick)="onUserAction($event)"
+    (addClick)="openAddUser()"
+  />
+</div>
+
+<!-- ═══════════════════════ VET STATIONS TAB ═══════════════════════ -->
+<div *ngIf="activeTab === 'vetstations' && !showStationDetail">
+  <app-table
+    title="Vet Stations"
+    [columns]="stationColumns"
+    [data]="stations"
+    [actions]="stationActions"
+    addButtonText="Add Vet Station"
+    [showPagination]="true"
+    [totalCount]="stationsTotalCount"
+    [pageSize]="stationsPageSize"
+    [currentPage]="stationsPage"
+    (pageChange)="onStationsPageChange($event)"
+    (searchChange)="onStationsSearch($event)"
+    (actionClick)="onStationAction($event)"
+    (addClick)="openAddStation()"
+  />
+</div>
+
+<!-- ═══════════════════════ STATION DETAIL VIEW ═══════════════════════ -->
+<div *ngIf="activeTab === 'vetstations' && showStationDetail && stationDetail" class="detail-container">
+
+  <!-- Back button -->
+  <button class="back-btn" (click)="closeStationDetail()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Vet Stations
+  </button>
+
+  <!-- Station Header Card -->
+  <div class="station-header-card">
+    <div class="station-header-top">
+      <div class="station-identity">
+        <div class="station-avatar">
+          {{ (stationDetail.name || 'V')[0] }}
+        </div>
+        <div>
+          <h2 class="station-name">{{ stationDetail.name }}</h2>
+          <p class="station-location">{{ stationDetail.city }}, {{ stationDetail.country }}</p>
+          <span *ngIf="stationMainVet" class="main-vet-badge">
+            {{ stationMainVet.firstName }} {{ stationMainVet.lastName }}
+          </span>
+        </div>
+      </div>
+      <div class="station-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ stationMetrics.totalAppointments }}</span>
+          <span class="stat-label">Appointments</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stationMetrics.totalEmployees }}</span>
+          <span class="stat-label">Employees</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stationMetrics.totalVets }}</span>
+          <span class="stat-label">Vets</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stationMetrics.totalNurses }}</span>
+          <span class="stat-label">Nurses</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stationMetrics.totalBarbers }}</span>
+          <span class="stat-label">Barbers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Tabs -->
+    <div class="detail-tabs">
+      <button class="detail-tab" [ngClass]="{ 'detail-tab-active': detailTab === 'employees' }" (click)="detailTab = 'employees'">Employees table</button>
+      <button class="detail-tab" [ngClass]="{ 'detail-tab-active': detailTab === 'info' }" (click)="detailTab = 'info'">Station info</button>
+    </div>
+  </div>
+
+  <!-- Employees Sub-tab -->
+  <div *ngIf="detailTab === 'employees'">
+    <app-table
+      title="Employees"
+      [columns]="stationEmpColumns"
+      [data]="stationEmployees"
+      [actions]="stationEmpActions"
+      addButtonText="Assign Employee"
+      (addClick)="openAssignEmployee()"
+      (actionClick)="onStationEmpAction($event)"
+    />
+  </div>
+
+  <!-- Info Sub-tab -->
+  <div *ngIf="detailTab === 'info'" class="info-grid">
+    <div class="info-card">
+      <h4>Contact</h4>
+      <div class="info-row"><span>Email</span><span>{{ stationDetail.email }}</span></div>
+      <div class="info-row"><span>Phone</span><span>{{ stationDetail.contactNumber }}</span></div>
+      <div class="info-row"><span>Address</span><span>{{ stationDetail.address }}</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Services</h4>
+      <div class="info-row"><span>In Office</span><span>{{ stationDetail.inOffice ? 'Yes' : 'No' }}</span></div>
+      <div class="info-row"><span>On Field</span><span>{{ stationDetail.onField ? 'Yes' : 'No' }}</span></div>
+      <div class="info-row"><span>Parking</span><span>{{ stationDetail.parking ? 'Yes' : 'No' }}</span></div>
+      <div class="info-row"><span>Wheelchair</span><span>{{ stationDetail.wheelchair ? 'Yes' : 'No' }}</span></div>
+      <div class="info-row"><span>Wifi</span><span>{{ stationDetail.wifi ? 'Yes' : 'No' }}</span></div>
+    </div>
+    <div *ngIf="stationDetail.description" class="info-card info-card-full">
+      <h4>Description</h4>
+      <p class="info-description">{{ stationDetail.description }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MODALS ═══════════════════════ -->
+
+<!-- Change Role Modal -->
+<div *ngIf="showRoleModal" class="modal-overlay" (click)="showRoleModal = false">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">Change Role</h3>
+    <p class="modal-subtitle">{{ selectedUser?.firstName }} {{ selectedUser?.lastName }} ({{ selectedUser?.username }})</p>
+    <div class="form-group">
+      <label>Role</label>
+      <select [(ngModel)]="selectedRoleId" class="form-select">
+        <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="showRoleModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveRole()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Add/Edit Modal -->
+<div *ngIf="showUserModal" class="modal-overlay" (click)="showUserModal = false">
+  <div class="modal-card modal-card-wide" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">{{ isNewUser ? 'Add User' : 'Edit User' }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name</label>
+        <input [(ngModel)]="userForm.firstName" class="form-input" placeholder="First name" />
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input [(ngModel)]="userForm.lastName" class="form-input" placeholder="Last name" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input [(ngModel)]="userForm.email" class="form-input" placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input [(ngModel)]="userForm.username" class="form-input" placeholder="Username" />
+      </div>
+      <div *ngIf="isNewUser" class="form-group">
+        <label>Password</label>
+        <input [(ngModel)]="userForm.password" class="form-input" type="password" placeholder="Password" />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input [(ngModel)]="userForm.phone" class="form-input" placeholder="Phone" />
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input [(ngModel)]="userForm.city" class="form-input" placeholder="City" />
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input [(ngModel)]="userForm.country" class="form-input" placeholder="Country" />
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select [(ngModel)]="userForm.roleId" class="form-select">
+          <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="showUserModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveUser()">{{ isNewUser ? 'Create' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Station Edit/Add Modal -->
+<div *ngIf="showStationModal" class="modal-overlay" (click)="showStationModal = false">
+  <div class="modal-card modal-card-wide" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">{{ isNewStation ? 'Add Vet Station' : 'Edit Vet Station' }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Name</label>
+        <input [(ngModel)]="stationForm.name" class="form-input" placeholder="Station name" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input [(ngModel)]="stationForm.email" class="form-input" placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input [(ngModel)]="stationForm.contactNumber" class="form-input" placeholder="Phone" />
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input [(ngModel)]="stationForm.address" class="form-input" placeholder="Address" />
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input [(ngModel)]="stationForm.city" class="form-input" placeholder="City" />
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input [(ngModel)]="stationForm.country" class="form-input" placeholder="Country" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea [(ngModel)]="stationForm.description" class="form-input" rows="3" placeholder="Description"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="showStationModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveStation()">{{ isNewStation ? 'Create' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Employee Modal -->
+<div *ngIf="showAssignModal" class="modal-overlay" (click)="showAssignModal = false">
+  <div class="modal-card" [ngClass]="{ 'modal-card-wide': assignMode === 'create' }" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">{{ assignMode === 'select' ? 'Assign Employee' : 'Create & Assign Employee' }}</h3>
+    <p class="modal-subtitle">to {{ stationDetail?.name }}</p>
+
+    <!-- Toggle buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="tab-btn" [ngClass]="{ 'tab-active': assignMode === 'select' }" (click)="assignMode = 'select'" style="flex:1;padding:8px;">Select Existing</button>
+      <button class="tab-btn" [ngClass]="{ 'tab-active': assignMode === 'create' }" (click)="assignMode = 'create'" style="flex:1;padding:8px;">Create New</button>
+    </div>
+
+    <!-- Select existing employee -->
+    <div *ngIf="assignMode === 'select'">
+      <div class="form-group">
+        <label>Employee</label>
+        <select [(ngModel)]="selectedAssignEmployeeId" class="form-select">
+          <option [ngValue]="null" disabled>-- Select employee --</option>
+          <option *ngFor="let emp of unassignedEmployees" [ngValue]="emp.id">
+            {{ emp.firstName }} {{ emp.lastName }} ({{ emp.role }})
+          </option>
+        </select>
+      </div>
+      <div *ngIf="unassignedEmployees.length === 0" class="empty-hint">
+        No unassigned employees available. Use "Create New" to add one.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="showAssignModal = false">Cancel</button>
+        <button class="btn-primary" (click)="assignEmployee()" [disabled]="!selectedAssignEmployeeId">Assign</button>
+      </div>
+    </div>
+
+    <!-- Create new employee -->
+    <div *ngIf="assignMode === 'create'">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input [(ngModel)]="newEmployeeForm.firstName" class="form-input" placeholder="First name" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input [(ngModel)]="newEmployeeForm.lastName" class="form-input" placeholder="Last name" />
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input [(ngModel)]="newEmployeeForm.email" class="form-input" placeholder="Email" />
+        </div>
+        <div class="form-group">
+          <label>Username *</label>
+          <input [(ngModel)]="newEmployeeForm.username" class="form-input" placeholder="Username" />
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input [(ngModel)]="newEmployeeForm.password" class="form-input" type="password" placeholder="Password" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input [(ngModel)]="newEmployeeForm.phone" class="form-input" placeholder="Phone" />
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input [(ngModel)]="newEmployeeForm.city" class="form-input" placeholder="City" />
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <input [(ngModel)]="newEmployeeForm.country" class="form-input" placeholder="Country" />
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select [(ngModel)]="newEmployeeForm.roleId" class="form-select">
+            <option *ngFor="let role of employeeRoles" [ngValue]="role.id">{{ role.name }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="showAssignModal = false">Cancel</button>
+        <button class="btn-primary" (click)="createAndAssignEmployee()">Create & Assign</button>
+      </div>
+    </div>
+  </div>
+</div>

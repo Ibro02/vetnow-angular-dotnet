@@ -58,11 +58,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     try
     {
+        await app.SeedRolesAsync();
         await app.SeedPetDataAsync();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error seeding pet data: {ex.Message}");
+        Console.WriteLine($"Error seeding data: {ex.Message}");
     }
 
 }

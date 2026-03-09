@@ -100,4 +100,23 @@ LogOut():void
     }
   }
 
+  // ─── Role helpers ───
+
+  /** Permission level: 1=User, 2=Employee, 3=MainVet, 4=Admin */
+  getPermissionLevel(): number {
+    return this.userProfile?.permissionLevel ?? 1;
+  }
+
+  isAtLeastEmployee(): boolean {
+    return this.getPermissionLevel() >= 2;
+  }
+
+  isAtLeastMainVet(): boolean {
+    return this.getPermissionLevel() >= 3;
+  }
+
+  isAdminUser(): boolean {
+    return this.getPermissionLevel() >= 4;
+  }
+
 }

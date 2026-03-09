@@ -1,0 +1,52 @@
+<app-header-title title="Availability" description="Manage your availability schedule" />
+
+<div class="availability-container">
+  <div class="availability-card">
+    <div class="card-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h3 class="card-title">Generate Default Availability</h3>
+    <p class="card-description">
+      This will create your default work schedule:
+    </p>
+
+    <!-- Admin: employee picker -->
+    <div *ngIf="auth.isAdminUser()" class="form-group" style="text-align:left; margin-bottom:20px;">
+      <label class="schedule-label" style="display:block; margin-bottom:6px;">Select Employee</label>
+      <select [(ngModel)]="selectedEmployeeId" class="employee-select">
+        <option [ngValue]="null" disabled>-- Choose an employee --</option>
+        <option *ngFor="let emp of employees" [ngValue]="emp.id">
+          {{ emp.firstName }} {{ emp.lastName }} ({{ emp.role }})
+        </option>
+      </select>
+    </div>
+
+    <div class="schedule-info">
+      <div class="schedule-row">
+        <span class="schedule-label">Working hours:</span>
+        <span class="schedule-value">09:00 - 17:00</span>
+      </div>
+      <div class="schedule-row">
+        <span class="schedule-label">Break:</span>
+        <span class="schedule-value">10:30 - 11:00</span>
+      </div>
+      <div class="schedule-row">
+        <span class="schedule-label">Appointment duration:</span>
+        <span class="schedule-value">35 minutes</span>
+      </div>
+    </div>
+
+    <button
+      class="generate-btn"
+      (click)="generateAvailability()"
+      [disabled]="loading || generated">
+      <span *ngIf="loading">Generating...</span>
+      <span *ngIf="!loading && !generated">Generate Availability</span>
+      <span *ngIf="generated">Availability Generated</span>
+    </button>
+  </div>
+</div>

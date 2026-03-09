@@ -5,6 +5,8 @@ import { PageTitleContainerComponent } from "../../components/common/page-title-
 import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 import {Router, RouterLink} from "@angular/router";
 import { ToasterService} from "../../services/toaster.service";
+import { MyAuthService } from "../../services/MyAuth";
+import { NgIf } from '@angular/common';
 import {
   faUser,
   faPaw,
@@ -12,7 +14,9 @@ import {
   faCreditCard,
   faBriefcase,
   faUsers,
-  faNewspaper
+  faNewspaper,
+  faClock,
+  faShieldHalved
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -20,12 +24,13 @@ import {
     standalone: true,
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.css',
-  imports: [SettingsCardComponent, PageTitleContainerComponent, HeaderTitleComponent, RouterLink]
+  imports: [SettingsCardComponent, PageTitleContainerComponent, HeaderTitleComponent, RouterLink, NgIf]
 })
 export class SettingsComponent implements OnInit{
   constructor(
     private router:Router,
     private toaster: ToasterService,
+    public auth: MyAuthService,
   ) {
   }
   ngOnInit(): void {
@@ -40,7 +45,6 @@ export class SettingsComponent implements OnInit{
   showToast() {
     console.log("Prvi put u settingsu!");
     this.toaster.info('Short Cut', 'To access settings page use: ALT + S');
-    // this.toastr.info("Ovdje možeš podesiti aplikaciju.");
   }
 
 
@@ -51,10 +55,20 @@ export class SettingsComponent implements OnInit{
     { link: '/settings/subscriptions',    text: 'Subscriptions', icon: faCreditCard },
   ];
 
+  // MainVet+ only: manage the workspace and employee roster
   public workspaceSettingsArr: SettingsCardContent[] = [
     { link: '/settings/vet-station', text: 'Workspace', icon: faBriefcase },
     { link: '/settings/employees',   text: 'Employees', icon: faUsers     },
-    { link: '/settings/posts',       text: 'Posts',     icon: faNewspaper },
+  ];
+
+  // Employee+ sees: Posts and Availability
+  public employeeExtrasArr: SettingsCardContent[] = [
+    { link: '/settings/posts',        text: 'Posts',        icon: faNewspaper },
+    { link: '/settings/availability', text: 'Availability', icon: faClock     },
+  ];
+
+  public adminSettingsArr: SettingsCardContent[] = [
+    { link: '/admin-panel', text: 'Admin Panel', icon: faShieldHalved },
   ];
 
   OpenProfileSettings() {

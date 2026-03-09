@@ -11,13 +11,25 @@ public static class SeedingExtensions
     /// <summary>
     /// Seeds the database with test pet data if it doesn't already exist
     /// </summary>
-    /// <param name="app">The web application builder</param>
     public static async Task SeedPetDataAsync(this WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<DataContext>();
             var seeder = new PetDataSeeder(context);
+            await seeder.SeedAsync();
+        }
+    }
+
+    /// <summary>
+    /// Seeds the database with roles if they don't already exist
+    /// </summary>
+    public static async Task SeedRolesAsync(this WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+            var seeder = new RoleSeeder(context);
             await seeder.SeedAsync();
         }
     }

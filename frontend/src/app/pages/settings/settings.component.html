@@ -1,11 +1,25 @@
 <app-header-title description="Which settings do you want manage?" title="Settings"/>
 <div class="flex flex-col items-center w-full gap-20 mt-10">
-    <div  class="">
-        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter']  ">Profile settings</h3>
-        <app-settings-card [array]="accountSettingsArr" ></app-settings-card>
-    </div>
     <div class="">
-        <h3 class=" text-neutral-500 text-lg font-semibold font-['Inter']">Workspace settings</h3>
+        <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Profile settings</h3>
+        <app-settings-card [array]="accountSettingsArr"></app-settings-card>
+    </div>
+
+    <!-- Workspace settings: MainVet+ only (Workspace & Employees management) -->
+    <div class="" *ngIf="auth.isAtLeastMainVet()">
+        <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Workspace settings</h3>
         <app-settings-card [array]="workspaceSettingsArr"></app-settings-card>
+    </div>
+
+    <!-- Employee extras: Posts & Availability (all employees) -->
+    <div class="" *ngIf="auth.isAtLeastEmployee()">
+        <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Employee</h3>
+        <app-settings-card [array]="employeeExtrasArr"></app-settings-card>
+    </div>
+
+    <!-- Admin section -->
+    <div class="" *ngIf="auth.isAdminUser()">
+        <h3 class="text-neutral-500 text-lg font-semibold font-['Inter']">Administration</h3>
+        <app-settings-card [array]="adminSettingsArr"></app-settings-card>
     </div>
 </div>
