@@ -189,10 +189,12 @@
 
   </div>
 
-  <!-- Pet Add/Edit Popup -->
-  <app-pet-add-card
+  <!-- Pet Add/Edit Popup — rendered via the universal config-driven form card -->
+  <app-dynamic-form-card
+    *ngIf="petFormConfig"
     [visible]="showPetForm"
-    [editPetData]="editingPetData"
+    [config]="petFormConfig"
+    [editData]="editingPetData"
     (onSave)="onPetSave($event)"
     (onCancel)="onPetCancel()"
   />

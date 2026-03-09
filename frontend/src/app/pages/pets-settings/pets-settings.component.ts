@@ -10,8 +10,10 @@ import { ProfileService } from '../../services/ProfileService';
 import { MyAuthService } from '../../services/MyAuth';
 import { Config } from '../../config';
 import axios from 'axios';
-import { PetAddCardComponent, PetFormData } from '../../components/group/pet-add-card/pet-add-card.component';
-
+import {
+  DynamicFormCardComponent,
+  DynamicFormConfig,
+} from '../../components/group/pet-add-card/pet-add-card.component';
 
 
 interface PetResponse {
@@ -50,8 +52,7 @@ interface PagedResponse<T> {
     PetCardComponent,
     HeaderTitleComponent,
     TableComponent,
-    PetAddCardComponent,
-
+    DynamicFormCardComponent,
   ],
   templateUrl: './pets-settings.component.html',
   styleUrl: './pets-settings.component.css'
@@ -117,7 +118,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
   // Pet add/edit popup state
   showPetForm: boolean = false;
-  editingPetData: PetFormData | null = null;
+  editingPetData: Record<string, any> | null = null;
+
+  /** Config-driven form definition — built once in ngOnInit */
+  petFormConfig?: DynamicFormConfig;
 
   constructor(
     private profileService: ProfileService,
@@ -125,6 +129,60 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    // Build the form config here so arrow-function lambdas can close over
+    // `this.authService` which is fully initialised by this point.
+    this.petFormConfig = {
+      title:     'Add New Pet',
+      editTitle: 'Edit Pet',
+      showPhoto: true,
+      photoKey:  'picture',
+      fields: [
+        {
+          key:         'name',
+          label:       'Name',
+          type:        'text',
+          required:    true,
+          placeholder: 'Enter pet name',
+        },
+        {
+          key:   'animalSpeciesId',
+          label: 'Select species',
+          type:  'dropdown',
+          loadOptions: async () => {
+            const { data } = await axios.get<any[]>(
+              Config.address + 'api/SpeciesGetAll/Get',
+              { headers: { 'my-auth-token': this.authService.token ?? '' } }
+            );
+            return data.map((s: any) => ({
+              id:   s.id,
+              name: s.speciesName || s.SpeciesName || '',
+            }));
+          },
+        },
+        {
+          key:       'breedId',
+          label:     'Select breed',
+          type:      'dropdown',
+          dependsOn: 'animalSpeciesId',
+          loadOptions: async (speciesId: any) => {
+            const { data } = await axios.get<any[]>(
+              Config.address + 'api/BreedGetBySpecies/Get?speciesId=' + speciesId,
+              { headers: { 'my-auth-token': this.authService.token ?? '' } }
+            );
+            return data.map((b: any) => ({
+              id:   b.id,
+              name: b.name || b.Name || '',
+            }));
+          },
+        },
+        {
+          key:   'birthDate',
+          label: 'Birth Date',
+          type:  'date',
+        },
+      ],
+    };
+
     this.initSearchListener();
     await this.profileService.getUserContent();
     await this.fetchPets();
@@ -281,19 +339,22 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     let formattedDate = '';
     if (pet.birthDate) {
       const d = new Date(pet.birthDate);
-      const year = d.getFullYear();
+      const year  = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const day   = String(d.getDate()).padStart(2, '0');
       formattedDate = `${year}-${month}-${day}`;
     }
 
+    // editingPetData is passed as [editData] to the dynamic form component.
+    // The 'id' key is not a form field — the save handler reads it here to
+    // construct the update request body.
     this.editingPetData = {
-      id: pet.id,
-      name: pet.name,
+      id:             pet.id,
+      name:           pet.name,
       animalSpeciesId: pet.animalSpeciesId,
-      breedId: pet.breedId,
-      birthDate: formattedDate,
-      picture: this.getPetPictureUrl(pet),
+      breedId:        pet.breedId,
+      birthDate:      formattedDate,
+      picture:        this.getPetPictureUrl(pet),
     };
     this.showPetForm = true;
   }
@@ -307,21 +368,23 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     this.showPetForm = true;
   }
 
-  async onPetSave(formData: PetFormData): Promise<void> {
+  /** Receives the generic Record emitted by DynamicFormCardComponent */
+  async onPetSave(formData: Record<string, any>): Promise<void> {
     try {
       const requestBody: any = {
-        name: formData.name,
-        birthDate: formData.birthDate || null,
-        animalSpeciesId: formData.animalSpeciesId,
-        breedId: formData.breedId,
+        name:           formData['name'],
+        birthDate:      formData['birthDate'] || null,
+        animalSpeciesId: formData['animalSpeciesId'],
+        breedId:        formData['breedId'],
       };
 
-      if (formData.id) {
-        requestBody.id = formData.id;
+      // In edit mode the id lives in editingPetData (not emitted by the form)
+      if (this.editingPetData?.['id']) {
+        requestBody.id = this.editingPetData['id'];
       }
 
-      if (formData.picture) {
-        requestBody.picture = formData.picture;
+      if (formData['picture']) {
+        requestBody.picture = formData['picture'];
       }
 
       await axios.post(
