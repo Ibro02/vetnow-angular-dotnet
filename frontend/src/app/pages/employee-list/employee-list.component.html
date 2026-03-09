@@ -6,7 +6,8 @@
   title="Employees"
   [columns]="columns"
   [data]="employees"
-  addButtonText="Add Employee"
+  [actions]="actions"
+  [addButtonText]="addBtnText"
   (addClick)="showAddEmployee = true"
   (actionClick)="onAction($event)"
 />

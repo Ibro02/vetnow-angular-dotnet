@@ -29,7 +29,8 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
             try
             {
                 var person = _db.Person.SingleOrDefault<Person>(x => x.Id == _token.UserProfileId);
-                var userProfile = new ProfileGetUserInfoResponse(person);
+                var employee = _db.Employee.SingleOrDefault(x => x.Id == person.Id);
+                var userProfile = new ProfileGetUserInfoResponse(person, employee);
                 return Ok(userProfile);
             }
             catch (Exception e)
@@ -53,14 +54,20 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
         public bool isBarber { get; set; } = false;
         public bool isMainVet { get; set; } = false;
         public bool isBasicUser { get; set; } = false;
+        public bool isAdmin { get; set; } = false;
         public bool isVisitor { get; set; } = false;
         public bool verified { get; set; }
         public DateTime BirthDate { get; set; } = DateTime.Now;
         public string? Username { get; set; }
         public string? Password { get; set; }
         public int? CityId { get; set; }
+        public int? RoleId { get; set; }
+        public string Role { get; set; } = "User";
+        public int PermissionLevel { get; set; }
+        public int? EmployeeId { get; set; }
+        public int? VetStationId { get; set; }
 
-        public ProfileGetUserInfoResponse(Person person)
+        public ProfileGetUserInfoResponse(Person person, Employee? employee)
         {
             if (person == null) throw new ArgumentNullException(nameof(person));
             Id = person.Id;
@@ -68,16 +75,23 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
             LastName = person.LastName;
             Email = person.Email;
             Phone = person.Phone;
+            RoleId = person.RoleId;
+            PermissionLevel = AuthService.GetPermissionLevel(person.RoleId);
+            EmployeeId = employee?.Id;
+            VetStationId = employee?.VetStationId;
+
             switch (person.RoleId)
             {
-                case 1: isBasicUser = true; break;
-                case 2: isBarber = true; break;
-                case 3: isNurse = true; break;
-                case 4: isVet = true; break;
-                case 5: isVet = true; break;
+                case 1: isBasicUser = true; Role = "User"; break;
+                case 2: isBarber = true; Role = "Barber"; break;
+                case 3: isNurse = true; Role = "Nurse"; break;
+                case 4: isVet = true; Role = "Vet"; break;
+                case 5: isMainVet = true; isVet = true; Role = "MainVet"; break;
+                case 6: isAdmin = true; Role = "Admin"; break;
                 default:
                     isVisitor = true;
                     isBasicUser = true;
+                    Role = "User";
                     break;
             }
             BirthDate = person.BirthDate;

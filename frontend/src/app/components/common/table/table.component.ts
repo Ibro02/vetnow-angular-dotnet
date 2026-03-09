@@ -49,10 +49,12 @@ export class TableComponent {
   @Output() addClick = new EventEmitter<void>();
   @Output() actionClick = new EventEmitter<{ action: string; row: any }>();
   @Output() pageChange = new EventEmitter<{ pageNumber: number; pageSize: number }>();
+  @Output() searchChange = new EventEmitter<string>();
 
   searchQuery: string = '';
   searchVisible: boolean = false;
   openMenuIndex: number | null = null;
+  private searchTimer: any = null;
 
   get filteredData(): any[] {
     // When server-side pagination is active, don't filter client-side
@@ -96,7 +98,17 @@ export class TableComponent {
 
   toggleSearch(): void {
     this.searchVisible = !this.searchVisible;
-    if (!this.searchVisible) this.searchQuery = '';
+    if (!this.searchVisible) {
+      this.searchQuery = '';
+      this.searchChange.emit('');
+    }
+  }
+
+  onSearchInput(): void {
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      this.searchChange.emit(this.searchQuery);
+    }, 400);
   }
 
   toggleMenu(index: number, event: Event): void {

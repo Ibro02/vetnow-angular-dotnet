@@ -1,0 +1,97 @@
+.availability-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.availability-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.card-icon {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.card-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.schedule-info {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.schedule-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.schedule-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.schedule-value {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.generate-btn {
+  padding: 12px 32px;
+  background: #065f46;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: #047857;
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: white;
+  box-sizing: border-box;
+}
+
+.employee-select:focus {
+  border-color: #065f46;
+  box-shadow: 0 0 0 3px rgba(6, 95, 70, 0.1);
+}

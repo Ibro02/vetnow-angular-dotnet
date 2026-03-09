@@ -10,6 +10,7 @@
         <input
           *ngIf="searchVisible"
           [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
           class="search-input"
           placeholder="Search..."
           autofocus

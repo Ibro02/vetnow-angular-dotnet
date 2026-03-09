@@ -9,10 +9,16 @@ export interface UserProfile {
   isBarber: boolean;
   isMainVet: boolean;
   isBasicUser: boolean;
+  isAdmin: boolean;
   isVisitor: boolean;
   birthDate: string;
   username: string | null;
   password: string | null;
   cityId: number | null;
   verified: boolean;
+  roleId: number | null;
+  role: string;
+  permissionLevel: number;
+  employeeId: number | null;
+  vetStationId: number | null;
 }
