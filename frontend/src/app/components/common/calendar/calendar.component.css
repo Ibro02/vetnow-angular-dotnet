@@ -70,9 +70,10 @@ button {
   color: white;
 }
 
+/* Persistent "today" ring — always visible regardless of selection */
 .current-date {
-  background: #97fbd3 !important;
-  color: black;
+  border: 2px solid #06701b !important;
+  font-weight: 700;
 }
 
 /* Day cell — relative so the dot can be positioned inside */

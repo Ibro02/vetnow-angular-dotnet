@@ -18,7 +18,7 @@ export class CalendarComponent {
   @Output() changeDate = new EventEmitter<Date>();
   @Input() highlightedDates: Date[] = [];
   currentDate: Date = new Date();
-  selectedDate: Date | null = null;
+  selectedDate: Date | null = new Date();
   constructor(public router: Router, private route: ActivatedRoute) {
   }
   get month(): string {
@@ -60,6 +60,14 @@ export class CalendarComponent {
     });
 
     //this.router.navigate([{date: this.selectedDate.toISOString()}]);
+  }
+
+  private today: Date = new Date();
+
+  isToday(day: number): boolean {
+    return this.today.getFullYear() === this.year
+      && this.today.getMonth() === this.currentDate.getMonth()
+      && this.today.getDate() === day;
   }
 
   isHighlighted(day: number): boolean {
