@@ -1,245 +1,258 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../common/button/button.component';
-import { Config } from '../../../config';
-import { MyAuthService } from '../../../services/MyAuth';
-import axios from 'axios';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
-interface SpeciesOption {
-  id: number;
+// ─── Public Interfaces ────────────────────────────────────────────────────────
+
+export interface FormFieldOption {
+  id: any;
   name: string;
 }
 
-interface BreedOption {
-  id: number;
-  name: string;
+export interface FormFieldConfig {
+  key: string;
+  label: string;
+  type: 'text' | 'number' | 'date' | 'dropdown' | 'textarea';
+  required?: boolean;
+  placeholder?: string;
+  /** Static options (used when loadOptions is absent) */
+  options?: FormFieldOption[];
+  /** Key of the parent dropdown this field depends on */
+  dependsOn?: string;
+  /** Async loader: called with no args for independent dropdowns,
+   *  with the parent value for dependent dropdowns */
+  loadOptions?: (parentValue?: any) => Promise<FormFieldOption[]>;
 }
 
-export interface PetFormData {
-  id: number | null;
-  name: string;
-  animalSpeciesId: number | null;
-  breedId: number | null;
-  birthDate: string;
-  picture: string | null; // base64 data URI or null
+export interface DynamicFormConfig {
+  title: string;
+  editTitle: string;
+  fields: FormFieldConfig[];
+  /** Show the circular photo uploader on the right */
+  showPhoto?: boolean;
+  /** Key inside formValues where the base-64 photo string is stored */
+  photoKey?: string;
 }
 
-// Predefined paw colors for pets without photos
+// ─── Paw colours (fallback avatar for pets without photos) ────────────────────
+
 const PAW_COLORS = [
-  '#6366f1', // indigo
-  '#ec4899', // pink
-  '#f59e0b', // amber
-  '#10b981', // emerald
-  '#8b5cf6', // violet
-  '#ef4444', // red
-  '#06b6d4', // cyan
-  '#f97316', // orange
-  '#84cc16', // lime
-  '#14b8a6', // teal
+  '#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6',
+  '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#14b8a6',
 ];
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 @Component({
-  selector: 'app-pet-add-card',
+  selector: 'app-dynamic-form-card',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule, ButtonComponent, DragDropModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, FormsModule, ButtonComponent, DragDropModule],
   templateUrl: './pet-add-card.component.html',
   styleUrl: './pet-add-card.component.css'
 })
-export class PetAddCardComponent implements OnInit, OnChanges {
+export class DynamicFormCardComponent implements OnChanges {
   @Input() visible: boolean = false;
-  @Input() editPetData: PetFormData | null = null;
+  @Input() config!: DynamicFormConfig;
+  /** null  → add mode,  object → edit mode */
+  @Input() editData: Record<string, any> | null = null;
 
-  @Output() onSave = new EventEmitter<PetFormData>();
+  @Output() onSave   = new EventEmitter<Record<string, any>>();
   @Output() onCancel = new EventEmitter<void>();
 
-  // Form fields
-  petName: string = '';
-  selectedSpeciesId: number | null = null;
-  selectedBreedId: number | null = null;
-  birthDate: string = '';
-  pictureBase64: string | null = null;
-  petId: number | null = null;
-
-  // Dropdown data
-  speciesList: SpeciesOption[] = [];
-  breedList: BreedOption[] = [];
-
-  // Default paw color (for pets without photos)
-  pawColor: string = '#9ca3af';
+  /** All current form values keyed by field.key */
+  formValues: Record<string, any> = {};
+  /** Runtime dropdown option lists keyed by field.key */
+  fieldOptions: Record<string, FormFieldOption[]> = {};
 
   isEditMode: boolean = false;
+  pawColor: string = '#9ca3af';
 
-  constructor(private authService: MyAuthService) {}
+  // ── Photo helpers ──────────────────────────────────────────────────────────
 
-  ngOnInit(): void {
-    this.fetchSpecies();
+  get photoValue(): string | null {
+    if (!this.config?.showPhoto || !this.config?.photoKey) return null;
+    return this.formValues[this.config.photoKey] ?? null;
   }
+
+  set photoValue(val: string | null) {
+    if (this.config?.showPhoto && this.config?.photoKey) {
+      this.formValues[this.config.photoKey] = val;
+    }
+  }
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
-      this.fetchSpecies();
+      this.isEditMode = !!this.editData;
+      this.resetForm();
 
-      if (this.editPetData) {
-        this.isEditMode = true;
-        this.petId = this.editPetData.id;
-        this.petName = this.editPetData.name || '';
-        this.selectedSpeciesId = this.editPetData.animalSpeciesId;
-        this.birthDate = this.editPetData.birthDate || '';
-        this.pictureBase64 = this.editPetData.picture;
-
-        // Assign a consistent paw color based on pet ID
-        if (this.petId) {
-          this.pawColor = PAW_COLORS[this.petId % PAW_COLORS.length];
+      if (this.isEditMode && this.editData) {
+        // Populate formValues from editData
+        for (const field of (this.config?.fields ?? [])) {
+          if (this.editData[field.key] !== undefined) {
+            this.formValues[field.key] = this.editData[field.key];
+          }
         }
-
-        // Load breeds for the selected species, then set the breed
-        if (this.selectedSpeciesId) {
-          this.fetchBreeds(this.selectedSpeciesId).then(() => {
-            this.selectedBreedId = this.editPetData!.breedId;
-          });
+        // Copy photo value
+        if (this.config?.showPhoto && this.config?.photoKey) {
+          this.formValues[this.config.photoKey] = this.editData[this.config.photoKey] ?? null;
         }
+        // Consistent paw colour based on entity id
+        const id = this.editData['id'];
+        this.pawColor = id != null
+          ? PAW_COLORS[id % PAW_COLORS.length]
+          : PAW_COLORS[Math.floor(Math.random() * PAW_COLORS.length)];
       } else {
-        this.isEditMode = false;
-        this.resetForm();
-        // Random paw color for new pets
         this.pawColor = PAW_COLORS[Math.floor(Math.random() * PAW_COLORS.length)];
+      }
+
+      // Load all independent dropdown options; then (in edit mode) dependent ones
+      this.loadIndependentDropdowns();
+    }
+  }
+
+  private resetForm(): void {
+    this.formValues   = {};
+    this.fieldOptions = {};
+  }
+
+  // ── Option loading ─────────────────────────────────────────────────────────
+
+  private async loadIndependentDropdowns(): Promise<void> {
+    if (!this.config) return;
+
+    const independentFields = this.config.fields.filter(
+      f => f.type === 'dropdown' && f.loadOptions && !f.dependsOn
+    );
+
+    await Promise.all(
+      independentFields.map(async f => {
+        try {
+          this.fieldOptions[f.key] = await f.loadOptions!();
+        } catch (e) {
+          console.error(`Failed to load options for "${f.key}"`, e);
+          this.fieldOptions[f.key] = [];
+        }
+      })
+    );
+
+    // In edit mode, load dependent dropdown options using the pre-filled parent values
+    if (this.isEditMode && this.editData) {
+      await this.loadDependentDropdownsForEdit();
+    }
+  }
+
+  private async loadDependentDropdownsForEdit(): Promise<void> {
+    if (!this.config || !this.editData) return;
+
+    const dependentFields = this.config.fields.filter(
+      f => f.type === 'dropdown' && f.dependsOn && f.loadOptions
+    );
+
+    for (const field of dependentFields) {
+      const parentValue = this.formValues[field.dependsOn!] ?? this.editData[field.dependsOn!];
+      if (parentValue != null) {
+        try {
+          this.fieldOptions[field.key] = await field.loadOptions!(parentValue);
+        } catch (e) {
+          console.error(`Failed to load dependent options for "${field.key}"`, e);
+          this.fieldOptions[field.key] = [];
+        }
       }
     }
   }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
+  // ── Template helpers ───────────────────────────────────────────────────────
+
+  getOptions(field: FormFieldConfig): FormFieldOption[] {
+    return this.fieldOptions[field.key] ?? field.options ?? [];
   }
 
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
+  isDropdownDisabled(field: FormFieldConfig): boolean {
+    if (!field.dependsOn) return false;
+    const parentValue = this.formValues[field.dependsOn];
+    return parentValue == null || parentValue === '';
   }
 
-  onFileDrop(event: DragEvent) {
-    event.preventDefault();
+  // ── Dropdown change (handles cascading) ────────────────────────────────────
 
+  async onDropdownChange(field: FormFieldConfig, value: any): Promise<void> {
+    this.formValues[field.key] = value ?? null;
+
+    if (!this.config) return;
+
+    // Find all fields that depend on this one and reload them
+    const dependentFields = this.config.fields.filter(f => f.dependsOn === field.key);
+    for (const depField of dependentFields) {
+      this.formValues[depField.key] = null;
+      this.fieldOptions[depField.key] = [];
+
+      if (value != null && depField.loadOptions) {
+        try {
+          this.fieldOptions[depField.key] = await depField.loadOptions(value);
+        } catch (e) {
+          console.error(`Failed to reload options for "${depField.key}"`, e);
+        }
+      }
+    }
+  }
+
+  // ── Photo upload ───────────────────────────────────────────────────────────
+
+  onDragOver(event: DragEvent): void  { event.preventDefault(); }
+  onDragLeave(event: DragEvent): void { event.preventDefault(); }
+
+  onFileDrop(event: DragEvent): void {
+    event.preventDefault();
     const file = event.dataTransfer?.files?.[0];
     if (!file) return;
-
-    if (file.size > 2097152) {
-      window.alert('File is too big! Maximum size is 2MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onload = () => {
-      this.pictureBase64 = reader.result as string;
-    };
-  }
-
-
-  async fetchSpecies(): Promise<void> {
-    try {
-      const { data } = await axios.get<any[]>(
-        Config.address + 'api/SpeciesGetAll/Get',
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
-      );
-      this.speciesList = data.map(s => ({
-        id: s.id,
-        name: s.speciesName || s.SpeciesName || ''
-      }));
-    } catch (error) {
-      console.error('Failed to fetch species:', error);
-    }
-  }
-
-  async fetchBreeds(speciesId: number): Promise<void> {
-    try {
-      const { data } = await axios.get<any[]>(
-        Config.address + 'api/BreedGetBySpecies/Get?speciesId=' + speciesId,
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
-      );
-      this.breedList = data.map(b => ({
-        id: b.id,
-        name: b.name || b.Name || ''
-      }));
-    } catch (error) {
-      console.error('Failed to fetch breeds:', error);
-      this.breedList = [];
-    }
-  }
-
-  onSpeciesChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.selectedSpeciesId = value ? Number(value) : null;
-    this.selectedBreedId = null;
-    this.breedList = [];
-
-    if (this.selectedSpeciesId) {
-      this.fetchBreeds(this.selectedSpeciesId);
-    }
-  }
-
-  onBreedChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.selectedBreedId = value ? Number(value) : null;
+    this.readFile(file);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.readFile(file);
+  }
 
+  private readFile(file: File): void {
     if (file.size > 2097152) {
-      window.alert('File is too big! Maximum size is 2MB.');
+      window.alert('File is too big! Maximum size is 2 MB.');
       return;
     }
-
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => {
-      this.pictureBase64 = reader.result as string;
-    };
+    reader.onload = () => { this.photoValue = reader.result as string; };
   }
 
   triggerFileInput(): void {
-    const fileInput = document.getElementById('pet-photo-input') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-    }
+    const input = document.getElementById('dynamic-form-photo-input') as HTMLInputElement;
+    if (input) input.click();
   }
 
-  removePhoto(): void {
-    this.pictureBase64 = null;
-  }
+  removePhoto(): void { this.photoValue = null; }
+
+  // ── Save / Cancel ──────────────────────────────────────────────────────────
 
   save(): void {
-    if (!this.petName.trim()) {
-      window.alert('Please enter a pet name.');
-      return;
+    if (!this.config) return;
+
+    for (const field of this.config.fields) {
+      if (field.required) {
+        const val = this.formValues[field.key];
+        if (val == null || (typeof val === 'string' && !val.trim())) {
+          window.alert(`Please fill in the required field: ${field.label}`);
+          return;
+        }
+      }
     }
 
-    const formData: PetFormData = {
-      id: this.petId,
-      name: this.petName.trim(),
-      animalSpeciesId: this.selectedSpeciesId,
-      breedId: this.selectedBreedId,
-      birthDate: this.birthDate,
-      picture: this.pictureBase64,
-    };
-    this.onSave.emit(formData);
+    this.onSave.emit({ ...this.formValues });
   }
 
-  cancel(): void {
-    this.onCancel.emit();
-  }
-
-  resetForm(): void {
-    this.petId = null;
-    this.petName = '';
-    this.selectedSpeciesId = null;
-    this.selectedBreedId = null;
-    this.birthDate = '';
-    this.pictureBase64 = null;
-    this.breedList = [];
-  }
+  cancel(): void { this.onCancel.emit(); }
 }

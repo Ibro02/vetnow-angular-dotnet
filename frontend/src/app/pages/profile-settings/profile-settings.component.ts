@@ -18,6 +18,7 @@ import * as L from 'leaflet';
 import {MyAuthService} from "../../services/MyAuth";
 import {Config} from "../../config";
 import {Router} from "@angular/router";
+import {I18nService} from "../../services/i18n.service";
 
 @Component({
   selector: 'app-profile-settings',
@@ -59,7 +60,8 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
   constructor(
     private myAuthService: MyAuthService,
     private toaster: ToasterService,
-    private router: Router
+    private router: Router,
+    public i18n: I18nService,
   ) {}
 
   profileSettingsFormGroup = new FormGroup({

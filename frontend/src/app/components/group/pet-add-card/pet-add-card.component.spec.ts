@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PetAddCardComponent } from './pet-add-card.component';
+import { DynamicFormCardComponent } from './pet-add-card.component';
 
-describe('PetAddCardComponent', () => {
-  let component: PetAddCardComponent;
-  let fixture: ComponentFixture<PetAddCardComponent>;
+describe('DynamicFormCardComponent', () => {
+  let component: DynamicFormCardComponent;
+  let fixture: ComponentFixture<DynamicFormCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PetAddCardComponent]
+      imports: [DynamicFormCardComponent]
     })
     .compileComponents();
-    
-    fixture = TestBed.createComponent(PetAddCardComponent);
+
+    fixture = TestBed.createComponent(DynamicFormCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

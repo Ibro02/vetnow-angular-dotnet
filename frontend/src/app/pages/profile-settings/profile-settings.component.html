@@ -1,8 +1,37 @@
 
 <div id="background">
-    <app-header-title title="My Profile" description="Edit your profile settings">My Profile</app-header-title>
+  <app-header-title
+    [title]="i18n.t('pageTitle')"
+    [description]="i18n.t('pageDescription')"
+  >{{ i18n.t('pageTitle') }}</app-header-title>
+
   <app-box-container>
-    <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg">
+    <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg relative">
+
+      <!-- ── Language toggle button ── -->
+      <button
+        (click)="i18n.toggle()"
+        [title]="i18n.t('switchLang')"
+        class="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5
+               rounded-full border border-gray-200 bg-white shadow-sm
+               text-xs font-semibold text-gray-600
+               hover:border-emerald-400 hover:text-emerald-600
+               transition-all duration-200 select-none z-10">
+
+        <!-- Globe icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10
+                   15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+
+        <!-- Show the OTHER language as the action (click to switch to it) -->
+        <span>{{ i18n.currentLang === 'en' ? '🇧🇦 BS' : '🇬🇧 EN' }}</span>
+      </button>
+
       <div class="flex flex-col w-2/3">
         <form class="md:grid grid-cols-2 gap-8">
 
@@ -10,7 +39,8 @@
           <div>
             <app-input
               type="text"
-              label="First Name"
+              [label]="i18n.t('firstName')"
+              [placeholder]="i18n.t('firstNamePlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.firstName"
               [value]="profileSettingsFormGroup.value.firstName?.toString()"
               name="fieldName"
@@ -19,7 +49,8 @@
 
             <app-input
               type="text"
-              label="Last Name"
+              [label]="i18n.t('lastName')"
+              [placeholder]="i18n.t('lastNamePlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.lastName"
               [value]="profileSettingsFormGroup.value.lastName?.toString()"
               name="fieldName"
@@ -28,7 +59,8 @@
 
             <app-input
               type="text"
-              label="Phone Number"
+              [label]="i18n.t('phone')"
+              [placeholder]="i18n.t('phonePlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.phone"
               [value]="profileSettingsFormGroup.value.phone?.toString()"
               name="fieldName"
@@ -37,7 +69,8 @@
 
             <app-input
               type="text"
-              label="Address"
+              [label]="i18n.t('address')"
+              [placeholder]="i18n.t('addressPlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.address"
               [value]="profileSettingsFormGroup.value.address?.toString()"
               name="fieldName"
@@ -46,18 +79,18 @@
 
             <app-input
               type="text"
-              label="City"
+              [label]="i18n.t('city')"
+              [placeholder]="i18n.t('cityPlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.city"
               [value]="profileSettingsFormGroup.value.city?.toString()"
               name="fieldName"
               ngDefaultControl
             ></app-input>
 
-
-
             <app-input
               type="text"
-              label="Country"
+              [label]="i18n.t('country')"
+              [placeholder]="i18n.t('countryPlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.country"
               [value]="profileSettingsFormGroup.value.country?.toString()"
               name="fieldName"
@@ -68,7 +101,9 @@
           <!-- Right column -->
           <div>
             <!-- Profile Image -->
-            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Profile Image</p>
+            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">
+              {{ i18n.t('profileImage') }}
+            </p>
             <div class="flex flex-col items-start gap-2 mb-4">
               <div class="cursor-pointer" (click)="openCropWizard()">
                 <div class="w-28 h-28 rounded-full border-1 border-black overflow-hidden bg-gray-200 flex items-center justify-center">
@@ -91,7 +126,7 @@
 
                 <!-- Header -->
                 <div class="px-6 py-4 border-b border-gray-200">
-                  <h2 class="text-lg font-semibold text-gray-800">Crop image</h2>
+                  <h2 class="text-lg font-semibold text-gray-800">{{ i18n.t('cropImage') }}</h2>
                 </div>
 
                 <!-- Crop area -->
@@ -134,8 +169,8 @@
 
                 <!-- Footer with Cancel / Save -->
                 <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-                  <app-button type="secondary" text="Cancel" (event)="closeCropWizard()"></app-button>
-                  <app-button type="primary" text="Save" (event)="saveCroppedImage()"></app-button>
+                  <app-button type="secondary" [text]="i18n.t('cancel')" (event)="closeCropWizard()"></app-button>
+                  <app-button type="primary"   [text]="i18n.t('save')"   (event)="saveCroppedImage()"></app-button>
                 </div>
 
               </div>
@@ -143,7 +178,8 @@
 
             <app-input
               type="text"
-              label="Email"
+              [label]="i18n.t('email')"
+              [placeholder]="i18n.t('emailPlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.email"
               [value]="profileSettingsFormGroup.value.email?.toString()"
               name="fieldName"
@@ -152,7 +188,8 @@
 
             <app-input
               type="text"
-              label="Username"
+              [label]="i18n.t('username')"
+              [placeholder]="i18n.t('usernamePlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.username"
               [value]="profileSettingsFormGroup.value.username?.toString()"
               name="fieldName"
@@ -161,7 +198,8 @@
 
             <app-input
               type="text"
-              label="Password"
+              [label]="i18n.t('password')"
+              [placeholder]="i18n.t('passwordPlaceholder')"
               [formControl]="profileSettingsFormGroup.controls.password"
               [value]="profileSettingsFormGroup.value.password?.toString()"
               name="fieldName"
@@ -171,24 +209,20 @@
 
           <!-- Leaflet Map - full width below both columns -->
           <div class="col-span-2 w-1/2" [style.visibility]="showCropWizard ? 'hidden' : 'visible'">
-            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Pick location on map</p>
+            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">
+              {{ i18n.t('pickLocation') }}
+            </p>
             <div #mapContainer class="w-full h-64 rounded-md overflow-hidden border border-gray-200 shadow-sm"></div>
           </div>
-
-          <!-- City & Country - auto-filled from map, full width row -->
-
-
-
 
         </form>
       </div>
 
-    <div class="align-middle">
-      <app-button type="secondary" text="Cancel" (click)="navigateToSettings()"></app-button>
-      <app-button type="primary" text="Save" (event)="saveChanges()"></app-button>
-    </div>
+      <div class="align-middle">
+        <app-button type="secondary" [text]="i18n.t('cancel')" (click)="navigateToSettings()"></app-button>
+        <app-button type="primary"   [text]="i18n.t('save')"   (event)="saveChanges()"></app-button>
+      </div>
 
     </div>
-
   </app-box-container>
 </div>
