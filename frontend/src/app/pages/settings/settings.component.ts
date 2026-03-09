@@ -5,6 +5,15 @@ import { PageTitleContainerComponent } from "../../components/common/page-title-
 import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 import {Router, RouterLink} from "@angular/router";
 import { ToasterService} from "../../services/toaster.service";
+import {
+  faUser,
+  faPaw,
+  faPalette,
+  faCreditCard,
+  faBriefcase,
+  faUsers,
+  faNewspaper
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-settings',
@@ -36,16 +45,16 @@ export class SettingsComponent implements OnInit{
 
 
   public accountSettingsArr: SettingsCardContent[] = [
-    { link: '/settings/profile-settings', text: 'My profile' },
-    { link: '/settings/my-pets', text: 'My pets' },
-    { link: '/settings/appearance', text: 'Appearance' },
-    { link: '/settings/subscriptions', text: 'Subscriptions' },
+    { link: '/settings/profile-settings', text: 'My profile',    icon: faUser       },
+    { link: '/settings/my-pets',          text: 'My pets',       icon: faPaw        },
+    { link: '/settings/appearance',       text: 'Appearance',    icon: faPalette    },
+    { link: '/settings/subscriptions',    text: 'Subscriptions', icon: faCreditCard },
   ];
 
   public workspaceSettingsArr: SettingsCardContent[] = [
-    { link: '/settings/vet-station', text: 'Workspace' },
-    { link: '/settings/employees', text: 'Employees' },
-    { link: '/settings/posts', text: 'Posts' },
+    { link: '/settings/vet-station', text: 'Workspace', icon: faBriefcase },
+    { link: '/settings/employees',   text: 'Employees', icon: faUsers     },
+    { link: '/settings/posts',       text: 'Posts',     icon: faNewspaper },
   ];
 
   OpenProfileSettings() {

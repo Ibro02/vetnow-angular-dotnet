@@ -2,8 +2,10 @@
      [class.bg-white]="!isDeleted"
      [class.card-deleted]="isDeleted">
 
-  <!-- Gradient header -->
-  <div class="w-full h-20" [class.gradient-header]="!isDeleted" [class.gradient-header-deleted]="isDeleted"></div>
+  <!-- Gradient header — colour cycles per card when not deleted -->
+  <div class="w-full h-20"
+       [style.background]="!isDeleted ? gradientStyle : null"
+       [class.gradient-header-deleted]="isDeleted"></div>
 
   <!-- Pet image overlapping the header -->
   <div class="flex justify-center -mt-10">

@@ -53,20 +53,51 @@ LogOut():void
   this.router.navigate(["/"]);
 }
 
-   getAuthorizationToken ()  {
-
-
+  /**
+   * Fixed: the old implementation returned BEFORE the axios POST resolved,
+   * so the token was never stored from the response. The login component
+   * (login.component.ts) already handles its own axios call and stores
+   * the token correctly, so this helper is kept for backward-compat but
+   * now actually awaits and stores the result.
+   */
+  async getAuthorizationToken(): Promise<string> {
     let link = Config.address + "api/LoginAuth/Post";
-    axios.post(link, this.loginValue,{headers:{
-        'my-auth-token':  this.token
-      }}).then(x=> {
-      !this.rememberMe?window.localStorage.getItem('my-auth-token'):window.sessionStorage.getItem('my-auth-token')
-      console.log(x.data);
-    }).catch(err=>console.log(err.error));
-
-
-    return (this.rememberMe?window.localStorage.getItem('my-auth-token'):window.sessionStorage.getItem('my-auth-token'))??" ";
+    try {
+      const response = await axios.post(link, this.loginValue, {
+        headers: { 'my-auth-token': this.token }
+      });
+      const newToken = response.data;
+      // Store the token based on rememberMe preference
+      if (this.rememberMe) {
+        window.localStorage.setItem('my-auth-token', newToken);
+      } else {
+        window.sessionStorage.setItem('my-auth-token', newToken);
+      }
+      this.token = newToken;
+      return newToken;
+    } catch (err) {
+      console.log(err);
+      return " ";
+    }
   }
-    //napravi dodavanje google tokena u bazu (preskoci generisanje tokena tj. prepusti google-u)
+
+  /**
+   * Sends a Google ID token to the backend, which validates it with Google
+   * and returns the app's own session token (login or auto-register).
+   */
+  async loginWithGoogle(googleIdToken: string): Promise<boolean> {
+    const link = Config.address + "api/GoogleAuth/Login";
+    try {
+      const response = await axios.post(link, { idToken: googleIdToken });
+      const newToken = response.data;
+      // Google logins are always "remembered"
+      window.localStorage.setItem('my-auth-token', newToken);
+      this.token = newToken;
+      return true;
+    } catch (err) {
+      console.log("Google login failed:", err);
+      return false;
+    }
+  }
 
 }

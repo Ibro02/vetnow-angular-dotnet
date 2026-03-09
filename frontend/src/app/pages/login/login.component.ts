@@ -30,8 +30,8 @@ async ngOnInit() {
    }
 }
 
-  public usernameOrEmail = "Testni";
-  public password = "Dzekson123_123";
+  public usernameOrEmail = "";
+  public password = "";
 
 placeholder:any
 emailRegex = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
@@ -39,7 +39,6 @@ passwordRegex = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{
 checkBox:boolean = false;
 token :any;
 isError:boolean = false;
-
   signIn = () => {
     this.myAuthService.loginValue!.usernameOrEmail = this.usernameOrEmail;
     this.myAuthService.loginValue!.password = this.password
