@@ -9,12 +9,14 @@ import {Router, RouterLink} from "@angular/router";
 import {MyAuthService} from "../../services/MyAuth";
 import { Config } from '../../config';
 import {ToasterService} from "../../services/toaster.service";
+import { shake, fadeIn } from '../../animations/shared.animations';
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [FaIconComponent, NgClass, FormsModule, SignInInputComponent, FormsModule, OtherSignUpMethodsComponent, RouterLink, NgForOf],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
+  animations: [shake, fadeIn],
 })
 export class LoginComponent implements OnInit{
 

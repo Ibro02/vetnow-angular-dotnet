@@ -11,6 +11,7 @@ import {TimeSlot} from "./TimeSlot";
 import {Config} from "../../config";
 import {Animal} from "./Animal";
 import {ToasterService} from "../../services/toaster.service";
+import { fadeIn, scaleIn } from '../../animations/shared.animations';
 
 @Component({
   selector: 'app-appointment-page',
@@ -23,7 +24,8 @@ import {ToasterService} from "../../services/toaster.service";
     FormsModule
   ],
   templateUrl: './appointment-page.component.html',
-  styleUrl: './appointment-page.component.css'
+  styleUrl: './appointment-page.component.css',
+  animations: [fadeIn, scaleIn],
 })
 export class AppointmentPageComponent {
   user: UserProfile | null = null;

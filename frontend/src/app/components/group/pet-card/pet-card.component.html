@@ -1,15 +1,15 @@
-<div class="w-72 rounded-2xl card-container transition-all duration-150 overflow-hidden"
-     [class.bg-white]="!isDeleted"
-     [class.card-deleted]="isDeleted">
+<div class="w-72 card hover-lift transition-all duration-200 overflow-hidden"
+     [class.card-deleted]="isDeleted"
+     [class.bg-white]="!isDeleted">
 
-  <!-- Gradient header — colour cycles per card when not deleted -->
+  <!-- Gradient header -->
   <div class="w-full h-20"
        [style.background]="!isDeleted ? gradientStyle : null"
        [class.gradient-header-deleted]="isDeleted"></div>
 
   <!-- Pet image overlapping the header -->
   <div class="flex justify-center -mt-10">
-    <div class="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
+    <div class="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center overflow-hidden shadow-md border-2 border-white">
       <img *ngIf="picture" [src]="picture" alt="Pet photo" class="w-full h-full object-cover"/>
       <fa-icon *ngIf="!picture" [icon]="faPaw" class="text-3xl text-gray-400"></fa-icon>
     </div>
@@ -17,22 +17,20 @@
 
   <!-- Pet info -->
   <div class="flex flex-col items-center px-4 pt-3 pb-2 gap-1">
-    <h2 class="text-black text-xl font-semibold font-['Inter']">{{ name }}</h2>
-    <p class="text-gray-600 text-sm font-normal font-['Inter']">Specie: {{ species }}</p>
-    <p class="text-gray-600 text-sm font-normal font-['Inter']">Breed: {{ breed }}</p>
-    <p class="text-gray-600 text-sm font-normal font-['Inter']">Age: {{ age }}</p>
+    <h2 class="text-gray-900 text-xl font-semibold font-body">{{ name }}</h2>
+    <p class="text-gray-500 text-sm font-body">Specie: {{ species }}</p>
+    <p class="text-gray-500 text-sm font-body">Breed: {{ breed }}</p>
+    <p class="text-gray-500 text-sm font-body">Age: {{ age }}</p>
   </div>
 
   <!-- Divider -->
-  <div class="w-full h-px bg-gray-200 mt-1"></div>
+  <div class="w-full h-px bg-gray-100 mt-1"></div>
 
   <!-- Action buttons -->
   <div class="flex justify-between items-center px-4 py-3">
-    <!-- Delete button (active pets) -->
     <button *ngIf="!isDeleted" (click)="delete()" class="text-gray-400 hover:text-red-500 transition-colors duration-200">
       <fa-icon [icon]="faTrash" class="text-lg"></fa-icon>
     </button>
-    <!-- Restore button (deleted pets) -->
     <button *ngIf="isDeleted" (click)="restore()" class="text-gray-400 hover:text-emerald-500 transition-colors duration-200">
       <fa-icon [icon]="faRotateLeft" class="text-lg"></fa-icon>
     </button>
@@ -45,5 +43,4 @@
       </button>
     </div>
   </div>
-
 </div>

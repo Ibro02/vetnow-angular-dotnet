@@ -11,6 +11,7 @@ import { HeaderTitleComponent } from '../../components/common/header-title/heade
 import { CalendarComponent } from '../../components/common/calendar/calendar.component';
 import axios from 'axios';
 import { Config } from '../../config';
+import { listStagger, fadeIn, scaleIn } from '../../animations/shared.animations';
 
 @Component({
   selector: 'app-my-appointments',
@@ -20,7 +21,8 @@ import { Config } from '../../config';
     RouterModule, TableComponent, HeaderTitleComponent, CalendarComponent
   ],
   templateUrl: './my-appointments.component.html',
-  styleUrl: './my-appointments.component.css'
+  styleUrl: './my-appointments.component.css',
+  animations: [listStagger, fadeIn, scaleIn],
 })
 export class MyAppointmentsComponent implements OnInit {
   user: UserProfile | null = null;

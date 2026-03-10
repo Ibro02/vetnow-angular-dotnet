@@ -122,23 +122,20 @@
     </div>
     <div>
         <label
-          class="my-auto flex h-4 mb-4 text-black text-lg font-normal font-['Inter']"
+          class="my-auto flex h-4 mb-4 text-black text-lg font-normal font-body"
           >Choose on map:</label
         >
         <div class="">
           <!-- Leaflet Map - full width below both columns -->
           <div class="col-span-2 w-1/2" [style.visibility]="showCropWizard ? 'hidden' : 'visible'">
-            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">Pick location on map</p>
+            <p class="text-sm text-black text-lg font-normal font-body mb-1">Pick location on map</p>
             <div #mapContainer class="w-full h-64 rounded-md overflow-hidden border border-gray-200 shadow-sm"></div>
           </div>
         </div>
       </div>
       </form>
     </div>
-    <button
-      class="button-3 bg-emerald-400 border border-emerald-400 rounded-md shadow-sm text-white font-semibold py-2 px-4 inline-block align-middle whitespace-nowrap select-none focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent disabled:bg-emerald-200 disabled:border-emerald-200 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-emerald-600 active:bg-emerald-500 active:bg-opacity-75"
-      (click)="saveChanges()"
-    >
+    <button class="btn-primary" (click)="saveChanges()">
       Save
     </button>
 

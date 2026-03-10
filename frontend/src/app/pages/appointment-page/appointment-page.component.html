@@ -191,6 +191,7 @@
 
       <!-- ─── Step 3: Booking summary ────────── -->
       <div *ngIf="appointmentTime"
+           @scaleIn
            class="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-5">
 
         <p class="font-bold text-emerald-800 mb-3 text-base">📋 Booking Summary</p>
@@ -215,8 +216,7 @@
 
         <button
           (click)="makeAnAppointment()"
-          class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white
-                 font-semibold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg">
+          class="btn-primary btn-lg w-full hover-glow">
           ✔&nbsp; Confirm Appointment
         </button>
 

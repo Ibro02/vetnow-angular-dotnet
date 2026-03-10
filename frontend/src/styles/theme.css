@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════════
+   VetStation Design Tokens
+   Single source of truth for the entire application.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Brand Colors ─────────────────────────────────────── */
+  --color-primary:        #33b3ae;
+  --color-primary-light:  #5cccc7;
+  --color-primary-dark:   #28918d;
+  --color-primary-50:     rgba(51, 179, 174, 0.08);
+  --color-primary-100:    rgba(51, 179, 174, 0.15);
+
+  --color-accent:         #3FCA93;
+  --color-accent-hover:   #35b882;
+  --color-accent-active:  #2ea574;
+  --color-accent-50:      rgba(63, 202, 147, 0.08);
+
+  /* ─── Neutrals ─────────────────────────────────────────── */
+  --color-bg:             #FFFFFF;
+  --color-bg-soft:        #FAF9F6;
+  --color-bg-muted:       #F3F4F6;
+  --color-surface:        #FFFFFF;
+  --color-surface-hover:  #F9FAFB;
+
+  --color-border:         #E5E7EB;
+  --color-border-light:   #F0F0F0;
+
+  --color-text:           #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted:     #9CA3AF;
+  --color-text-inverse:   #FFFFFF;
+
+  /* ─── Semantic Colors ──────────────────────────────────── */
+  --color-danger:         #EF4444;
+  --color-danger-hover:   #DC2626;
+  --color-danger-50:      #FEF2F2;
+  --color-warning:        #F59E0B;
+  --color-warning-50:     #FFFBEB;
+  --color-info:           #3B82F6;
+  --color-success:        #10B981;
+  --color-success-50:     #ECFDF5;
+
+  /* ─── Typography ───────────────────────────────────────── */
+  --font-display:         'Italiana', serif;
+  --font-body:            'Inter', system-ui, sans-serif;
+
+  --text-xs:    0.75rem;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.5rem;
+  --text-3xl:   2rem;
+  --text-4xl:   2.5rem;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* ─── Spacing Scale (8px base) ─────────────────────────── */
+  --space-1:   0.25rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-10:  2.5rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+  --space-20:  5rem;
+
+  /* ─── Border Radius ────────────────────────────────────── */
+  --radius-sm:   0.375rem;
+  --radius-md:   0.5rem;
+  --radius-lg:   0.75rem;
+  --radius-xl:   1rem;
+  --radius-2xl:  1.25rem;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ──────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md:   0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg:   0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+  --shadow-xl:   0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 1px 6px rgba(0, 0, 0, 0.07);
+  --shadow-none: 0 0 0 transparent;
+
+  /* ─── Transitions ──────────────────────────────────────── */
+  --ease-default:  cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+
+  /* ─── Layout ───────────────────────────────────────────── */
+  --navbar-height:    4rem;
+  --sidebar-width:    280px;
+  --content-max-width: 72rem;
+  --page-padding:     1.5rem;
+}

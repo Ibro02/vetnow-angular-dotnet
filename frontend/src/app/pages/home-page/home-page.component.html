@@ -1,19 +1,183 @@
+<!-- ══════════════════════════════════════════
+     HERO — map background + search bar
+     ══════════════════════════════════════════ -->
+<section class="hero">
 
-<div class="m-1 ">
-  <div class="flex w-1/4 m-auto justify-center text-xl items-center">
-    <app-search-input (keyup)="handleChange($event)"></app-search-input>
+  <!-- City map SVG (decorative, full-bleed) -->
+  <div class="hero-map" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 340"
+         class="w-full h-full" preserveAspectRatio="xMidYMid slice">
+
+      <!-- ── Base terrain ── -->
+      <rect width="1440" height="340" fill="#e8e1d4"/>
+
+      <!-- ── Green areas (parks / vegetation) ── -->
+      <polygon points="0,0 260,0 200,130 0,160" fill="#ccddb0" opacity="0.75"/>
+      <polygon points="1440,0 1200,0 1260,110 1440,140" fill="#ccddb0" opacity="0.7"/>
+      <rect x="560" y="0" width="140" height="90" rx="6" fill="#c8dba8" opacity="0.6"/>
+      <polygon points="380,260 520,240 540,340 360,340" fill="#cdddb2" opacity="0.55"/>
+      <polygon points="900,200 1060,180 1100,340 880,340" fill="#c8dba8" opacity="0.5"/>
+
+      <!-- ── City blocks — top band ── -->
+      <rect x="210" y="0"  width="90"  height="62" rx="2" fill="#d4ccbf"/>
+      <rect x="310" y="0"  width="75"  height="58" rx="2" fill="#d8d0c3"/>
+      <rect x="396" y="0"  width="105" height="54" rx="2" fill="#cec6b8"/>
+      <rect x="512" y="0"  width="42"  height="68" rx="2" fill="#d6cec1"/>
+      <rect x="710" y="0"  width="115" height="72" rx="2" fill="#d2cab9"/>
+      <rect x="836" y="0"  width="95"  height="68" rx="2" fill="#d8d0c4"/>
+      <rect x="942" y="0"  width="80"  height="60" rx="2" fill="#ccc4b4"/>
+      <rect x="1033" y="0" width="110" height="58" rx="2" fill="#d4ccbf"/>
+      <rect x="1155" y="0" width="48"  height="65" rx="2" fill="#dbd3c7"/>
+
+      <!-- ── City blocks — middle band ── -->
+      <rect x="0"   y="100" width="65"  height="80" rx="2" fill="#cec6b8" opacity="0.8"/>
+      <rect x="195" y="80"  width="78"  height="70" rx="2" fill="#d2cab9"/>
+      <rect x="284" y="75"  width="100" height="65" rx="2" fill="#d6cec0"/>
+      <rect x="395" y="82"  width="55"  height="58" rx="2" fill="#cac2b2"/>
+      <rect x="462" y="78"  width="82"  height="72" rx="2" fill="#d4ccbe"/>
+      <rect x="558" y="95"  width="70"  height="55" rx="2" fill="#d0c8b8"/>
+      <rect x="640" y="78"  width="55"  height="70" rx="2" fill="#d8d0c2"/>
+      <rect x="706" y="85"  width="90"  height="60" rx="2" fill="#ccc4b6"/>
+      <rect x="808" y="80"  width="68"  height="68" rx="2" fill="#d4ccbe"/>
+      <rect x="888" y="90"  width="95"  height="55" rx="2" fill="#d0c8ba"/>
+      <rect x="995" y="78"  width="58"  height="72" rx="2" fill="#d8d0c4"/>
+      <rect x="1065" y="85" width="80"  height="62" rx="2" fill="#cec6b8"/>
+      <rect x="1158" y="80" width="110" height="68" rx="2" fill="#d2cab8"/>
+      <rect x="1280" y="88" width="90"  height="65" rx="2" fill="#d6cec0"/>
+      <rect x="1380" y="80" width="60"  height="75" rx="2" fill="#d4ccbc"/>
+
+      <!-- ── City blocks — lower band ── -->
+      <rect x="60"  y="185" width="82"  height="65" rx="2" fill="#d0c8ba"/>
+      <rect x="155" y="178" width="65"  height="72" rx="2" fill="#cec6b8"/>
+      <rect x="232" y="182" width="100" height="60" rx="2" fill="#d4ccbe"/>
+      <rect x="344" y="175" width="55"  height="68" rx="2" fill="#d8d0c2"/>
+      <rect x="410" y="180" width="78"  height="62" rx="2" fill="#cac2b2"/>
+      <rect x="500" y="176" width="50"  height="58" rx="2" fill="#d2cab8"/>
+      <rect x="562" y="185" width="88"  height="65" rx="2" fill="#d6cec2"/>
+      <rect x="662" y="178" width="72"  height="70" rx="2" fill="#ccc4b6"/>
+      <rect x="746" y="182" width="95"  height="62" rx="2" fill="#d0c8ba"/>
+      <rect x="852" y="176" width="58"  height="68" rx="2" fill="#d8d0c4"/>
+      <rect x="922" y="184" width="80"  height="60" rx="2" fill="#d4ccbe"/>
+      <rect x="1013" y="178" width="68" height="72" rx="2" fill="#cec6b8"/>
+      <rect x="1094" y="182" width="100" height="62" rx="2" fill="#d2cab8"/>
+      <rect x="1206" y="175" width="75" height="70" rx="2" fill="#d6cec0"/>
+      <rect x="1294" y="180" width="88" height="65" rx="2" fill="#d0c8b8"/>
+
+      <!-- ── Road network — major horizontal ── -->
+      <rect x="0" y="168" width="1440" height="10" rx="0" fill="#f0ebe2" opacity="0.9"/>
+      <rect x="0" y="62"  width="1440" height="8"  rx="0" fill="#ede8de" opacity="0.8"/>
+      <rect x="0" y="250" width="1440" height="8"  rx="0" fill="#ede8de" opacity="0.7"/>
+
+      <!-- ── Road network — major vertical ── -->
+      <rect x="185"  y="0" width="8" height="340" fill="#ede8de" opacity="0.8"/>
+      <rect x="390"  y="0" width="7" height="340" fill="#ede8de" opacity="0.7"/>
+      <rect x="555"  y="0" width="6" height="340" fill="#ede8de" opacity="0.7"/>
+      <rect x="700"  y="0" width="8" height="340" fill="#ede8de" opacity="0.75"/>
+      <rect x="885"  y="0" width="7" height="340" fill="#ede8de" opacity="0.7"/>
+      <rect x="1060" y="0" width="6" height="340" fill="#ede8de" opacity="0.65"/>
+      <rect x="1155" y="0" width="7" height="340" fill="#ede8de" opacity="0.7"/>
+      <rect x="1285" y="0" width="6" height="340" fill="#ede8de" opacity="0.65"/>
+
+      <!-- ── Diagonal road (river road / main boulevard) ── -->
+      <path d="M0,220 Q360,160 720,178 Q1080,196 1440,155"
+            stroke="#ede8de" stroke-width="10" fill="none" opacity="0.7"/>
+
+      <!-- ── Location Pins ── -->
+
+      <!-- Pin A — prominent center-left -->
+      <g transform="translate(340, 95)">
+        <path d="M0,-28 C-14,-28 -22,-16 -22,0 C-22,14 0,32 0,32 C0,32 22,14 22,0 C22,-16 14,-28 0,-28 Z"
+              fill="#3FCA93" opacity="0.92"/>
+        <circle cx="0" cy="-4" r="9" fill="#ffffff" opacity="0.95"/>
+      </g>
+
+      <!-- Pin B — top right cluster -->
+      <g transform="translate(780, 48)">
+        <path d="M0,-22 C-11,-22 -17,-13 -17,0 C-17,11 0,25 0,25 C0,25 17,11 17,0 C17,-13 11,-22 0,-22 Z"
+              fill="#3FCA93" opacity="0.88"/>
+        <circle cx="0" cy="-3" r="7" fill="#ffffff" opacity="0.95"/>
+      </g>
+
+      <!-- Pin C — upper right -->
+      <g transform="translate(1080, 72)">
+        <path d="M0,-22 C-11,-22 -17,-13 -17,0 C-17,11 0,25 0,25 C0,25 17,11 17,0 C17,-13 11,-22 0,-22 Z"
+              fill="#3FCA93" opacity="0.85"/>
+        <circle cx="0" cy="-3" r="7" fill="#ffffff" opacity="0.95"/>
+      </g>
+
+      <!-- Pin D — left side -->
+      <g transform="translate(120, 130)">
+        <path d="M0,-18 C-9,-18 -14,-10 -14,0 C-14,9 0,20 0,20 C0,20 14,9 14,0 C14,-10 9,-18 0,-18 Z"
+              fill="#3FCA93" opacity="0.80"/>
+        <circle cx="0" cy="-2" r="5.5" fill="#ffffff" opacity="0.9"/>
+      </g>
+
+      <!-- Pin E — center right -->
+      <g transform="translate(960, 130)">
+        <path d="M0,-20 C-10,-20 -16,-11 -16,0 C-16,10 0,23 0,23 C0,23 16,10 16,0 C16,-11 10,-20 0,-20 Z"
+              fill="#3FCA93" opacity="0.85"/>
+        <circle cx="0" cy="-3" r="6" fill="#ffffff" opacity="0.92"/>
+      </g>
+
+      <!-- Pin F — far right -->
+      <g transform="translate(1340, 55)">
+        <path d="M0,-18 C-9,-18 -14,-10 -14,0 C-14,9 0,20 0,20 C0,20 14,9 14,0 C14,-10 9,-18 0,-18 Z"
+              fill="#3FCA93" opacity="0.78"/>
+        <circle cx="0" cy="-2" r="5.5" fill="#ffffff" opacity="0.9"/>
+      </g>
+
+      <!-- Pin G — lower center -->
+      <g transform="translate(580, 205)">
+        <path d="M0,-18 C-9,-18 -14,-10 -14,0 C-14,9 0,20 0,20 C0,20 14,9 14,0 C14,-10 9,-18 0,-18 Z"
+              fill="#3FCA93" opacity="0.75"/>
+        <circle cx="0" cy="-2" r="5.5" fill="#ffffff" opacity="0.9"/>
+      </g>
+
+    </svg>
   </div>
 
+  <!-- Bottom fade — blends map into page background -->
+  <div class="hero-fade"></div>
 
-  <div class="line-clamp-1 w-auto bg-black h-[0.01rem] mt-4 mx-4"></div>
-  <div *ngIf="this.vetStationService.isLoading"  class="text-center h-screen d-flex align-items-center">
-  <div class="spinner-border text-success w-16 h-16 m-auto box-border flex flex-wrap justify-center items-center" role="status">
-    <span class="visually-hidden">Loading...</span>
+  <!-- Hero content — title + search bar -->
+  <div class="hero-content">
+    <h1 class="hero-title">Find a Vet Station Nearby</h1>
+    <div class="hero-search">
+      <app-search-input (keyup)="handleChange($event)"></app-search-input>
+    </div>
   </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════
+     CARDS GRID
+     ══════════════════════════════════════════ -->
+<div class="max-w-content mx-auto px-4 md:px-6 pt-8 pb-12">
+
+  <!-- Loading skeletons -->
+  <div *ngIf="this.vetStationService.isLoading"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="card animate-pulse">
+      <div class="h-36 bg-gray-200 rounded-t-xl"></div>
+      <div class="card-body space-y-3">
+        <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        <div class="h-3 bg-gray-200 rounded w-full"></div>
+        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+      </div>
+    </div>
   </div>
-  <div *ngIf="!this.vetStationService.isLoading" class="flex flex-wrap justify-center items-center m-auto box-border">
-    <div class="flex flex-col justify-center items-center w-1/6 mx-14 my-4" *ngFor="let i of this.vetStationService.vetStations?.vetStations" >
-<app-vet-card [vetStation]="i" routerLink="vet-station-home/{{i?.id}}"></app-vet-card>
+
+  <!-- Vet station cards -->
+  <div *ngIf="!this.vetStationService.isLoading"
+       [@listStagger]="this.vetStationService.vetStations?.vetStations?.length"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <app-vet-card
+      *ngFor="let i of this.vetStationService.vetStations?.vetStations"
+      [vetStation]="i"
+      routerLink="vet-station-home/{{i?.id}}"
+      @fadeIn>
+    </app-vet-card>
   </div>
-  </div>
+
 </div>

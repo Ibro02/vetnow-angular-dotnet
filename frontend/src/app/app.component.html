@@ -1,3 +1,5 @@
 <app-navbar></app-navbar>
-<router-outlet class="background-container h-16 w-full flex items-center justify-center"></router-outlet>
+<main class="relative" style="margin-top: var(--navbar-height);" [@routeAnimation]="prepareRoute(outlet)">
+  <router-outlet #outlet="outlet"></router-outlet>
+</main>
 <app-toaster></app-toaster>

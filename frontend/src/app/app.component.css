@@ -1,14 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&family=Italiana&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Inter&family=Italiana&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Italiana&display=swap');
 
-*
-{
-  margin: 0;
-  padding: 0;
-}
-
-
-.flex-container{
+.flex-container {
   display: flex;
   gap: 5px;
 }
