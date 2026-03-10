@@ -8,7 +8,9 @@
       "Bash(xargs grep -l \"app-toaster\")",
       "Bash(xargs grep -l \"MyAuthService\\\\|AuthService\")",
       "Bash(npx ng build)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(dotnet build VetStat.Tests/VetStat.Tests.csproj)",
+      "Bash(dotnet test VetStat.Tests/VetStat.Tests.csproj --no-build)"
     ]
   }
 }
