@@ -40,11 +40,15 @@ constructor(private elementRef:ElementRef, public vetStationService:VetStationSe
       this.filterIsClicked = false;
     }
   }
-  handleChange(temp: boolean, i:number, j:number) {
+  handleChange(temp: boolean, i: number, j: number) {
     temp = !temp;
-
     this.vetStationService.dropdown[i].children[j].value = temp;
     this.vetStationService.setValues();
-//console.log(this.dropdown[i].children[j])
+  }
+
+  get activeFilterCount(): number {
+    return this.vetStationService.dropdown
+      .reduce((acc: number, group: any) =>
+        acc + group.children.filter((c: any) => c.value).length, 0);
   }
 }

@@ -1,15 +1,15 @@
 <div class="mt-20 flex justify-center" title="container">
-  <div class="login-register-box">
+  <div class="login-register-box" [@shake]="isError" @fadeIn>
     <div class="flex-container" title="inputSection">
       <h2 class="title">Register</h2>
       <div class="text-inputs">
         <app-sign-in-input [inputValue]="this.newUser.Email" (valueChanged)="handleValueChanged($event, 'Email')" inputType="text" title="Email"></app-sign-in-input>
         <app-sign-in-input [inputValue]="this.newUser.Username" (valueChanged)="handleValueChanged($event, 'Username')" inputType="text" title="Username"></app-sign-in-input>
-        <app-sign-in-input [inputValue]="this.newUser.Password" (valueChanged)="handleValueChanged($event, 'Password')" inputType="password"  title="Password"></app-sign-in-input>
+        <app-sign-in-input [inputValue]="this.newUser.Password" (valueChanged)="handleValueChanged($event, 'Password')" inputType="password" title="Password"></app-sign-in-input>
     </div>
     <div class="flex flex-col w-full justify-center items-center">
       <div class="flex-center-container m-3" title="singInButton">
-        <button id="signInButton" (click)="register()" routerLink="/">Register</button>
+        <button id="signInButton" class="hover-glow" (click)="register()" routerLink="/">Register</button>
       </div>
       <div class="">
         <h4 class="m-2">Already have an account?<span class="underline" (click)="this.router.navigate([''])"> Log in</span></h4>
@@ -17,8 +17,6 @@
       <footer>
         <app-other-sign-up-methods [isLogin]="true"></app-other-sign-up-methods>
       </footer>
-
     </div>
-
 </div>
 </div>

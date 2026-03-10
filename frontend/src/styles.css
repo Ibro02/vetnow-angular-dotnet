@@ -1,18 +1,244 @@
-/* You can add global styles to this file, and also import other style files */
+/* ═══════════════════════════════════════════════════════════
+   VetStation Global Styles
+   ═══════════════════════════════════════════════════════════ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body
-{
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  
+/* ─── Base ────────────────────────────────────────────────── */
+@layer base {
+  body {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background-color: var(--color-bg-soft);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    line-height: var(--leading-tight);
+  }
+
+  /* Smooth scroll for the whole app */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-.container
-{
+/* ─── Buttons ─────────────────────────────────────────────── */
+@layer components {
+
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2
+           font-semibold
+           rounded-btn
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed
+           active:scale-[0.97]
+           select-none whitespace-nowrap;
+    font-family: var(--font-body);
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  .btn-md {
+    @apply px-5 py-2.5 text-sm;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .btn-primary {
+    @apply btn-base btn-md
+           text-white;
+    background-color: var(--color-accent);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-primary:focus {
+    --tw-ring-color: rgba(63, 202, 147, 0.4);
+  }
+
+  .btn-secondary {
+    @apply btn-base btn-md
+           bg-white text-gray-700
+           border border-gray-200;
+  }
+  .btn-secondary:hover {
+    @apply bg-gray-50 border-gray-300;
+  }
+  .btn-secondary:focus {
+    --tw-ring-color: rgba(209, 213, 219, 0.6);
+  }
+
+  .btn-danger {
+    @apply btn-base btn-md
+           bg-red-500 text-white;
+  }
+  .btn-danger:hover {
+    @apply bg-red-600;
+  }
+  .btn-danger:focus {
+    --tw-ring-color: rgba(252, 165, 165, 0.6);
+  }
+
+  .btn-ghost {
+    @apply btn-base btn-md
+           bg-transparent text-gray-600;
+  }
+  .btn-ghost:hover {
+    @apply bg-gray-100;
+  }
+  .btn-ghost:focus {
+    --tw-ring-color: rgba(209, 213, 219, 0.6);
+  }
+
+  .btn-brand {
+    @apply btn-base btn-md
+           text-white;
+    background-color: var(--color-primary);
+  }
+  .btn-brand:hover {
+    background-color: var(--color-primary-dark);
+  }
+  .btn-brand:focus {
+    --tw-ring-color: rgba(51, 179, 174, 0.4);
+  }
+}
+
+/* ─── Cards ───────────────────────────────────────────────── */
+@layer components {
+  .card {
+    @apply bg-white overflow-hidden;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-light);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--duration-normal) var(--ease-default),
+                transform var(--duration-normal) var(--ease-default);
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer;
+  }
+  .card-interactive:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+  .card-interactive:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-body {
+    @apply p-5;
+  }
+
+  .card-header {
+    @apply px-5 py-4 border-b border-gray-100;
+  }
+}
+
+/* ─── Micro-Interactions ──────────────────────────────────── */
+@layer components {
+
+  /* Hover Lift — for any clickable card */
+  .hover-lift {
+    transition: transform var(--duration-normal) var(--ease-default),
+                box-shadow var(--duration-normal) var(--ease-default);
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+  .hover-lift:active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Hover Glow — for primary CTAs */
+  .hover-glow {
+    transition: all var(--duration-normal) var(--ease-default);
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 20px var(--color-accent-50),
+                0 4px 12px rgba(63, 202, 147, 0.25);
+  }
+
+  /* Focus Ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    --tw-ring-color: var(--color-primary-100);
+  }
+
+  /* Image Zoom on Hover */
+  .img-zoom {
+    overflow: hidden;
+  }
+  .img-zoom img {
+    transition: transform 0.5s var(--ease-default);
+  }
+  .img-zoom:hover img {
+    transform: scale(1.08);
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-gray-100 rounded-lg animate-pulse;
+  }
+
+  /* Smooth border highlight on selection */
+  .selectable {
+    @apply border-2 border-transparent transition-all duration-200;
+  }
+  .selectable.selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-50);
+  }
+}
+
+/* ─── Time Slot Buttons ───────────────────────────────────── */
+@layer components {
+  .time-slot-btn {
+    @apply flex flex-col items-center justify-center gap-1
+           py-3 px-2 rounded-xl border-2
+           font-medium text-sm
+           transition-all duration-200;
+  }
+
+  .time-slot-btn:not(.selected) {
+    @apply border-gray-200 text-gray-500;
+  }
+  .time-slot-btn:not(.selected):hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-50);
+    color: var(--color-primary);
+  }
+
+  .time-slot-btn.selected {
+    @apply border-emerald-500 bg-emerald-50 text-emerald-700 font-bold;
+    box-shadow: 0 0 0 3px var(--color-accent-50);
+    animation: selectPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@keyframes selectPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ─── Legacy utilities (keep existing classes working) ─────── */
+.container {
   height: 2.6rem;
   font-size: small;
   width: 100%;
@@ -21,11 +247,9 @@ body
   justify-content: space-between;
 }
 
-.flex-center-container
-{
+.flex-center-container {
   display: flex;
   flex-direction: column;
   justify-items: center;
   align-items: center;
 }
-

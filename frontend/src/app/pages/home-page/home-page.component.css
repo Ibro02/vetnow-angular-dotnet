@@ -1,4 +1,83 @@
-button
-{
-  border:1px solid black;
+/* ══════════════════════════════════════════
+   HERO SECTION
+   ══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   HERO — overflow is NOT hidden so the
+   search-input dropdown can extend below
+   ══════════════════════════════════════════ */
+.hero {
+  position: relative;
+  height: 300px;
+  background: #e8e1d4;
+  /* No overflow:hidden — the dropdown must be visible below */
+}
+
+/* SVG map — overflow is clipped here instead */
+.hero-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.hero-map svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Gradient fades map to page background at the bottom */
+.hero-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(242, 240, 235, 0.6) 65%,
+    var(--color-bg-soft, #FAF9F6) 100%
+  );
+  pointer-events: none;
+}
+
+/* Hero text + search — centered over the map */
+.hero-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 1rem;
+  gap: 1.25rem;
+}
+
+.hero-title {
+  font-family: var(--font-body);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.75), 0 0 28px rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* Search bar wrapper — constrains width, stacks above everything */
+.hero-search {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 540px;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 640px) {
+  .hero {
+    height: 260px;
+  }
+  .hero-search {
+    max-width: 100%;
+  }
 }

@@ -5,6 +5,7 @@ import { MyAuthService } from '../../services/MyAuth';
 import axios from "axios";
 import {Router, RouterLink} from "@angular/router";
 import { ToasterService } from '../../services/toaster.service';
+import { shake, fadeIn } from '../../animations/shared.animations';
 
 @Component({
     selector: 'app-register',
@@ -14,7 +15,8 @@ import { ToasterService } from '../../services/toaster.service';
     imports: [
         OtherSignUpMethodsComponent,
         SignInInputComponent
-    ]
+    ],
+    animations: [shake, fadeIn],
 })
 export class RegisterComponent implements OnInit{
     constructor(public router:Router,private myAuthService:MyAuthService, private toaster: ToasterService) {

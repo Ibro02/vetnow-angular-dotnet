@@ -84,15 +84,25 @@
         </a>
       </div>
         </div>
-        <h3 class="Schedule text-center text-turquoise-blue my-3 w-full flex justify-center items-center gap-1 cursor-pointer link-hover" [routerLink]="['settings']"><fa-icon [icon]="faGear"  class="text-xl w-8"></fa-icon>Manage</h3>
       </div>
 
       </div >
-    <button *ngIf="myAuthService.IsLogged()" type="button" class="btn btn-outline-danger m-auto" (click)="myAuthService.LogOut()">Sign out</button>
 
-    <div class="mt-auto w-auto mx-6" title="FAQ">
-      <div class="line-clamp-1 w-full bg-gray-600 h-[0.01rem]"></div>
-      <p class="Schedule text-center font-extralight text-turquoise-blue my-2 cursor-pointer link-hover">FAQ</p>
+    <!-- ── Bottom group: Manage / FAQ / Sign out — pinned to bottom ── -->
+    <div class="mt-auto w-full flex flex-col items-center px-6 pb-5 gap-2">
+      <h3 class="Schedule text-center text-turquoise-blue w-full flex justify-center items-center gap-1 cursor-pointer link-hover"
+          [routerLink]="['settings']"
+          data-bs-dismiss="offcanvas">
+        <fa-icon [icon]="faGear" class="text-xl w-8"></fa-icon>Manage
+      </h3>
+      <div class="w-full bg-gray-300 h-px"></div>
+      <p class="Schedule text-center font-extralight text-turquoise-blue my-1 cursor-pointer link-hover">FAQ</p>
+      <button *ngIf="myAuthService.IsLogged()"
+              type="button"
+              class="btn btn-outline-danger w-auto"
+              (click)="myAuthService.LogOut()">
+        Sign out
+      </button>
     </div>
   </div>
 </div>

@@ -1,38 +1,36 @@
 button {
-  color: #06701b;
+  color: var(--color-primary-dark);
 }
 .calendar-container {
   width: 400px;
-  background: #A9E4B5;
+  background: var(--color-accent-50, #a9e4b5);
   padding: 0px 0px 20px 0px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  border: 1px solid #acacac;
-
+  border: 1px solid var(--color-border);
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   padding: 5px 0.5rem;
-  border-bottom: 1px solid #acacac;
-  border-radius: 10px 10px 0 0;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-md);
   align-items: center;
-  font-size: 20px;
+  font-size: var(--text-xl);
   font-weight: bold;
   margin-bottom: 10px;
-  transition: 0.5s ease all;
-
+  transition: var(--duration-slow) ease all;
 }
 .calendar-header:hover {
-  box-shadow: none;
+  box-shadow: var(--shadow-none);
 }
 .calendar-header button {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: var(--text-lg);
   cursor: pointer;
 }
 
@@ -57,22 +55,23 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
 }
 
 .calendar-grid div:hover {
-  background: #74C69D;
+  background: var(--color-accent-hover);
 }
 
 .selected {
-  background: #3FCA93 !important;
-  color: white;
+  background: var(--color-accent) !important;
+  color: var(--color-text-inverse);
 }
 
 /* Persistent "today" ring — always visible regardless of selection */
 .current-date {
-  border: 2px solid #06701b !important;
+  border: 2px solid var(--color-primary-dark) !important;
   font-weight: 700;
 }
 
@@ -86,8 +85,8 @@ button {
 .dot {
   width: 5px;
   height: 5px;
-  border-radius: 50%;
-  background: #3FCA93;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
   position: absolute;
   bottom: 4px;
   left: 50%;
@@ -96,7 +95,7 @@ button {
 
 /* When the day is selected, make the dot white so it stays visible */
 .selected .dot {
-  background: white;
+  background: var(--color-text-inverse);
 }
 
 /* Subtle font weight bump for highlighted days */

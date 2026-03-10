@@ -1,112 +1,81 @@
-
-
-h4
-{
-  height: 0;
-  color: #000;
+h4 {
+  color: var(--color-text);
   text-align: center;
-  font-family: Inter;
-  font-size: 0.745rem;
-  font-style: normal;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
   font-weight: 400;
-  line-height: normal;
 }
 
-h4 span
-{
+h4 span {
   cursor: pointer;
-  color: #2C6330;
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
+  color: var(--color-primary-dark);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: color var(--duration-fast);
 }
 
-a{
-  color: #2C6330;
-  text-align: right;
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-
+h4 span:hover {
+  color: var(--color-primary);
 }
 
-.relative-container
-{
+a {
+  color: var(--color-primary-dark);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  transition: color var(--duration-fast);
+}
+
+a:hover {
+  color: var(--color-primary);
+}
+
+.relative-container {
   height: 1px;
   width: 100%;
-  background-color: black;
+  background-color: var(--color-border);
   padding: 0;
 }
 
-
-.line
-{
+.line {
   margin: 0;
   display: inline;
   width: 100%;
-  background-color: black;
+  background-color: var(--color-border);
   height: 1px;
   position: relative;
-
 }
-.line-h4
-{
+
+.line-h4 {
   height: auto;
   margin: 0;
   width: 10rem;
 }
 
-
 .social-icons a {
   cursor: pointer;
   background-color: white;
-  border-radius: 50px;
+  border-radius: var(--radius-full);
   color: #3d3d41;
   display: inline-block;
   line-height: 52px;
   text-align: center;
   height: 50px;
   width: 50px;
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  margin: 0px 15px;
+  box-shadow: var(--shadow-sm);
+  margin: 0 12px;
   font-size: 22px;
-  transition: 0.5s ease all;
-}
-.social-icons a:hover
-{
-  background-color: rgba(0,0,0,50%);
-  color:white;
-
+  transition: all var(--duration-normal) var(--ease-default);
+  border: 1px solid var(--color-border-light);
 }
 
-.social-icons a.facebook:hover
-{
-  filter: drop-shadow(0 0 0.75rem #4267b2);
-}
-.social-icons a.apple:hover
-{
-  filter: drop-shadow(0 0 0.75rem #3b3b3b);
-}
-.social-icons a.gmail:hover
-{
-  filter: drop-shadow(0 0 0.75rem #bb0939);
-}
-.social-icons a.microsoft:hover
-{
-  filter: drop-shadow(0 0 0.75rem #ffbb00);
+.social-icons a:hover {
+  background-color: var(--color-bg-muted);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
-
-.shadow-img1{
-
-  background-repeat:no-repeat;
-  background-position:bottom;
-}
-
-.shadow-img2{
-  background-position: bottom;
-  background-size: 100%;
-  background-repeat: no-repeat;
-}
+.social-icons a.facebook:hover { color: #4267b2; }
+.social-icons a.apple:hover    { color: #3b3b3b; }
+.social-icons a.gmail:hover    { color: #bb0939; }
+.social-icons a.microsoft:hover { color: #ffbb00; }

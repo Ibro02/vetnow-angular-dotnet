@@ -1,37 +1,46 @@
-<div class="w-80 h-96 bg-zinc-300 rounded-2xl card-container transition-all duration-150" >
-    <div class="w-80 h-36 bg-emerald-800 rounded-t-2xl flex justify-end items-end photo-section">
-      <img *ngIf="vetStation?.stationImage" class="w-full h-full rounded-t-2xl object-cover" src="{{vetStation?.stationImage}}"/>
+<div class="card-interactive w-full hover-lift">
+  <div class="h-36 bg-emerald-800 overflow-hidden img-zoom">
+    <img *ngIf="vetStation?.stationImage"
+         class="w-full h-full object-cover"
+         src="{{vetStation?.stationImage}}"
+         alt="{{vetStation?.name}}"/>
+    <div *ngIf="!vetStation?.stationImage"
+         class="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-700 to-teal-600">
+      <span class="text-white text-opacity-30 text-5xl font-bold select-none">{{ (vetStation?.name ?? 'V').charAt(0) }}</span>
     </div>
-    <div class="w-80 inline-flex items-center bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 cool-shadow">
-        <span class="w-72 h-3 text-center text-xs font-normal font-['Inter']">1km</span>
+  </div>
+
+  <div class="inline-flex items-center w-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 border-b border-green-100">
+    <span class="w-full text-center">1km</span>
+  </div>
+
+  <div class="card-body flex flex-col justify-between gap-3" style="min-height: 180px;">
+    <div>
+      <h3 class="text-gray-900 text-lg font-semibold font-body leading-tight mb-1">
+        {{vetStation?.name}}
+      </h3>
+      <p class="text-gray-500 text-sm font-body mb-2">Location</p>
+      <p class="text-gray-400 text-xs font-body line-clamp-3 leading-relaxed">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lorem lorem, iaculis vitae est mattis.
+      </p>
     </div>
 
-    <div class="m-3 flex justify-between h-3/5 flex-col desc-section">
-        <div class="text-container">
-            <h1 class="w-72 text-black text-xl font-semibold font-['Inter'] station-title">
-           {{vetStation?.name}}
-            </h1>
-            <h2 class="w-64 text-black text-base font-normal font-['Inter'] station-location">
-                Location
-            </h2>
-            <div class="w-72 text-black text-xs font-normal font-['Inter'] station-details">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lorem lorem, iaculis vitae est mattis, hendrerit mattis urna.
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </div>
-        </div>
-
-        <div class="availabilities-work-type-container">
-            <div class="flex gap-3 w-1/2 items-start availabilities-sec">
-                <fa-icon *ngIf="vetStation?.parking" class="w-3 h-4 text-black text-2xl font-normal font-['Inter']" [icon]="this.faP"></fa-icon>
-                <fa-icon *ngIf="vetStation?.wifi" class="w-6 h-5 text-black text-xl font-black font-['Font Awesome 5 Free']" [icon]="this.faWifi"></fa-icon>
-                <fa-icon *ngIf="vetStation?.wheelchair" class="w-6 h-5 text-black text-xl font-black font-['Font Awesome 5 Free']" [icon]="this.faWheelchair"></fa-icon>
-            </div>
-            <div class="flex w-1/2 gap-3 justify-end work-type-sec">
-              <span *ngIf="vetStation?.inOffice" class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 cool-shadow">In Office</span>
-              <span *ngIf="vetStation?.onField" class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 cool-shadow">On Field</span>
-
-<!--<div class="w-16 h-7 p-1 bg-lightgreen-modified rounded-lg on-field-button text-center cool-shadow text-xs">On Field</div>-->
-            </div>
-        </div>
+    <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+      <div class="flex gap-2 items-center text-gray-400">
+        <fa-icon *ngIf="vetStation?.parking" [icon]="this.faP" class="text-base"></fa-icon>
+        <fa-icon *ngIf="vetStation?.wifi" [icon]="this.faWifi" class="text-base"></fa-icon>
+        <fa-icon *ngIf="vetStation?.wheelchair" [icon]="this.faWheelchair" class="text-base"></fa-icon>
+      </div>
+      <div class="flex gap-2">
+        <span *ngIf="vetStation?.inOffice"
+              class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+          In Office
+        </span>
+        <span *ngIf="vetStation?.onField"
+              class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
+          On Field
+        </span>
+      </div>
     </div>
+  </div>
 </div>

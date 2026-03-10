@@ -1,21 +1,22 @@
 <div class="mt-20 flex" title="container">
-<div class="login-register-box justify-center items-center h-auto m-auto" title="loginBox">
+<div class="login-register-box justify-center items-center h-auto m-auto"
+     [@shake]="isError" @fadeIn title="loginBox">
   <div class="flex-container" title="inputSection">
     <h2 class="title">Log in</h2>
     <div class="text-inputs">
-      <app-sign-in-input [inputValue]="this.usernameOrEmail" (valueChanged)="handleValueChanged($event,'usernameOrEmail')" inputType="text" title="Username / Email" [isError]="isError" ></app-sign-in-input>
+      <app-sign-in-input [inputValue]="this.usernameOrEmail" (valueChanged)="handleValueChanged($event,'usernameOrEmail')" inputType="text" title="Username / Email" [isError]="isError"></app-sign-in-input>
       <app-sign-in-input [inputValue]="this.password" (valueChanged)="handleValueChanged($event, 'password')" inputType="password" title="Password" [isError]="isError"></app-sign-in-input>
     </div>
     <div class="container" title="keepMeSignedAndPasswordRecovery">
-      <form class="cursor-pointer gap-1.5 h-3" >
-        <input [(ngModel)]="this.checkBox" id="password" type="checkbox" class="cursor-pointer flex  m-auto" name="checkBox">
+      <form class="cursor-pointer gap-1.5 h-3">
+        <input [(ngModel)]="this.checkBox" id="password" type="checkbox" class="cursor-pointer flex m-auto accent-emerald-500" name="checkBox">
         <span (click)="keepMeSigned()" class="cursor-pointer flex place-items-center h-full">Keep me signed in</span>
       </form>
       <a href="#">Forgot password?</a>
     </div>
   </div>
   <div class="flex-center-container m-4" title="singInButton">
-    <button id="signInButton" (click)="signIn()" routerLink="/home-page">Sign in</button>
+    <button id="signInButton" class="hover-glow" (click)="signIn()" routerLink="/home-page">Sign in</button>
     <h4 class="m-2">Don't have an account?<span class="underline" routerLink="/register"> Register</span></h4>
   </div>
 <footer>

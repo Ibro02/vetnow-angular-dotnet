@@ -5,8 +5,7 @@
     [description]="i18n.t('pageDescription')"
   >{{ i18n.t('pageTitle') }}</app-header-title>
 
-  <app-box-container>
-    <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg relative">
+  <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg relative">
 
       <!-- ── Language toggle button ── -->
       <button
@@ -101,7 +100,7 @@
           <!-- Right column -->
           <div>
             <!-- Profile Image -->
-            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">
+            <p class="text-sm text-black text-lg font-normal font-body mb-1">
               {{ i18n.t('profileImage') }}
             </p>
             <div class="flex flex-col items-start gap-2 mb-4">
@@ -209,7 +208,7 @@
 
           <!-- Leaflet Map - full width below both columns -->
           <div class="col-span-2 w-1/2" [style.visibility]="showCropWizard ? 'hidden' : 'visible'">
-            <p class="text-sm text-black text-lg font-normal font-['Inter'] mb-1">
+            <p class="text-sm text-black text-lg font-normal font-body mb-1">
               {{ i18n.t('pickLocation') }}
             </p>
             <div #mapContainer class="w-full h-64 rounded-md overflow-hidden border border-gray-200 shadow-sm"></div>
@@ -223,6 +222,5 @@
         <app-button type="primary"   [text]="i18n.t('save')"   (event)="saveChanges()"></app-button>
       </div>
 
-    </div>
-  </app-box-container>
+  </div>
 </div>
