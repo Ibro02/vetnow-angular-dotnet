@@ -37,6 +37,40 @@ public class AvailabilityAddEndpoint : MyEndpointBase
         {
             _db.Availability.Add(newAvailability);
             _db.SaveChanges();
+
+            // Generate time slots for the next 30 days based on the availability
+            var duration = TimeSpan.FromMinutes(newAvailability.AppointmentDuration);
+            var slots = new List<TimeSlot>();
+
+            for (int dayOffset = 0; dayOffset < 30; dayOffset++)
+            {
+                var slotDate = DateTime.Today.AddDays(dayOffset);
+                var current = newAvailability.AvailableFrom;
+
+                while (current + duration <= newAvailability.AvailableTo)
+                {
+                    // Skip slots that overlap with the break window
+                    if (current < newAvailability.BreakTo && current + duration > newAvailability.BreakFrom)
+                    {
+                        current = newAvailability.BreakTo;
+                        continue;
+                    }
+
+                    slots.Add(new TimeSlot
+                    {
+                        AvailabilityId = newAvailability.Id,
+                        SlotEmployeeId = newAvailability.EmployeeId,
+                        SlotDateTime = slotDate + current,
+                        AppointmentTime = current,
+                        IsAvailable = true
+                    });
+
+                    current += duration;
+                }
+            }
+
+            _db.TimeSlot.AddRange(slots);
+            _db.SaveChanges();
         }
         catch (Exception ex)
         {

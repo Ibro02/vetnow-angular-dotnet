@@ -64,6 +64,9 @@ public class AdminPanelEndpoints : MyEndpointBase
         return Ok(new { totalCount, users });
     }
 
+    // Employee role IDs: Barber=2, Nurse=3, Vet=4, MainVet=5
+    private static readonly int[] EmployeeRoleIds = { 2, 3, 4, 5 };
+
     [HttpPut("Users/Update")]
     public ActionResult UpdateUser([FromBody] AdminUpdateUserRequest request)
     {
@@ -80,7 +83,33 @@ public class AdminPanelEndpoints : MyEndpointBase
         if (request.Phone != null) person.Phone = request.Phone;
         if (request.City != null) person.City = request.City;
         if (request.Country != null) person.Country = request.Country;
-        if (request.RoleId.HasValue) person.RoleId = request.RoleId.Value;
+
+        if (request.RoleId.HasValue)
+        {
+            person.RoleId = request.RoleId.Value;
+
+            var existingEmployee = _db.Employee.SingleOrDefault(e => e.Id == person.Id);
+            bool isNowEmployeeRole = EmployeeRoleIds.Contains(request.RoleId.Value);
+
+            if (isNowEmployeeRole && existingEmployee == null)
+            {
+                // Promote to employee: insert a row in the Employee table (TPT)
+                _db.Database.ExecuteSqlRaw(
+                    "INSERT INTO Employee (Id, DateOfEmployment, IsDeleted) VALUES ({0}, {1}, {2})",
+                    person.Id, DateTime.Now, false);
+            }
+            else if (!isNowEmployeeRole && existingEmployee != null)
+            {
+                // Demote from employee: clean up and remove Employee row
+                var availability = _db.Availability.Where(a => a.EmployeeId == person.Id);
+                _db.Availability.RemoveRange(availability);
+                var timeSlots = _db.TimeSlot.Where(t => t.SlotEmployeeId == person.Id);
+                _db.TimeSlot.RemoveRange(timeSlots);
+                _db.SaveChanges();
+
+                _db.Database.ExecuteSqlRaw("DELETE FROM Employee WHERE Id = {0}", person.Id);
+            }
+        }
 
         _db.SaveChanges();
         return Ok(person);

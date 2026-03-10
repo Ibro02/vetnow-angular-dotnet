@@ -24,16 +24,24 @@ public class RoleSeeder
 
         var roles = new List<Role>
         {
-            new Role { Id = 1, Name = "User" },
-            new Role { Id = 2, Name = "Barber" },
-            new Role { Id = 3, Name = "Nurse" },
-            new Role { Id = 4, Name = "Vet" },
-            new Role { Id = 5, Name = "MainVet" },
-            new Role { Id = 6, Name = "Admin" },
+            new Role { Name = "User" },
+            new Role { Name = "Barber" },
+            new Role { Name = "Nurse" },
+            new Role { Name = "Vet" },
+            new Role { Name = "MainVet" },
+            new Role { Name = "Admin" },
         };
 
         _context.Role.AddRange(roles);
+        try
+        {
         await _context.SaveChangesAsync();
+
+        }
+        catch(Exception ex)
+        {
+            throw ex;
+        }
         Console.WriteLine($"Created {roles.Count} roles");
     }
 }
