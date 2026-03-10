@@ -8,7 +8,7 @@ import { ButtonComponent } from '../../components/common/button/button.component
 import { HeaderTitleComponent } from "../../components/common/header-title/header-title.component";
 
 import { NgFor, NgIf } from '@angular/common';
-import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import axios, { AxiosResponse } from 'axios';
 import * as L from 'leaflet';
@@ -57,19 +57,19 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   vetStationFormGroup = new FormGroup({
-    name: new FormControl(''),
-    city: new FormControl(''),
-    country: new FormControl(''),
-    contactNumber: new FormControl(''),
-    email: new FormControl(''),
-    address: new FormControl(''),
-    description: new FormControl(''),
-    onField: new FormControl(false),
-    inOffice: new FormControl(false),
-    parking: new FormControl(false),
-    wheelchair: new FormControl(false),
-    wifi: new FormControl(false),
-    stationImage: new FormControl('')
+    name:          new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+    city:          new FormControl('', [Validators.maxLength(100)]),
+    country:       new FormControl('', [Validators.maxLength(100)]),
+    contactNumber: new FormControl('', [Validators.required, Validators.pattern(/^\+?[\d\s\-()\.\+]{7,15}$/)]),
+    email:         new FormControl('', [Validators.required, Validators.email, Validators.maxLength(254)]),
+    address:       new FormControl('', [Validators.required, Validators.maxLength(200)]),
+    description:   new FormControl('', [Validators.maxLength(1000)]),
+    onField:       new FormControl(false),
+    inOffice:      new FormControl(false),
+    parking:       new FormControl(false),
+    wheelchair:    new FormControl(false),
+    wifi:          new FormControl(false),
+    stationImage:  new FormControl(''),
   });
 
   constructor(private fb: FormBuilder, public toaster: ToasterService) {
@@ -153,6 +153,10 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async saveChanges() {
+    if (this.vetStationFormGroup.invalid) {
+      this.toaster.error('Validation Error', 'Please correct the form errors before saving.');
+      return;
+    }
 
     const apiUrl = `https://localhost:44308/api/VetStation/Edit/${this.id}`;
 

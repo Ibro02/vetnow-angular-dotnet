@@ -64,17 +64,39 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
     public i18n: I18nService,
   ) {}
 
+  readonly passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,128}$/;
+
   profileSettingsFormGroup = new FormGroup({
-    firstName: new FormControl("", [Validators.required]),
-    lastName: new FormControl("", [Validators.required]),
-    phone: new FormControl("", [Validators.required]),
-    email: new FormControl("", [Validators.required, Validators.email]),
-    username: new FormControl("", [Validators.required]),
-    password: new FormControl("", [Validators.required]),
-    picture: new FormControl("", [Validators.required]),
-    city: new FormControl("", [Validators.required]),
-    address: new FormControl("", [Validators.required]),
-    country: new FormControl("", [Validators.required]),
+    firstName: new FormControl("", [
+      Validators.required,
+      Validators.maxLength(50),
+      Validators.pattern(/^[a-zA-Z\u00C0-\u024F\s'\-]+$/),
+    ]),
+    lastName: new FormControl("", [
+      Validators.required,
+      Validators.maxLength(50),
+      Validators.pattern(/^[a-zA-Z\u00C0-\u024F\s'\-]+$/),
+    ]),
+    phone: new FormControl("", [
+      Validators.required,
+      Validators.pattern(/^\+?[\d\s\-()\.\+]{7,15}$/),
+    ]),
+    email: new FormControl("", [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(254),
+    ]),
+    username: new FormControl("", [
+      Validators.required,
+      Validators.minLength(5),
+      Validators.maxLength(30),
+      Validators.pattern(/^[a-zA-Z0-9_\-]+$/),
+    ]),
+    password: new FormControl(""),   // optional — only validated if non-empty
+    picture: new FormControl(""),    // optional — user may not change it
+    city: new FormControl("", [Validators.maxLength(100)]),
+    address: new FormControl("", [Validators.maxLength(200)]),
+    country: new FormControl("", [Validators.maxLength(100)]),
   })
 
 
@@ -187,6 +209,15 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
 
 
   async saveChanges() {
+    if (this.profileSettingsFormGroup.invalid) {
+      this.toaster.error('Validation Error', 'Please correct the form errors before saving.');
+      return;
+    }
+    const password = this.profileSettingsFormGroup.value.password;
+    if (password && !this.passwordRegex.test(password)) {
+      this.toaster.error('Validation Error', 'Password must be 8–128 characters with uppercase, lowercase, digit, and special character.');
+      return;
+    }
     const token = this.myAuthService.token;
     const apiUrl = Config.address + 'api/ProfileSettings/Edit';
     await axios

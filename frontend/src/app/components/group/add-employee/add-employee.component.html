@@ -1,4 +1,5 @@
 <app-button text="Add new employee" (event)="openModal()"></app-button>
+
 <!-- The Modal -->
 <div
   class="modal bg-black bg-opacity-25"
@@ -19,8 +20,10 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -28,8 +31,9 @@
                 <input
                   id="firstName"
                   formControlName="firstName"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('firstName')"
                 />
               </div>
             </div>
@@ -39,12 +43,14 @@
                 <input
                   id="lastName"
                   formControlName="lastName"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('lastName')"
                 />
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -52,8 +58,9 @@
                 <input
                   id="email"
                   formControlName="email"
-                  class="form-control"
                   type="email"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('email')"
                 />
               </div>
             </div>
@@ -63,12 +70,14 @@
                 <input
                   id="phone"
                   formControlName="phone"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('phone')"
                 />
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -76,8 +85,9 @@
                 <input
                   id="roleId"
                   formControlName="roleId"
-                  class="form-control"
                   type="number"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('roleId')"
                 />
               </div>
             </div>
@@ -87,12 +97,14 @@
                 <input
                   id="birthDate"
                   formControlName="birthDate"
-                  class="form-control"
                   type="date"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('birthDate')"
                 />
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -100,8 +112,9 @@
                 <input
                   id="username"
                   formControlName="username"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('username')"
                 />
               </div>
             </div>
@@ -111,12 +124,14 @@
                 <input
                   id="password"
                   formControlName="password"
-                  class="form-control"
                   type="password"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('password')"
                 />
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -124,8 +139,9 @@
                 <input
                   id="city"
                   formControlName="city"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('city')"
                 />
               </div>
             </div>
@@ -135,12 +151,14 @@
                 <input
                   id="country"
                   formControlName="country"
-                  class="form-control"
                   type="text"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('country')"
                 />
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -148,12 +166,14 @@
                 <input
                   id="dateOfEmployment"
                   formControlName="dateOfEmployment"
-                  class="form-control"
                   type="date"
+                  class="form-control"
+                  [class.is-invalid]="isInvalid('dateOfEmployment')"
                 />
               </div>
             </div>
           </div>
+
           <div class="modal-footer">
             <button
               type="button"
@@ -164,6 +184,7 @@
             </button>
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
+
         </form>
       </div>
     </div>

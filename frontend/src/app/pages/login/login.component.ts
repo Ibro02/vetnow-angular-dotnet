@@ -42,7 +42,7 @@ isError:boolean = false;
   signIn = () => {
     this.myAuthService.loginValue!.usernameOrEmail = this.usernameOrEmail;
     this.myAuthService.loginValue!.password = this.password
-    if (this.emailRegex.test(this.usernameOrEmail) || this.passwordRegex.test(this.password) )
+    if (this.usernameOrEmail.trim() && this.password.trim())
     {
       let link = Config.address + "api/LoginAuth/Post";
 
@@ -67,7 +67,7 @@ isError:boolean = false;
    else
     {
     this.isError=true;
-     this.toaster.error("Error", "Incorrect user name or email entry!")
+     this.toaster.error("Error", "Please enter your username/email and password.")
     }
   }
   handleValueChanged($event:string, obj:string) {

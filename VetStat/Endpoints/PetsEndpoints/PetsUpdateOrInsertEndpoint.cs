@@ -4,6 +4,7 @@ using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
 using VetStat.Models;
+using VetStat.Validators;
 using static VetStat.Endpoints.PetsEndpoints.PetsUpdateOrInsertEndpoint;
 
 namespace VetStat.Endpoints.PetsEndpoints;
@@ -33,6 +34,11 @@ public class PetsUpdateOrInsertEndpoint : MyEndpointBaseAsync
         var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
         if (authToken == null)
             return Unauthorized("Invalid token.");
+
+        var validator = new AnimalSaveValidator();
+        var validation = validator.Validate(request);
+        if (!validation.IsValid)
+            return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
         bool isInsert = (request.Id == null || request.Id == 0);
         Animal animal;

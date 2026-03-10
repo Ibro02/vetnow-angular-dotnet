@@ -19,6 +19,10 @@ export interface FormFieldConfig {
   type: 'text' | 'number' | 'date' | 'dropdown' | 'textarea';
   required?: boolean;
   placeholder?: string;
+  /** Maximum selectable date for date fields (ISO string YYYY-MM-DD) */
+  maxDate?: string;
+  /** Minimum selectable date for date fields (ISO string YYYY-MM-DD) */
+  minDate?: string;
   /** Static options (used when loadOptions is absent) */
   options?: FormFieldOption[];
   /** Key of the parent dropdown this field depends on */
@@ -249,6 +253,17 @@ export class DynamicFormCardComponent implements OnChanges {
         const val = this.formValues[field.key];
         if (val == null || (typeof val === 'string' && !val.trim())) {
           window.alert(`Please fill in the required field: ${field.label}`);
+          return;
+        }
+      }
+      if (field.type === 'date' && this.formValues[field.key]) {
+        const selected = new Date(this.formValues[field.key]);
+        if (field.maxDate && selected > new Date(field.maxDate)) {
+          window.alert(`${field.label} cannot be in the future.`);
+          return;
+        }
+        if (field.minDate && selected < new Date(field.minDate)) {
+          window.alert(`${field.label} is too far in the past.`);
           return;
         }
       }

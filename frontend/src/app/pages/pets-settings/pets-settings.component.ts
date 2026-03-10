@@ -145,9 +145,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           placeholder: 'Enter pet name',
         },
         {
-          key:   'animalSpeciesId',
-          label: 'Select species',
-          type:  'dropdown',
+          key:      'animalSpeciesId',
+          label:    'Select species',
+          type:     'dropdown',
+          required: true,
           loadOptions: async () => {
             const { data } = await axios.get<any[]>(
               Config.address + 'api/SpeciesGetAll/Get',
@@ -176,9 +177,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           },
         },
         {
-          key:   'birthDate',
-          label: 'Birth Date',
-          type:  'date',
+          key:     'birthDate',
+          label:   'Birth Date',
+          type:    'date',
+          maxDate: new Date().toISOString().split('T')[0],
         },
       ],
     };
