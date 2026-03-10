@@ -58,8 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     try
     {
-        await app.SeedRolesAsync();
-        await app.SeedPetDataAsync();
+        await app.SeedAllDataAsync();
     }
     catch (Exception ex)
     {
