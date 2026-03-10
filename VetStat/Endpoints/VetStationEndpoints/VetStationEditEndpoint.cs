@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
+using VetStat.Validators;
 
 namespace VetStat.Endpoints.VetStationEndpoints;
 
@@ -19,6 +20,13 @@ public class VetStationEditEndpoint : MyEndpointBase
     public ActionResult HandleAsync([FromBody] VetStation vetStation, int id)
     {
         var _vetStation = _db.VetStation.Where(x => x.Id == id).FirstOrDefault();
+        if (_vetStation == null)
+            return NotFound("Vet station not found.");
+
+        var validator = new VetStationEditValidator();
+        var validation = validator.Validate(vetStation);
+        if (!validation.IsValid)
+            return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
         try
         {

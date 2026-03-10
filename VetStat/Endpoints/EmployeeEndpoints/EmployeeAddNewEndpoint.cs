@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
+using VetStat.Validators;
 using static VetStat.Endpoints.EmployeeEndpoints.EmployeeAddNewEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
@@ -24,6 +25,11 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
         {
             if (newEmployee == null)
                 return NoContent();
+
+            var validator = new EmployeeAddValidator();
+            var validation = validator.Validate(newEmployee);
+            if (!validation.IsValid)
+                return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
             if (_db.Employee.ToList().Where(x => x.Email == newEmployee.Email).IsNullOrEmpty())
             {

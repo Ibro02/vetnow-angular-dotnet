@@ -192,6 +192,33 @@ export class AdminPanelComponent implements OnInit {
   }
 
   async saveUser() {
+    if (this.isNewUser) {
+      const _emailRx    = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+      const _usernameRx = /^[a-zA-Z0-9_\-]{5,30}$/;
+      const _passwordRx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,128}$/;
+      const _nameRx     = /^[a-zA-Z\u00C0-\u024F\s'\-]+$/;
+
+      if (!this.userForm.firstName?.trim() || !_nameRx.test(this.userForm.firstName)) {
+        this.toaster.error('Validation Error', 'First name is required and must contain only letters.');
+        return;
+      }
+      if (!this.userForm.lastName?.trim() || !_nameRx.test(this.userForm.lastName)) {
+        this.toaster.error('Validation Error', 'Last name is required and must contain only letters.');
+        return;
+      }
+      if (!_emailRx.test(this.userForm.email)) {
+        this.toaster.error('Validation Error', 'Email format is invalid.');
+        return;
+      }
+      if (!_usernameRx.test(this.userForm.username)) {
+        this.toaster.error('Validation Error', 'Username must be 5–30 characters (letters, digits, _ or -).');
+        return;
+      }
+      if (!_passwordRx.test(this.userForm.password)) {
+        this.toaster.error('Validation Error', 'Password must be 8–128 characters with uppercase, lowercase, digit, and special character.');
+        return;
+      }
+    }
     try {
       if (this.isNewUser) {
         await axios.post(`${environment.apiUrl}/api/AdminPanel/Users/Add`, this.userForm, { headers: this.headers });
@@ -280,6 +307,27 @@ export class AdminPanelComponent implements OnInit {
   }
 
   async saveStation() {
+    if (this.isNewStation) {
+      const _emailRx = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+      const _phoneRx = /^\+?[\d\s\-()\.\+]{7,15}$/;
+
+      if (!this.stationForm.name?.trim() || this.stationForm.name.trim().length < 2) {
+        this.toaster.error('Validation Error', 'Station name must be at least 2 characters.');
+        return;
+      }
+      if (!this.stationForm.address?.trim()) {
+        this.toaster.error('Validation Error', 'Address is required.');
+        return;
+      }
+      if (this.stationForm.email && !_emailRx.test(this.stationForm.email)) {
+        this.toaster.error('Validation Error', 'Email format is invalid.');
+        return;
+      }
+      if (this.stationForm.contactNumber && !_phoneRx.test(this.stationForm.contactNumber)) {
+        this.toaster.error('Validation Error', 'Contact number format is invalid.');
+        return;
+      }
+    }
     try {
       if (this.isNewStation) {
         await axios.post(`${environment.apiUrl}/api/AdminPanel/VetStations/Add`, this.stationForm, { headers: this.headers });
@@ -394,8 +442,29 @@ export class AdminPanelComponent implements OnInit {
   }
 
   async createAndAssignEmployee() {
-    if (!this.newEmployeeForm.firstName || !this.newEmployeeForm.email || !this.newEmployeeForm.username || !this.newEmployeeForm.password) {
-      this.toaster.error('Error', 'Please fill in required fields (name, email, username, password).');
+    const _emailRx    = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const _usernameRx = /^[a-zA-Z0-9_\-]{5,30}$/;
+    const _passwordRx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,128}$/;
+    const _nameRx     = /^[a-zA-Z\u00C0-\u024F\s'\-]+$/;
+
+    if (!this.newEmployeeForm.firstName?.trim() || !_nameRx.test(this.newEmployeeForm.firstName)) {
+      this.toaster.error('Validation Error', 'First name is required and must contain only letters.');
+      return;
+    }
+    if (!this.newEmployeeForm.lastName?.trim() || !_nameRx.test(this.newEmployeeForm.lastName)) {
+      this.toaster.error('Validation Error', 'Last name is required and must contain only letters.');
+      return;
+    }
+    if (!_emailRx.test(this.newEmployeeForm.email)) {
+      this.toaster.error('Validation Error', 'Email format is invalid.');
+      return;
+    }
+    if (!_usernameRx.test(this.newEmployeeForm.username)) {
+      this.toaster.error('Validation Error', 'Username must be 5–30 characters (letters, digits, _ or -).');
+      return;
+    }
+    if (!_passwordRx.test(this.newEmployeeForm.password)) {
+      this.toaster.error('Validation Error', 'Password must be 8–128 characters with uppercase, lowercase, digit, and special character.');
       return;
     }
     try {

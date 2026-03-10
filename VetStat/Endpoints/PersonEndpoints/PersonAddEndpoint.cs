@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
 using VetStat.Helpers.Api;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
+using VetStat.Validators;
 
 namespace VetStat.Endpoints.PersonEndpoints;
 
@@ -25,22 +25,21 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
     {
         try
         {
-            if (_db.Person.ToList<Person>().Where(x => x.Username == person.Username).IsNullOrEmpty())
-            {
-                if (_db.Person.ToList<Person>().Where(x => x.Email == person.Email).IsNullOrEmpty())
-                {
-                    if (Services.PersonValidator(person))
-                    {
-                        _db.Person.Add(person);
-                        _db.SaveChanges();
-                    }
-                }
-                else throw new Exception("Email already in use");
-            }
-            else
+            var validator = new PersonCreateValidator();
+            var validation = validator.Validate(person);
+            if (!validation.IsValid)
+                return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
+
+            if (!_db.Person.ToList<Person>().Where(x => x.Username == person.Username).IsNullOrEmpty())
                 throw new Exception("Username already in use");
+
+            if (!_db.Person.ToList<Person>().Where(x => x.Email == person.Email).IsNullOrEmpty())
+                throw new Exception("Email already in use");
+
+            _db.Person.Add(person);
+            _db.SaveChanges();
+
             return Ok(person);
-            throw new Exception("Something is wrong! Try again!");
         }
         catch (Exception ex)
         {

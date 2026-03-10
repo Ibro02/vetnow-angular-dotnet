@@ -152,7 +152,7 @@ export class AppointmentPageComponent {
     try {
       await axios.post(Config.address + "api/Appointment/Add", this.newAppointment);
       this.toaster.success("Appointment booked!", `See you on ${this.appointmentTime}!`);
-      this.router.navigate(['/']);
+      this.router.navigate(['/home-page']);
     } catch (err: any) {
       this.toaster.error("Booking failed", "Something went wrong. Please try again.");
       console.error(err?.message);

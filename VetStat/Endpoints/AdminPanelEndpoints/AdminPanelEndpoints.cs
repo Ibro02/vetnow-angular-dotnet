@@ -4,6 +4,7 @@ using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
 using VetStat.Models;
+using VetStat.Validators;
 
 namespace VetStat.Endpoints.AdminPanelEndpoints;
 
@@ -177,6 +178,11 @@ public class AdminPanelEndpoints : MyEndpointBase
         if (!_authService.IsAdmin())
             return Unauthorized("Admin access required.");
 
+        var stationValidator = new VetStationCreateValidator();
+        var stationValidation = stationValidator.Validate(station);
+        if (!stationValidation.IsValid)
+            return BadRequest(string.Join("; ", stationValidation.Errors.Select(e => e.ErrorMessage)));
+
         _db.VetStation.Add(station);
         _db.SaveChanges();
         return Ok(station);
@@ -227,6 +233,11 @@ public class AdminPanelEndpoints : MyEndpointBase
     {
         if (!_authService.IsAdmin())
             return Unauthorized("Admin access required.");
+
+        var userValidator = new AdminAddUserValidator();
+        var userValidation = userValidator.Validate(request);
+        if (!userValidation.IsValid)
+            return BadRequest(string.Join("; ", userValidation.Errors.Select(e => e.ErrorMessage)));
 
         if (_db.Person.Any(p => p.Email == request.Email))
             return BadRequest("A user with this email already exists.");
@@ -448,6 +459,11 @@ public class AdminPanelEndpoints : MyEndpointBase
     {
         if (!_authService.IsAdmin())
             return Unauthorized("Admin access required.");
+
+        var empValidator = new AdminAddEmployeeValidator();
+        var empValidation = empValidator.Validate(request);
+        if (!empValidation.IsValid)
+            return BadRequest(string.Join("; ", empValidation.Errors.Select(e => e.ErrorMessage)));
 
         if (_db.Person.Any(p => p.Email == request.Email))
             return BadRequest("A user with this email already exists.");

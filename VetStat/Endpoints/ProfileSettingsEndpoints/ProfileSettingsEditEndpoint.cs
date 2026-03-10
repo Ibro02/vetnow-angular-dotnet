@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
+using VetStat.Validators;
 using static VetStat.Endpoints.ProfileSettingsEndpoints.ProfileSettingsEditEndpoint;
 
 namespace VetStat.Endpoints.ProfileSettingsEndpoints;
@@ -33,6 +34,11 @@ public class ProfileSettingsEditEndpoint : MyEndpointBase
         var person = _db.Person.SingleOrDefault(x => x.Id == authToken.UserProfileId);
         if (person == null)
             return NotFound("User not found.");
+
+        var validator = new ProfileSettingsEditValidator();
+        var validation = validator.Validate(request);
+        if (!validation.IsValid)
+            return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
         try
         {

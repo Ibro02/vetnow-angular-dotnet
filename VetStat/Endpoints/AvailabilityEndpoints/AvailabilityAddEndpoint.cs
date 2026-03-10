@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
+using VetStat.Validators;
 using static VetStat.Endpoints.AvailabilityEndpoints.AvailabilityAddEndpoint;
 
 namespace VetStat.Endpoints.AvailabilityEndpoints;
@@ -19,6 +20,11 @@ public class AvailabilityAddEndpoint : MyEndpointBase
     [HttpPost("Add")]
     public ActionResult<Availability> HandleAsync([FromBody] AvailabilityAddRequest availability)
     {
+        var validator = new AvailabilityAddValidator();
+        var validation = validator.Validate(availability);
+        if (!validation.IsValid)
+            return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
+
         string[] availableFrom = availability.AvailableFrom.Split(':');
         string[] availableTo = availability.AvailableTo.Split(':');
         string[] breakFrom = availability.BreakFrom.Split(':');
