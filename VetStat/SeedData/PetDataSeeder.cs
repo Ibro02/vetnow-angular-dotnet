@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Models;
 
@@ -7,8 +8,7 @@ namespace VetStat.SeedData;
 /// Seeder class for generating test data:
 /// - 10 different species
 /// - 2 breeds per species (20 total)
-/// - 40 animals (skipping MedicalFile)
-/// - All animals assigned to OwnerID 4
+/// - 40 animals distributed across seeded users
 /// </summary>
 public class PetDataSeeder
 {
@@ -45,19 +45,33 @@ public class PetDataSeeder
         {
             throw ex;
         }
-        Console.WriteLine($"✓ Created {species.Count} species");
+        Console.WriteLine($"Created {species.Count} species");
 
         var breeds = GenerateBreeds(species);
         await _context.Breed.AddRangeAsync(breeds);
         await _context.SaveChangesAsync();
-        Console.WriteLine($"✓ Created {breeds.Count} breeds");
+        Console.WriteLine($"Created {breeds.Count} breeds");
 
-        var animals = GenerateAnimals(species, breeds);
+        // Get all users with "User" role to distribute animals across them
+        var userRole = await _context.Role.FirstOrDefaultAsync(r => r.Name == "User");
+        var userIds = userRole != null
+            ? await _context.Person.Where(p => p.RoleId == userRole.Id).Select(p => p.Id).ToListAsync()
+            : new List<int>();
+
+        // Fallback: if no users found, use the first Person in DB
+        if (!userIds.Any())
+        {
+            var firstPerson = await _context.Person.FirstOrDefaultAsync();
+            if (firstPerson != null)
+                userIds.Add(firstPerson.Id);
+        }
+
+        var animals = GenerateAnimals(species, breeds, userIds);
         await _context.Animal.AddRangeAsync(animals);
         await _context.SaveChangesAsync();
-        Console.WriteLine($"✓ Created {animals.Count} animals");
+        Console.WriteLine($"Created {animals.Count} animals");
 
-        Console.WriteLine("✓ Pet data seeding completed successfully!");
+        Console.WriteLine("Pet data seeding completed successfully!");
     }
 
     /// <summary>
@@ -131,9 +145,9 @@ public class PetDataSeeder
     }
 
     /// <summary>
-    /// Generates 40 animals, all with OwnerID = 4
+    /// Generates 40 animals distributed across the provided user IDs
     /// </summary>
-    private List<Animal> GenerateAnimals(List<Species> species, List<Breed> breeds)
+    private List<Animal> GenerateAnimals(List<Species> species, List<Breed> breeds, List<int> userIds)
     {
         var animalNames = new List<string>
         {
@@ -160,15 +174,18 @@ public class PetDataSeeder
             var daysAgo = _random.Next(365, 3650);
             var birthDate = DateTime.UtcNow.AddDays(-daysAgo);
 
+            // Distribute animals across all users (round-robin)
+            var ownerId = userIds.Any() ? userIds[i % userIds.Count] : (int?)null;
+
             animals.Add(new Animal
             {
                 Name = animalNames[i],
-                OwnerId = 4, // All animals belong to OwnerID 4
+                OwnerId = ownerId,
                 AnimalSpeciesId = selectedSpecies.Id,
                 BreedId = selectedBreed.Id,
                 BirthDate = birthDate,
-                Picture = null, // No picture data
-                MedicalFile = null, // Skipped as requested
+                Picture = null,
+                MedicalFile = null,
                 IsFavourite = _random.Next(0, 3) == 0 // ~33% chance of being favorite
             });
         }
