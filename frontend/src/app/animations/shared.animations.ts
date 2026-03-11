@@ -84,6 +84,22 @@ export const pulse = trigger('pulse', [
   ]),
 ]);
 
+/** Slide Step — for multi-step wizard transitions */
+export const slideStep = trigger('slideStep', [
+  transition(':increment', [
+    style({ opacity: 0, transform: 'translateX(40px)' }),
+    animate('300ms cubic-bezier(0.0, 0.0, 0.2, 1)',
+      style({ opacity: 1, transform: 'translateX(0)' })
+    ),
+  ]),
+  transition(':decrement', [
+    style({ opacity: 0, transform: 'translateX(-40px)' }),
+    animate('300ms cubic-bezier(0.0, 0.0, 0.2, 1)',
+      style({ opacity: 1, transform: 'translateX(0)' })
+    ),
+  ]),
+]);
+
 /** Shake — for form validation errors */
 export const shake = trigger('shake', [
   transition('false => true', [

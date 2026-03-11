@@ -43,8 +43,8 @@ export class SettingsComponent implements OnInit{
   }
 
   showToast() {
-    console.log("Prvi put u settingsu!");
-    this.toaster.info('Short Cut', 'To access settings page use: ALT + S');
+    console.log("First time in settings!");
+    this.toaster.info('Short Cut', 'To access settings easily use: ALT + S');
   }
 
 

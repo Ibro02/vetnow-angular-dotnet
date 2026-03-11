@@ -409,25 +409,20 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   }
 
   async exportMedicalReport(): Promise<void> {
-    // Uzimamo OwnerId iz prvog učitanog ljubimca
     const ownerId = this.pets.length > 0 ? this.pets[0].ownerId : null;
 
     if (!ownerId) {
-      alert('Nema dostupnih ljubimaca za generisanje izvještaja.');
+      alert('No available pets to generate the pdf');
       return;
     }
 
     try {
-      // 1. URL sa samo jednim parametrom
       const url = `${Config.address}api/PetsReport/Generate?OwnerId=${ownerId}`;
 
-      // 2. Axios poziv
       const response = await axios.get(url, {
         headers: { 'my-auth-token': this.authService.token ?? '' },
-        responseType: 'blob' // Obavezno za fajlove
+        responseType: 'blob'
       });
-
-      // 3. Hendlanje preuzetog fajla
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const downloadUrl = window.URL.createObjectURL(blob);
 
@@ -438,13 +433,12 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       document.body.appendChild(link);
       link.click();
 
-      // 4. Čišćenje
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
 
     } catch (error) {
-      console.error('Greška pri preuzimanju PDF-a:', error);
-      alert('Došlo je do greške prilikom generisanja izvještaja.');
+      console.error('Failed while generating PDF', error);
+      alert('Failed while generating PDF');
     }
   }
 }

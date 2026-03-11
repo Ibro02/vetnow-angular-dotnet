@@ -7,7 +7,6 @@
 
   <div class="bg-white flex flex-col w-4/5 m-auto justify-evenly items-center gap-3 border-1 rounded-lg relative">
 
-      <!-- ── Language toggle button ── -->
       <button
         (click)="i18n.toggle()"
         [title]="i18n.t('switchLang')"
@@ -17,7 +16,6 @@
                hover:border-emerald-400 hover:text-emerald-600
                transition-all duration-200 select-none z-10">
 
-        <!-- Globe icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
              viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -27,7 +25,6 @@
                    15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
 
-        <!-- Show the OTHER language as the action (click to switch to it) -->
         <span>{{ i18n.currentLang === 'en' ? '🇧🇦 BS' : '🇬🇧 EN' }}</span>
       </button>
 
