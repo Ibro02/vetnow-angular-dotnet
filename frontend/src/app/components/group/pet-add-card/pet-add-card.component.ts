@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgClass, NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../common/button/button.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -16,7 +16,7 @@ export interface FormFieldOption {
 export interface FormFieldConfig {
   key: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'dropdown' | 'textarea';
+  type: 'text' | 'number' | 'date' | 'dropdown' | 'textarea' | 'password';
   required?: boolean;
   placeholder?: string;
   /** Maximum selectable date for date fields (ISO string YYYY-MM-DD) */
@@ -40,6 +40,8 @@ export interface DynamicFormConfig {
   showPhoto?: boolean;
   /** Key inside formValues where the base-64 photo string is stored */
   photoKey?: string;
+  /** Number of columns for form fields (default: 1) */
+  gridColumns?: number;
 }
 
 // ─── Paw colours (fallback avatar for pets without photos) ────────────────────
@@ -54,7 +56,7 @@ const PAW_COLORS = [
 @Component({
   selector: 'app-dynamic-form-card',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, FormsModule, ButtonComponent, DragDropModule, FaIconComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgClass, NgStyle, FormsModule, ButtonComponent, DragDropModule, FaIconComponent],
   templateUrl: './pet-add-card.component.html',
   styleUrl: './pet-add-card.component.css'
 })

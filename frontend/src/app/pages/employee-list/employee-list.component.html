@@ -1,13 +1,27 @@
 <app-header-title title="Employees" description="List of employees" />
 
-<app-add-employee *ngIf="showAddEmployee" (event)="ngOnInit(); showAddEmployee = false" />
-
 <app-table
   title="Employees"
   [columns]="columns"
   [data]="employees"
   [actions]="actions"
   [addButtonText]="addBtnText"
-  (addClick)="showAddEmployee = true"
+  [showPagination]="true"
+  [totalCount]="totalCount"
+  [pageSize]="pageSize"
+  [currentPage]="currentPage"
+  [pageSizeOptions]="[5, 10, 20]"
+  (addClick)="onAddClick()"
   (actionClick)="onAction($event)"
+  (pageChange)="onPageChange($event)"
+  (searchChange)="onSearchChange($event)"
+/>
+
+<app-dynamic-form-card
+  *ngIf="employeeFormConfig"
+  [visible]="showEmployeeForm"
+  [config]="employeeFormConfig"
+  [editData]="editingEmployeeData"
+  (onSave)="onEmployeeSave($event)"
+  (onCancel)="onEmployeeCancel()"
 />
