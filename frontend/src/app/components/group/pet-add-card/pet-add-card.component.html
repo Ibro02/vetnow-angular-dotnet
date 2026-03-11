@@ -1,7 +1,6 @@
 <div *ngIf="visible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
 
-  <div class="bg-white rounded-3xl shadow-xl w-full overflow-hidden relative"
-       [ngStyle]="{ 'max-width': config.gridColumns && config.gridColumns > 1 ? '56rem' : '42rem' }">
+  <div class="bg-white rounded-3xl shadow-xl w-full max-w-2xl overflow-hidden relative">
 
     <!-- Header -->
     <div class="flex justify-between items-center px-8 py-6">
@@ -23,11 +22,7 @@
     <div class="px-10 pb-10 flex flex-col md:flex-row gap-10">
 
       <!-- Left side: dynamic fields rendered from config -->
-      <div class="flex-1"
-           [ngClass]="config.gridColumns && config.gridColumns > 1 ? 'grid gap-x-6 gap-y-4' : 'space-y-4'"
-           [ngStyle]="config.gridColumns && config.gridColumns > 1
-             ? { 'grid-template-columns': 'repeat(' + config.gridColumns + ', minmax(0, 1fr))' }
-             : {}">
+      <div class="flex-1 space-y-4">
 
         <div *ngFor="let field of config.fields">
 
@@ -42,15 +37,6 @@
             <!-- ── text ─────────────────────────────────────────────────── -->
             <input *ngSwitchCase="'text'"
                    type="text"
-                   [(ngModel)]="formValues[field.key]"
-                   [placeholder]="field.placeholder || ''"
-                   class="w-full h-10 rounded-lg border border-gray-300 px-3 text-sm
-                          focus:outline-none focus:ring-2 focus:ring-emerald-400
-                          focus:border-emerald-400 transition" />
-
-            <!-- ── password ────────────────────────────────────────────── -->
-            <input *ngSwitchCase="'password'"
-                   type="password"
                    [(ngModel)]="formValues[field.key]"
                    [placeholder]="field.placeholder || ''"
                    class="w-full h-10 rounded-lg border border-gray-300 px-3 text-sm

@@ -98,12 +98,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 export class I18nService {
   currentLang: Lang = 'en';
 
-  /** Translate a key for the current language. Falls back to the key itself. */
   t(key: string): string {
     return TRANSLATIONS[this.currentLang][key] ?? key;
   }
 
-  /** Toggle between English and Bosnian. */
   toggle(): void {
     this.currentLang = this.currentLang === 'en' ? 'bs' : 'en';
   }

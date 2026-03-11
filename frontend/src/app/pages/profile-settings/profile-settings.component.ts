@@ -124,7 +124,6 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
       shadowSize: [41, 41]
     });
     L.Marker.prototype.options.icon = iconDefault;
-
     // Initialize Leaflet map
     this.map = L.map(this.mapContainer.nativeElement, {
       center: [defaultLat, defaultLng],
