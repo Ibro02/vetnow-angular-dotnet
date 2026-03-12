@@ -13,7 +13,7 @@ import { ProfileService } from "../../services/ProfileService";
 import { RouterLink } from "@angular/router";
 import { fadeIn, scaleIn } from '../../animations/shared.animations';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {faClipboardCheck, faCut, faStethoscope, faSyringe, faUserMd} from "@fortawesome/free-solid-svg-icons";
+import {faClipboardCheck, faCut, faStethoscope, faSyringe, faUserMd, faTimes, faSearchPlus} from "@fortawesome/free-solid-svg-icons";
 @Component({
   selector: 'app-vet-station-home-page',
   standalone: true,
@@ -34,6 +34,12 @@ export class VetStationHomePageComponent implements OnInit {
   pets: Animal[] = [];
   timeSlots: TimeSlot[] = [];
 
+  faTimes = faTimes;
+  faSearchPlus = faSearchPlus;
+  showGallery = false;
+  selectedImage: string | null = null;
+  isZoomed = false;
+
   appointmentTime?: string | null;
   newAppointment: any;
   isLoadingSlots = false;
@@ -53,6 +59,14 @@ export class VetStationHomePageComponent implements OnInit {
     { id: 4, name: 'Vaccine', icon: faSyringe, serviceId: 3, api: this.nurseApi }
   ];
 
+  galleryImages = [
+    'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1597233545218-358006460790?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=800'
+  ];
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -100,7 +114,20 @@ export class VetStationHomePageComponent implements OnInit {
     const { data } = await axios.get(Config.address + service.api, { params: { id: this.vetStationId } });
     this.employeeList = data;
   }
+  toggleGallery(state: boolean) {
+    this.showGallery = state;
+    // Prevent body scroll when gallery is open
+    document.body.style.overflow = state ? 'hidden' : 'auto';
+  }
+  openZoom(img: string) {
+    this.selectedImage = img;
+    this.isZoomed = false;
+  }
 
+  closeZoom() {
+    this.selectedImage = null;
+    this.isZoomed = false;
+  }
   isLoaded = () => this.vetStation != null;
   selectEmployee(e: Employee) {
     this.selectedEmployee = e;

@@ -31,3 +31,32 @@ ng-container {
 #noDoctors:hover fa-icon {
   transform: translateY(-5px);
 }
+/* Smooth transition for the zoom effect */
+.transition-transform {
+  will-change: transform;
+}
+
+/* Ensure the Masonry layout doesn't split images */
+.break-inside-avoid {
+  break-inside: avoid;
+}
+
+/* Custom Zoom-in cursor for gallery items */
+.cursor-zoom-in {
+  cursor: zoom-in;
+}
+
+/* Custom Zoom-out cursor for the Lightbox */
+.cursor-zoom-out {
+  cursor: zoom-out;
+}
+
+/* Pulse for skeleton is still here */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
