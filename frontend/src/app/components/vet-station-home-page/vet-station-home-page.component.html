@@ -1,53 +1,181 @@
+<div class="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
 
+  <main class="flex-1 flex flex-col px-12 py-10 overflow-y-auto">
 
-<div class="h-full">
-  <div class="flex flex-col items-center justify-center gap-6 mx-24 my-6">
-    <h1 class="text-5xl text-center my-font">{{vetStation?.name}}</h1>
-    <div class="line-clamp-1 w-full bg-black h-[1px]"></div>
-  </div>
-  <div class="h-full flex flex-col justify-center mx-10 md:mx-40 lg:mx-72 my-auto ">
-    <div class="shadow-2xl">
-      <app-image-carousel></app-image-carousel>
-    </div>
-    <div class="h-full my-5">
-      <app-service-swipper (onClick)="openEmployeeTablePopUp($event)"></app-service-swipper>
-    </div>
-    <div class="mb-10">
-      <app-about-us-footer [vetStationInfo]=this.vetStationInfo></app-about-us-footer>
-    </div>
-  </div>
-</div>
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Select a vet</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <ng-template #mainSkeleton>
+      <div class="animate-pulse flex flex-col gap-8 w-full">
+        <div class="space-y-3">
+          <div class="h-10 bg-slate-200 rounded-2xl w-1/3"></div>
+          <div class="h-4 bg-slate-100 rounded-lg w-1/4"></div>
+        </div>
+
+        <div class="bg-white p-8 rounded-[35px] border border-slate-100">
+          <div class="h-3 bg-slate-100 rounded w-24 mb-6"></div>
+          <div class="flex gap-4">
+            <div class="h-12 bg-slate-100 rounded-full w-32"></div>
+            <div class="h-12 bg-slate-100 rounded-full w-32"></div>
+            <div class="h-12 bg-slate-100 rounded-full w-32"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div class="bg-white p-8 rounded-[35px] border border-slate-100 h-96"></div>
+          <div class="bg-white p-8 rounded-[35px] border border-slate-100 h-96"></div>
+        </div>
       </div>
-      <div class="modal-body">
-        <table class="table table-hover">
-          <thead>
-          <tr>
-            <th scope="col">First Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr *ngFor="let e of employeeList" class="hover:cursor-pointer" [routerLink]="['/new-appointment',e.id]" [queryParams]="{date: this.date}" data-bs-dismiss="modal">
-            <td>{{e.firstName}}</td>
-            <td>{{e.lastName}}</td>
-            <td>{{e.email}}</td>
-            <td>{{e.phone}}</td>
-          </tr>
-          </tbody>
-        </table>
+    </ng-template>
+
+    <ng-container *ngIf="isLoaded(); else mainSkeleton">
+      <header class="mb-10">
+        <h1 class="text-4xl font-bold text-slate-800 tracking-tight">Make appointment</h1>
+        <p class="text-slate-400 mt-2">Book your visit at {{vetStation?.name}} in just a few steps</p>
+      </header>
+
+      <section class="bg-white p-8 rounded-[35px] shadow-sm mb-6 border border-slate-100">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Choose category</p>
+        <div class="flex flex-wrap gap-4">
+          <button *ngFor="let s of vetServices" (click)="selectService(s)"
+                  [ngClass]="selectedServiceId === s.id ? 'bg-[#A3E635] border-[#A3E635] text-slate-900 shadow-lg shadow-[#A3E635]/20' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'"
+                  class="flex items-center gap-3 px-7 py-3 rounded-full border transition-all font-bold text-sm">
+            <fa-icon *ngIf="s?.icon" [icon]="s!.icon!" class="text-gray-400 w-5 text-center"></fa-icon> {{s.name}}
+          </button>
+        </div>
+      </section>
+
+      <section *ngIf="selectedServiceId" class="bg-white p-8 rounded-[35px] shadow-sm mb-6 border border-slate-100" @fadeIn>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Choose doctor</p>
+        <div *ngIf="employeeList && employeeList.length > 0; else noDoctors" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div *ngFor="let e of employeeList" (click)="selectEmployee(e)"
+               [ngClass]="selectedEmployee?.id === e.id ? 'border-[#A3E635] bg-lime-50/20 ring-2 ring-lime-100' : 'border-slate-100 hover:border-slate-200'"
+               class="flex items-center gap-4 p-4 border-2 rounded-3xl cursor-pointer transition-all">
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xl">
+              {{ e.firstName[0] }}
+            </div>
+            <div>
+              <p class="font-bold text-slate-800">Dr. {{e.firstName}} {{e.lastName}}</p>
+              <p class="text-xs text-slate-400">{{displayRoleName(e.roleId)}}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noDoctors>
+          <div class="py-12 flex flex-col items-center justify-center text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+              <fa-icon [icon]="faUserMd" size="3x"></fa-icon>
+            </div>
+            <h4 class="text-slate-600 font-bold text-lg">No specialists found</h4>
+            <p class="text-slate-400 text-sm max-w-xs mx-auto">
+              Please try selecting a different service or contact the station directly for availability.
+            </p>
+          </div>
+        </ng-template>
+      </section>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" *ngIf="selectedEmployee" @scaleIn>
+        <div class="flex flex-col gap-6">
+          <div class="bg-white p-8 rounded-[35px] shadow-sm border border-slate-100">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Choose date</p>
+            <app-calendar (changeDate)="changeDate($event)"></app-calendar>
+          </div>
+
+          <div class="bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 relative">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Choose pet</p>
+            <button (click)="isPetDropdownOpen = !isPetDropdownOpen"
+                    class="w-full flex justify-between px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-semibold text-slate-700">
+              <span>🐾 {{ selectedPet?.name ?? 'Search or select a pet...' }}</span>
+              <i class="bi bi-chevron-down"></i>
+            </button>
+            <div *ngIf="isPetDropdownOpen" class="absolute z-50 left-8 right-8 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden">
+              <div *ngFor="let p of pets" (click)="selectPet(p)" class="p-4 hover:bg-lime-50 cursor-pointer border-b last:border-0 font-medium text-slate-700">
+                🐾 {{p.name}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex flex-col">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Select time slot</p>
+          <div *ngIf="isLoadingSlots" class="flex-1 flex items-center justify-center"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#A3E635]"></div></div>
+          <div *ngIf="!isLoadingSlots" class="grid grid-cols-3 gap-4 flex-1 overflow-y-auto max-h-[400px] pr-2">
+            <button *ngFor="let slot of timeSlots" (click)="prepareBooking(slot)"
+                    [ngClass]="newAppointment?.timeSlotId === slot.id ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-500'"
+                    class="py-4 rounded-2xl font-bold transition-all border-2 border-transparent">
+              {{ slot.appointmentTime.substring(0, 5) }}
+            </button>
+          </div>
+          <div *ngIf="appointmentTime" class="mt-8 p-6 bg-lime-50 rounded-[25px] flex items-center justify-between" @scaleIn>
+            <div class="text-slate-800">
+              <p class="text-xs font-bold text-lime-600 uppercase">Confirmed Time</p>
+              <p class="font-bold">{{ appointmentTime }}</p>
+            </div>
+            <button (click)="confirmBooking()" class="bg-[#A3E635] hover:bg-[#8CD024] text-slate-900 font-bold py-4 px-10 rounded-2xl shadow-lg shadow-lime-300/40">
+              Book Now
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </ng-container>
+  </main>
+
+  <aside class="w-96 bg-white border-l border-slate-200 p-10 hidden lg:flex flex-col gap-8 shadow-[-20px_0_40px_-30px_rgba(0,0,0,0.05)]">
+
+    <div *ngIf="!isLoaded()" class="animate-pulse flex flex-col gap-8">
+      <div class="bg-slate-50 p-8 rounded-[40px] flex flex-col items-center">
+        <div class="w-24 h-24 bg-slate-200 rounded-3xl mb-6"></div>
+        <div class="h-6 bg-slate-200 rounded-lg w-3/4 mb-3"></div>
+        <div class="h-4 bg-slate-100 rounded-lg w-1/2"></div>
+      </div>
+      <div class="space-y-6">
+        <div class="h-12 bg-slate-50 rounded-2xl w-full"></div>
+        <div class="h-12 bg-slate-50 rounded-2xl w-full"></div>
+      </div>
+      <div class="space-y-3 mt-4">
+        <div class="h-6 bg-slate-200 rounded-lg w-1/2"></div>
+        <div class="h-20 bg-slate-50 rounded-2xl w-full"></div>
       </div>
     </div>
-  </div>
+
+    <ng-container *ngIf="isLoaded()">
+      <div class="bg-slate-50 p-8 rounded-[40px] text-center">
+        <div class="w-24 h-24 bg-white rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-sm overflow-hidden">
+          <img *ngIf="vetStation?.stationImage"
+               class="w-full h-full object-cover"
+               src="{{vetStation?.stationImage}}"
+               alt="{{vetStation?.name}}"/>
+          <div *ngIf="!vetStation?.stationImage"
+               class="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-700 to-teal-600">
+            <span class="text-white text-opacity-30 text-5xl font-bold select-none">{{ (vetStation?.name ?? 'V').charAt(0) }}</span>
+          </div>
+        </div>
+        <h3 class="font-bold text-2xl text-slate-800">{{vetStation?.name}}</h3>
+        <p class="text-slate-400 text-sm mt-2">Professional Veterinary Care</p>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0"><i class="bi bi-telephone-fill"></i></div>
+          <div>
+            <p class="text-xs font-bold text-slate-400 uppercase">Contact Number</p>
+            <p class="font-bold text-slate-700">{{vetStation?.contactNumber || 'Not provided'}}</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-lime-50 flex items-center justify-center text-lime-600 shrink-0"><i class="bi bi-geo-alt-fill"></i></div>
+          <div>
+            <p class="text-xs font-bold text-slate-400 uppercase">Location</p>
+            <p class="font-bold text-slate-700">{{vetStationFullAddress}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-3">Description</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">{{vetStation.description}}</p>
+      </div>
+
+      <div>
+        <a class="underline text-emerald-800 font-semibold cursor-pointer hover:text-emerald-600 transition-colors">See more...</a>
+      </div>
+    </ng-container>
+
+  </aside>
 </div>
