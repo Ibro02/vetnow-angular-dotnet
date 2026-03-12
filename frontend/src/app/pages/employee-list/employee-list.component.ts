@@ -56,7 +56,7 @@ export class EmployeeListComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`);
-    this.employees = data;
+    this.employees = data.dataItems;
   }
 
   onAction(event: { action: string; row: any }): void {
