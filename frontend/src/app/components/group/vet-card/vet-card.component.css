@@ -3,3 +3,31 @@
   display: block;
   width: 100%;
 }
+/* Custom Pulse with smooth easing */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .4;
+  }
+}
+
+/* Optional: Make the transition from Skeleton to Content smooth */
+ng-container {
+  display: block;
+  transition: opacity 0.3s ease-in-out;
+}
+/* In your CSS file */
+.text-slate-200 fa-icon {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.02));
+  transition: transform 0.3s ease;
+}
+
+#noDoctors:hover fa-icon {
+  transform: translateY(-5px);
+}
