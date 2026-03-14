@@ -71,7 +71,101 @@ public class PetDataSeeder
         await _context.SaveChangesAsync();
         Console.WriteLine($"Created {animals.Count} animals");
 
+        // Seed guaranteed 3 animals each for "admin" and "user" accounts
+        var guaranteedAnimals = await GenerateGuaranteedAnimalsAsync(species, breeds);
+        if (guaranteedAnimals.Any())
+        {
+            await _context.Animal.AddRangeAsync(guaranteedAnimals);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"Created {guaranteedAnimals.Count} guaranteed animals for admin and user accounts");
+        }
+
         Console.WriteLine("Pet data seeding completed successfully!");
+    }
+
+    /// <summary>
+    /// Generates 3 guaranteed animals for the "admin" and "user" accounts
+    /// </summary>
+    private async Task<List<Animal>> GenerateGuaranteedAnimalsAsync(List<Species> species, List<Breed> breeds)
+    {
+        var animals = new List<Animal>();
+
+        var adminUser = await _context.Person.FirstOrDefaultAsync(p => p.Username == "admin");
+        var regularUser = await _context.Person.FirstOrDefaultAsync(p => p.Username == "user");
+
+        // Admin's pets: Milo (Dog), Coco (Cat), Pepper (Parrot)
+        if (adminUser != null)
+        {
+            var dogSpecies = species.First(s => s.SpeciesName == "Dog");
+            var catSpecies = species.First(s => s.SpeciesName == "Cat");
+            var parrotSpecies = species.First(s => s.SpeciesName == "Parrot");
+
+            animals.Add(new Animal
+            {
+                Name = "Milo",
+                OwnerId = adminUser.Id,
+                AnimalSpeciesId = dogSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == dogSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = true
+            });
+            animals.Add(new Animal
+            {
+                Name = "Coco",
+                OwnerId = adminUser.Id,
+                AnimalSpeciesId = catSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == catSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = false
+            });
+            animals.Add(new Animal
+            {
+                Name = "Pepper",
+                OwnerId = adminUser.Id,
+                AnimalSpeciesId = parrotSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == parrotSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = false
+            });
+        }
+
+        // User's pets: Biscuit (Rabbit), Kiki (Budgerigar), Toby (Hamster)
+        if (regularUser != null)
+        {
+            var rabbitSpecies = species.First(s => s.SpeciesName == "Rabbit");
+            var budgieSpecies = species.First(s => s.SpeciesName == "Budgerigar");
+            var hamsterSpecies = species.First(s => s.SpeciesName == "Hamster");
+
+            animals.Add(new Animal
+            {
+                Name = "Biscuit",
+                OwnerId = regularUser.Id,
+                AnimalSpeciesId = rabbitSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == rabbitSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = true
+            });
+            animals.Add(new Animal
+            {
+                Name = "Kiki",
+                OwnerId = regularUser.Id,
+                AnimalSpeciesId = budgieSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == budgieSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = false
+            });
+            animals.Add(new Animal
+            {
+                Name = "Toby",
+                OwnerId = regularUser.Id,
+                AnimalSpeciesId = hamsterSpecies.Id,
+                BreedId = breeds.First(b => b.SpeciesId == hamsterSpecies.Id).Id,
+                BirthDate = DateTime.UtcNow.AddDays(-_random.Next(365, 2500)),
+                IsFavourite = false
+            });
+        }
+
+        return animals;
     }
 
     /// <summary>

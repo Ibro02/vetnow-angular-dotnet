@@ -1,5 +1,5 @@
 import { NgClass, NgStyle } from '@angular/common';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -38,12 +38,34 @@ function birthDateValidator(): ValidatorFn {
   styleUrls: ['./add-employee.component.css'],
 })
 export class AddEmployeeComponent implements OnInit {
+  @Input() editEmployee: any = null;
   @Output() event = new EventEmitter<void>();
 
   employeeForm: FormGroup;
   showModal = false;
+  isEditMode = false;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.editEmployee) {
+      this.isEditMode = true;
+      this.employeeForm.patchValue({
+        firstName: this.editEmployee.firstName ?? '',
+        lastName: this.editEmployee.lastName ?? '',
+        email: this.editEmployee.email ?? '',
+        phone: this.editEmployee.phone ?? '',
+        roleId: this.editEmployee.roleId ?? 0,
+        birthDate: this.editEmployee.birthDate ? this.editEmployee.birthDate.substring(0, 10) : '',
+        username: this.editEmployee.username ?? '',
+        city: this.editEmployee.city ?? '',
+        country: this.editEmployee.country ?? '',
+        dateOfEmployment: this.editEmployee.dateOfEmployment ? this.editEmployee.dateOfEmployment.substring(0, 10) : '',
+      });
+      // Password is not required in edit mode
+      this.employeeForm.get('password')?.clearValidators();
+      this.employeeForm.get('password')?.updateValueAndValidity();
+    }
+    this.openModal();
+  }
 
   constructor(private fb: FormBuilder, private toaster: ToasterService) {
     this.employeeForm = this.fb.group({
@@ -85,6 +107,7 @@ export class AddEmployeeComponent implements OnInit {
       vetStationId: 1,
       roleId: 0,
     });
+    this.event.emit();
   }
 
   onSubmit(): void {
@@ -110,21 +133,43 @@ export class AddEmployeeComponent implements OnInit {
       return;
     }
 
-    const url = `${Config.address}api/EmployeeEndpoint/AddNewEmployee`;
-    axios.post(url, newEmployee)
-      .then(() => {
-        this.toaster.success('Success', 'Employee added successfully.');
-        this.event.emit();
-        this.closeModal();
-      })
-      .catch((error) => {
-        // Backend returns semicolon-separated error messages — show each as its own toast.
-        const raw: string = error.response?.data ?? error.message ?? 'An unexpected error occurred.';
-        raw.split(';')
-           .map((s: string) => s.trim())
-           .filter(Boolean)
-           .forEach((msg: string) => this.toaster.error('Validation Error', msg));
-      });
+    if (this.isEditMode) {
+      const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
+      const updatePayload: any = { id: this.editEmployee.id, ...newEmployee };
+      // Remove password if empty (not changed)
+      if (!updatePayload.password) delete updatePayload.password;
+
+      const url = `${Config.address}api/Employee/Edit`;
+      axios.put(url, updatePayload, { headers: { 'my-auth-token': token } })
+        .then(() => {
+          this.toaster.success('Success', 'Employee updated successfully.');
+          this.event.emit();
+          this.closeModal();
+        })
+        .catch((error) => {
+          const raw: string = error.response?.data ?? error.message ?? 'An unexpected error occurred.';
+          raw.split(';')
+             .map((s: string) => s.trim())
+             .filter(Boolean)
+             .forEach((msg: string) => this.toaster.error('Error', msg));
+        });
+    } else {
+      const url = `${Config.address}api/EmployeeEndpoint/AddNewEmployee`;
+      axios.post(url, newEmployee)
+        .then(() => {
+          this.toaster.success('Success', 'Employee added successfully.');
+          this.event.emit();
+          this.closeModal();
+        })
+        .catch((error) => {
+          // Backend returns semicolon-separated error messages — show each as its own toast.
+          const raw: string = error.response?.data ?? error.message ?? 'An unexpected error occurred.';
+          raw.split(';')
+             .map((s: string) => s.trim())
+             .filter(Boolean)
+             .forEach((msg: string) => this.toaster.error('Validation Error', msg));
+        });
+    }
   }
 
   private showFrontendErrors(): void {

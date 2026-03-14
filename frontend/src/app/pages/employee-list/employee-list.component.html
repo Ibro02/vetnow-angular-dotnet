@@ -1,6 +1,6 @@
 <app-header-title title="Employees" description="List of employees" />
 
-<app-add-employee *ngIf="showAddEmployee" (event)="ngOnInit(); showAddEmployee = false" />
+<app-add-employee *ngIf="showAddEmployee" [editEmployee]="editingEmployee" (event)="ngOnInit(); showAddEmployee = false; editingEmployee = null" />
 
 <app-table
   title="Employees"
@@ -8,6 +8,6 @@
   [data]="employees"
   [actions]="actions"
   [addButtonText]="addBtnText"
-  (addClick)="showAddEmployee = true"
+  (addClick)="editingEmployee = null; showAddEmployee = true"
   (actionClick)="onAction($event)"
 />
