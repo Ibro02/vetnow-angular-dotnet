@@ -34,6 +34,40 @@ public class UserSeeder
         {
             new Person
             {
+                FirstName = "Admin",
+                LastName = "Adminovic",
+                Email = "admin@vetstation.com",
+                Phone = "+387 61 000 001",
+                RoleId = 6, // Admin
+                Username = "admin",
+                Password = "Admin1234!",
+                City = "Sarajevo",
+                Country = "Bosnia and Herzegovina",
+                Address = "Marsala Tita 1",
+                BirthDate = new DateTime(1985, 1, 1),
+                ProfileCreationDate = DateTime.UtcNow,
+                MembershipLoyalty = 0.0f,
+                verified = true
+            },
+            new Person
+            {
+                FirstName = "User",
+                LastName = "Useric",
+                Email = "user@vetstation.com",
+                Phone = "+387 61 000 002",
+                RoleId = 1, // User
+                Username = "user",
+                Password = "User1234!",
+                City = "Sarajevo",
+                Country = "Bosnia and Herzegovina",
+                Address = "Ferhadija 15",
+                BirthDate = new DateTime(1993, 6, 15),
+                ProfileCreationDate = DateTime.UtcNow,
+                MembershipLoyalty = 0.0f,
+                verified = true
+            },
+            new Person
+            {
                 FirstName = "Amir",
                 LastName = "Hadzic",
                 Email = "amir.hadzic@test.com",

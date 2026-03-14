@@ -18,6 +18,7 @@ import {ToasterService} from "../../services/toaster.service";
 export class EmployeeListComponent implements OnInit {
   employees: any[] = [];
   showAddEmployee = false;
+  editingEmployee: any = null;
 
   columns: TableColumn[] = [
     {
@@ -62,7 +63,8 @@ export class EmployeeListComponent implements OnInit {
   onAction(event: { action: string; row: any }): void {
     if (!this.auth.isAtLeastMainVet()) return; // extra safety
     if (event.action === 'edit') {
-      console.log('Edit employee:', event.row);
+      this.editingEmployee = event.row;
+      this.showAddEmployee = true;
     } else if (event.action === 'delete') {
       let url: string = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
       const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');

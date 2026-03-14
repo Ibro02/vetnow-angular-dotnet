@@ -59,7 +59,7 @@ isError:boolean = false;
           this.router.navigate(["home-page"]);
         else
           this.router.navigate(["verification"]);
-//Fabenef337!
+
 
       }).catch(err=>console.log(err.message));
 
