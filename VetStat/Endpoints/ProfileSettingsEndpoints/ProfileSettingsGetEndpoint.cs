@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -7,6 +8,7 @@ using static VetStat.Endpoints.ProfileSettingsEndpoints.ProfileSettingsGetEndpoi
 
 namespace VetStat.Endpoints.ProfileSettingsEndpoints;
 
+[Authorize]
 [Route("api/ProfileSettings")]
 public class ProfileSettingsGetEndpoint : MyEndpointBase
 {
@@ -22,9 +24,6 @@ public class ProfileSettingsGetEndpoint : MyEndpointBase
     [HttpGet("Get")]
     public ActionResult HandleAsync()
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         string token = HttpContext.Request.Headers["my-auth-token"];
 
         var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);

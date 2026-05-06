@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
@@ -5,6 +6,7 @@ using VetStat.Helpers.Api;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
+[Authorize]
 [Route("api/Appointment")]
 public class AppointmentGetByCustomerIdEndpoint : MyEndpointBase
 {

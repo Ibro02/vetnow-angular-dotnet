@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -5,6 +6,7 @@ using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.PetsEndpoints;
 
+[Authorize]
 [Route("api/Pets")]
 public class PetsSoftDeleteEndpoint : MyEndpointBase
 {
@@ -20,9 +22,6 @@ public class PetsSoftDeleteEndpoint : MyEndpointBase
     [HttpDelete("SoftDelete")]
     public ActionResult HandleAsync([FromQuery] int id)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         var animal = _db.Animal.FirstOrDefault(x => x.Id == id);
         if (animal == null)
             return NotFound("Pet not found.");

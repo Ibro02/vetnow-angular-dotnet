@@ -1,4 +1,5 @@
-﻿using VetStat.Data;
+using System.Security.Claims;
+using VetStat.Data;
 using VetStat.Models;
 
 namespace VetStat.Helpers.Services
@@ -14,25 +15,57 @@ namespace VetStat.Helpers.Services
             _httpContext = httpContext;
         }
 
+        /// <summary>
+        /// Checks whether the current request is authenticated via the ASP.NET pipeline.
+        /// Falls back to the legacy header-based check for backward compatibility.
+        /// </summary>
         public bool IsLogged()
         {
-            string authToken = _httpContext.HttpContext.Request.Headers["my-auth-token"];
-            AuthentificationToken? token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == authToken);
-            return token != null;
+            var user = _httpContext.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated == true)
+                return true;
+
+            // Legacy fallback: check the raw header token against the database
+            string authToken = _httpContext.HttpContext?.Request.Headers["my-auth-token"];
+            if (string.IsNullOrEmpty(authToken)) return false;
+
+            return _db.AuthentificationToken.Any(x => x.Token == authToken);
         }
 
         /// <summary>
-        /// Gets the currently authenticated Person from the auth token header.
+        /// Gets the currently authenticated Person.
+        /// Prefers ClaimsPrincipal (set by TokenAuthenticationHandler), falls back to header lookup.
         /// </summary>
         public Person? GetCurrentUser()
         {
-            string authToken = _httpContext.HttpContext.Request.Headers["my-auth-token"];
+            var user = _httpContext.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var userId))
+                    return _db.Person.SingleOrDefault(x => x.Id == userId);
+            }
+
+            // Legacy fallback
+            string authToken = _httpContext.HttpContext?.Request.Headers["my-auth-token"];
             if (string.IsNullOrEmpty(authToken)) return null;
 
             var token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == authToken);
             if (token == null) return null;
 
             return _db.Person.SingleOrDefault(x => x.Id == token.UserProfileId);
+        }
+
+        /// <summary>
+        /// Gets the current user's ID from ClaimsPrincipal (no DB lookup needed).
+        /// Returns null if not authenticated.
+        /// </summary>
+        public int? GetCurrentUserId()
+        {
+            var userIdClaim = _httpContext.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out var userId))
+                return userId;
+            return null;
         }
 
         /// <summary>
@@ -52,20 +85,39 @@ namespace VetStat.Helpers.Services
 
         public bool IsAtLeastEmployee()
         {
-            var user = GetCurrentUser();
-            return user != null && GetPermissionLevel(user.RoleId) >= 2;
+            var level = GetCurrentPermissionLevel();
+            return level >= 2;
         }
 
         public bool IsAtLeastMainVet()
         {
-            var user = GetCurrentUser();
-            return user != null && GetPermissionLevel(user.RoleId) >= 3;
+            var level = GetCurrentPermissionLevel();
+            return level >= 3;
         }
 
         public bool IsAdmin()
         {
-            var user = GetCurrentUser();
-            return user != null && user.RoleId == 6;
+            var level = GetCurrentPermissionLevel();
+            return level >= 4;
+        }
+
+        /// <summary>
+        /// Reads permission level from ClaimsPrincipal (set by TokenAuthenticationHandler).
+        /// Falls back to DB lookup if claims are not available.
+        /// </summary>
+        private int GetCurrentPermissionLevel()
+        {
+            var user = _httpContext.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var levelClaim = user.FindFirst("PermissionLevel")?.Value;
+                if (int.TryParse(levelClaim, out var level))
+                    return level;
+            }
+
+            // Legacy fallback
+            var person = GetCurrentUser();
+            return person != null ? GetPermissionLevel(person.RoleId) : 0;
         }
     }
 }

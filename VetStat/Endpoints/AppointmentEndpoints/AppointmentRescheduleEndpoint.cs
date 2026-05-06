@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
+[Authorize]
 [Route("api/Appointment")]
 public class AppointmentRescheduleEndpoint : MyEndpointBase
 {

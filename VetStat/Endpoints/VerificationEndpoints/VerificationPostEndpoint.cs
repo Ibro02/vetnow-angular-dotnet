@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using VetStat.Data;
@@ -7,6 +8,7 @@ using static VetStat.Endpoints.VerificationEndpoints.VerificationPostEndpoint;
 
 namespace VetStat.Endpoints.VerificationEndpoints;
 
+[AllowAnonymous]
 [Route("/Verification")]
 public class VerificationPostEndpoint : MyEndpointBase
 {

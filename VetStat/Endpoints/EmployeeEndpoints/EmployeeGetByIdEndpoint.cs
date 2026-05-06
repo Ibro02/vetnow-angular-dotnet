@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -6,6 +7,7 @@ using static VetStat.Endpoints.EmployeeEndpoints.EmployeeGetByIdEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
+[Authorize]
 [Route("api/Employee")]
 public class EmployeeGetByIdEndpoint : MyEndpointBaseAsync
     .WithRequest<EmployeeGetByIdRequest>

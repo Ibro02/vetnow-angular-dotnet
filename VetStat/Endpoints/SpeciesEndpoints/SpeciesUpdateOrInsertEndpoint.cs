@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
 using VetStat.Models;
 using static VetStat.Endpoints.SpeciesEndpoints.SpeciesUpdateOrInsertEndpoint;
 
 namespace VetStat.Endpoints.SpeciesEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
 [Route("api/SpeciesUpdateOrInsert")]
 public class SpeciesUpdateOrInsertEndpoint : MyEndpointBaseAsync
     .WithRequest<SpeciesUpdateOrInsertRequest>
@@ -26,14 +29,6 @@ public class SpeciesUpdateOrInsertEndpoint : MyEndpointBaseAsync
     public override async Task<ActionResult<int>> HandleAsync(
         [FromBody] SpeciesUpdateOrInsertRequest request, CancellationToken cancellationToken = default)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
-        string token = HttpContext.Request.Headers["my-auth-token"];
-        var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
-        if (authToken == null)
-            return Unauthorized("Invalid token.");
-
         bool isInsert = (request.Id == null || request.Id == 0);
         Species species;
 

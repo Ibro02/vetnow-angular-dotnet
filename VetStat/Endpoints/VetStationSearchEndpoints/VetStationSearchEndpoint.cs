@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
@@ -6,6 +7,7 @@ using static VetStat.Endpoints.VetStationSearchEndpoints.VetStationSearchEndpoin
 
 namespace VetStat.Endpoints.VetStationSearchEndpoints;
 
+[AllowAnonymous]
 [Route("api/VetStationSearch")]
 public class VetStationSearchEndpoint : MyEndpointBaseAsync
     .WithRequest<VetStationSearchRequest>

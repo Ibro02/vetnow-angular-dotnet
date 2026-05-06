@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
+[Authorize]
 [Route("api/Employee")]
 public class EmployeeGetAllEndpoint : MyEndpointBase
 {

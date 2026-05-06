@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using VetStat.Endpoints.VetStationSearchEndpoints;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
 using VetStat.Helpers.Services.Email;
 using VetStat.Helpers.Validators;
@@ -17,14 +18,29 @@ IServiceCollection serviceCollection = builder.Services.AddDbContext<VetStat.Dat
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
-builder.Services.AddHostedService<something>();
+builder.Services.AddHostedService<TokenCleanupService>();
 // DEV ENVIRONMENT: Generates time slots on startup and every 24h.
 // For production, replace with a proper scheduler (Hangfire, Quartz.NET, Azure Timer Trigger, etc.)
 builder.Services.AddHostedService<AppointmentGeneratorService>();
+
+// --- Authentication ---
+builder.Services.AddAuthentication(TokenAuthenticationDefaults.AuthenticationScheme)
+    .AddScheme<TokenAuthenticationOptions, TokenAuthenticationHandler>(
+        TokenAuthenticationDefaults.AuthenticationScheme, options => { });
+
+// --- Authorization policies ---
+builder.Services.AddAuthorization(options =>
+{
+    options.AddVetStationPolicies();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    // Resolve duplicate DTO class names across nested types (e.g. EmployeeGetByVetStationIdRequest)
+    c.CustomSchemaIds(type => (type.FullName ?? type.Name).Replace("+", "."));
+
     c.AddSecurityDefinition("my-auth-token", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -77,6 +93,7 @@ app.UseCors(
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
