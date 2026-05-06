@@ -56,7 +56,10 @@ export class EmployeeListComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`);
+    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
+    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`, {
+      headers: { 'my-auth-token': token }
+    });
     this.employees = data.dataItems;
   }
 

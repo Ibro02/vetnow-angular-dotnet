@@ -83,9 +83,14 @@ export class VetStationHomePageComponent implements OnInit {
     this.fetchPets();
   }
 
+  private getToken(): string | null {
+    return window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
+  }
+
   async fetchVetStats() {
     try {
-      const { data } = await axios.get(Config.address + "api/VetStation/Get/", { params: { id: this.vetStationId } });
+      const token = this.getToken();
+      const { data } = await axios.get(Config.address + "api/VetStation/Get/", { params: { id: this.vetStationId }, headers: { 'my-auth-token': token } });
       this.vetStation = data[0];
       this.vetStationFullAddress = `${this.vetStation.address}, ${this.vetStation.city},\n${this.vetStation.country}`
     } catch (error) { console.error(error); }
@@ -93,7 +98,8 @@ export class VetStationHomePageComponent implements OnInit {
 
   async fetchPets() {
     try {
-      const { data } = await axios.get(Config.address + `api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`);
+      const token = this.getToken();
+      const { data } = await axios.get(Config.address + `api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`, { headers: { 'my-auth-token': token } });
       this.pets = Array.isArray(data) ? data : [];
     } catch { this.pets = []; }
   }
@@ -102,7 +108,8 @@ export class VetStationHomePageComponent implements OnInit {
     if (!this.selectedEmployee) return;
     this.isLoadingSlots = true;
     try {
-      const { data } = await axios.get(Config.address + `api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`);
+      const token = this.getToken();
+      const { data } = await axios.get(Config.address + `api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`, { headers: { 'my-auth-token': token } });
       this.timeSlots = Array.isArray(data) ? data : [];
     } catch { this.timeSlots = []; }
     finally { this.isLoadingSlots = false; }
@@ -111,7 +118,8 @@ export class VetStationHomePageComponent implements OnInit {
   async selectService(service: any) {
     this.selectedServiceId = service.id;
     this.selectedEmployee = undefined;
-    const { data } = await axios.get(Config.address + service.api, { params: { id: this.vetStationId } });
+    const token = this.getToken();
+    const { data } = await axios.get(Config.address + service.api, { params: { id: this.vetStationId }, headers: { 'my-auth-token': token } });
     this.employeeList = data;
   }
   toggleGallery(state: boolean) {
@@ -157,7 +165,8 @@ export class VetStationHomePageComponent implements OnInit {
   async confirmBooking() {
     if (!this.selectedPet) return this.toaster.error("Selection Required", "Please select a pet.");
     try {
-      await axios.post(Config.address + "api/Appointment/Add", this.newAppointment);
+      const token = this.getToken();
+      await axios.post(Config.address + "api/Appointment/Add", this.newAppointment, { headers: { 'my-auth-token': token } });
       this.toaster.success("Booked!", "See you soon.");
       this.router.navigate(['/home-page']);
     } catch { this.toaster.error("Error", "Booking failed."); }

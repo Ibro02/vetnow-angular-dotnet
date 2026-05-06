@@ -30,7 +30,7 @@ public class EmployeeGetByVetStationIdEndpoint : MyEndpointBaseAsync
         }
         catch (Exception ex)
         {
-            return BadRequest($"Could not delete: {ex.Message}");
+            return BadRequest($"Could not retrieve employees: {ex.Message}");
         }
     }
 

@@ -154,8 +154,9 @@ export class AddEmployeeComponent implements OnInit {
              .forEach((msg: string) => this.toaster.error('Error', msg));
         });
     } else {
+      const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
       const url = `${Config.address}api/EmployeeEndpoint/AddNewEmployee`;
-      axios.post(url, newEmployee)
+      axios.post(url, newEmployee, { headers: { 'my-auth-token': token } })
         .then(() => {
           this.toaster.success('Success', 'Employee added successfully.');
           this.event.emit();

@@ -19,9 +19,10 @@ export class ProfileService {
  async getUserContent(): Promise<void>
   {
     var link = Config.address + "api/ProfileEndpoint/GetUserInfo/";
+    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
 
     try{
-    const response = await axios.get(link + this.myAuthService.token,{headers:{'my-auth-token': this.myAuthService.token}});
+    const response = await axios.get(link + token,{headers:{'my-auth-token': token}});
     this.userProfile = response?.data;
     } catch (error) {
       console.log(error);
