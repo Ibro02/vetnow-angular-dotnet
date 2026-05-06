@@ -1,6 +1,6 @@
 using VetStat.Models;
 
-namespace VetStat.Endpoints.PetsEndpoint
+namespace VetStat.Endpoints.PetsEndpoints
 {
     public class PetsGetByIdResponse
     {
