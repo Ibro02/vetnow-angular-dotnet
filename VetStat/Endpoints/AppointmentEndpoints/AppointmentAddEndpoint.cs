@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
@@ -6,6 +7,7 @@ using VetStat.Models;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
+[Authorize]
 [Route("api/Appointment")]
 public class AppointmentAddEndpoint : MyEndpointBaseAsync
     .WithRequest<Appointment>

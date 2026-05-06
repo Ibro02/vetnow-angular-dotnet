@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -9,6 +10,7 @@ using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.PetsEndpoints;
 
+[Authorize]
 [Route("api/PetsReport")]
 public class PetsReportEndpoint : MyEndpointBase
 {
@@ -26,9 +28,6 @@ public class PetsReportEndpoint : MyEndpointBase
         [FromQuery] PetsReportRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         QuestPDF.Settings.License = LicenseType.Community;
 
         try

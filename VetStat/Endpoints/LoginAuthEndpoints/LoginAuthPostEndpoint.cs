@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using VetStat.Data;
@@ -10,6 +11,7 @@ using static VetStat.Endpoints.LoginAuthEndpoints.LoginAuthPostEndpoint;
 
 namespace VetStat.Endpoints.LoginAuthEndpoints;
 
+[AllowAnonymous]
 [Route("api/LoginAuth")]
 public class LoginAuthPostEndpoint : MyEndpointBase
 {

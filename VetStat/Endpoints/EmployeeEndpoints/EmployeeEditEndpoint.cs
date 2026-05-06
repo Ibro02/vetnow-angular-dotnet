@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
 using static VetStat.Endpoints.EmployeeEndpoints.EmployeeEditEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
 [Route("api/Employee")]
 public class EmployeeEditEndpoint : MyEndpointBase
 {
@@ -21,9 +24,6 @@ public class EmployeeEditEndpoint : MyEndpointBase
     [HttpPut("Edit")]
     public ActionResult HandleAsync([FromBody] EmployeeEditRequest request)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         var employee = _db.Employee.FirstOrDefault(x => x.Id == request.Id);
         if (employee == null)
             return NotFound("Employee not found.");

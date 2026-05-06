@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
@@ -8,6 +9,7 @@ using VetStat.Models;
 
 namespace VetStat.Endpoints.PetsEndpoints;
 
+[Authorize]
 [Route("api/PetsGetById")]
 public class PetsGetByIdEndpoint : MyEndpointBase
 {
@@ -25,9 +27,6 @@ public class PetsGetByIdEndpoint : MyEndpointBase
         [FromQuery] PetsGetByIdRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         int ownerId;
 
         if (request.Id.HasValue)

@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
 using VetStat.Models;
 using VetStat.Validators;
 
 namespace VetStat.Endpoints.AdminPanelEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AdminOnly)]
 [Route("api/AdminPanel")]
 public class AdminPanelEndpoints : MyEndpointBase
 {
@@ -25,8 +28,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpGet("Users")]
     public ActionResult GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var query = _db.Person.AsQueryable();
 
@@ -71,8 +72,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPut("Users/Update")]
     public ActionResult UpdateUser([FromBody] AdminUpdateUserRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var person = _db.Person.SingleOrDefault(p => p.Id == request.Id);
         if (person == null) return NotFound("User not found.");
@@ -119,8 +118,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpDelete("Users/Delete")]
     public ActionResult DeleteUser([FromQuery] int id)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var person = _db.Person.SingleOrDefault(p => p.Id == id);
         if (person == null) return NotFound("User not found.");
@@ -148,8 +145,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpGet("VetStations")]
     public ActionResult GetAllVetStations([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var query = _db.VetStation.AsQueryable();
 
@@ -175,8 +170,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPost("VetStations/Add")]
     public ActionResult AddVetStation([FromBody] VetStation station)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var stationValidator = new VetStationCreateValidator();
         var stationValidation = stationValidator.Validate(station);
@@ -191,8 +184,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPut("VetStations/Update")]
     public ActionResult UpdateVetStation([FromBody] VetStation station)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var existing = _db.VetStation.SingleOrDefault(v => v.Id == station.Id);
         if (existing == null) return NotFound("Vet station not found.");
@@ -217,8 +208,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpDelete("VetStations/Delete")]
     public ActionResult DeleteVetStation([FromQuery] int id)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var station = _db.VetStation.SingleOrDefault(v => v.Id == id);
         if (station == null) return NotFound("Vet station not found.");
@@ -231,8 +220,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPost("Users/Add")]
     public ActionResult AddUser([FromBody] AdminAddUserRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var userValidator = new AdminAddUserValidator();
         var userValidation = userValidator.Validate(request);
@@ -270,8 +257,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpGet("VetStations/Details/{id}")]
     public ActionResult GetVetStationDetails(int id)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var station = _db.VetStation.SingleOrDefault(v => v.Id == id);
         if (station == null) return NotFound("Vet station not found.");
@@ -321,8 +306,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPut("VetStations/AssignEmployee")]
     public ActionResult AssignEmployee([FromBody] AssignEmployeeRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var employee = _db.Employee.SingleOrDefault(e => e.Id == request.EmployeeId);
         if (employee == null) return NotFound("Employee not found.");
@@ -335,8 +318,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPut("VetStations/RemoveEmployee")]
     public ActionResult RemoveEmployeeFromStation([FromBody] AssignEmployeeRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var employee = _db.Employee.SingleOrDefault(e => e.Id == request.EmployeeId);
         if (employee == null) return NotFound("Employee not found.");
@@ -349,8 +330,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPut("VetStations/AssignMainVet")]
     public ActionResult AssignMainVet([FromBody] AssignMainVetRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         // Check employee exists
         var employee = _db.Employee.SingleOrDefault(e => e.Id == request.EmployeeId);
@@ -404,8 +383,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpGet("Employees")]
     public ActionResult GetAllEmployees([FromQuery] int? vetStationId = null)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var query = _db.Employee.Where(e => !e.IsDeleted).AsQueryable();
 
@@ -433,8 +410,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpGet("Employees/Unassigned")]
     public ActionResult GetUnassignedEmployees()
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var employees = _db.Employee
             .Where(e => !e.IsDeleted && e.VetStationId == null)
@@ -457,8 +432,6 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpPost("Employees/Add")]
     public ActionResult AddEmployee([FromBody] AdminAddEmployeeRequest request)
     {
-        if (!_authService.IsAdmin())
-            return Unauthorized("Admin access required.");
 
         var empValidator = new AdminAddEmployeeValidator();
         var empValidation = empValidator.Validate(request);
@@ -495,12 +468,10 @@ public class AdminPanelEndpoints : MyEndpointBase
 
     // ─── Roles ───
 
+    [Authorize] // Override class-level AdminOnly: any authenticated user can view roles
     [HttpGet("Roles")]
     public ActionResult GetAllRoles()
     {
-        if (!_authService.IsLogged())
-            return Unauthorized();
-
         return Ok(_db.Role.ToList());
     }
 

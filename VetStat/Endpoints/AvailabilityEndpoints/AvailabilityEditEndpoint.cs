@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Models;
 
 namespace VetStat.Endpoints.AvailabilityEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
 [Route("api/Availability")]
 public class AvailabilityEditEndpoint : MyEndpointBase
 {

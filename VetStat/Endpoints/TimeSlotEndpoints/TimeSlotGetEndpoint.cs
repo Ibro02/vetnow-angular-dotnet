@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
@@ -5,6 +6,7 @@ using VetStat.Helpers.Api;
 
 namespace VetStat.Endpoints.TimeSlotEndpoints;
 
+[Authorize]
 [Route("api/TimeSlot")]
 public class TimeSlotGetEndpoint : MyEndpointBase
 {

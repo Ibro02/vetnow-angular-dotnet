@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Models;
 using VetStat.Validators;
 
 namespace VetStat.Endpoints.VetStationEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastMainVet)]
 [Route("api/VetStation")]
 public class VetStationEditEndpoint : MyEndpointBase
 {

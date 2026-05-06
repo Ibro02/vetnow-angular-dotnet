@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
@@ -9,6 +10,7 @@ using static VetStat.Endpoints.PetsEndpoints.PetsUpdateOrInsertEndpoint;
 
 namespace VetStat.Endpoints.PetsEndpoints;
 
+[Authorize]
 [Route("api/PetsUpdateOrInsert")]
 public class PetsUpdateOrInsertEndpoint : MyEndpointBaseAsync
     .WithRequest<PetsUpdateOrInsertRequest>
@@ -27,9 +29,6 @@ public class PetsUpdateOrInsertEndpoint : MyEndpointBaseAsync
     public override async Task<ActionResult<int>> HandleAsync(
         [FromBody] PetsUpdateOrInsertRequest request, CancellationToken cancellationToken = default)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         string token = HttpContext.Request.Headers["my-auth-token"];
         var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
         if (authToken == null)

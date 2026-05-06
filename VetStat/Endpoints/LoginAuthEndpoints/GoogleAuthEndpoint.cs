@@ -1,4 +1,5 @@
 using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -7,6 +8,7 @@ using VetStat.Models;
 
 namespace VetStat.Endpoints.LoginAuthEndpoints;
 
+[AllowAnonymous]
 [Route("api/GoogleAuth")]
 public class GoogleAuthEndpoint : MyEndpointBase
 {

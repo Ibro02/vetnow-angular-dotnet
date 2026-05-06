@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
@@ -7,6 +8,7 @@ using VetStat.Validators;
 
 namespace VetStat.Endpoints.PersonEndpoints;
 
+[AllowAnonymous]
 [Route("api/Person")]
 public class PersonAddEndpoint : MyEndpointBaseAsync
     .WithRequest<Person>

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
@@ -6,6 +7,7 @@ using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.BreedEndpoints;
 
+[Authorize]
 [Route("api/BreedGetBySpecies")]
 public class BreedGetBySpeciesEndpoint : MyEndpointBase
 {
@@ -23,9 +25,6 @@ public class BreedGetBySpeciesEndpoint : MyEndpointBase
         [FromQuery] int speciesId,
         CancellationToken cancellationToken = default)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         var breeds = await _db.Breed
             .Where(b => b.SpeciesId == speciesId)
             .Select(b => new BreedGetBySpeciesResponse

@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
 [Route("api/Employee")]
 public class EmployeeDeleteEndpoint : MyEndpointBase
 {
@@ -20,9 +23,6 @@ public class EmployeeDeleteEndpoint : MyEndpointBase
     [HttpDelete("Delete")]
     public ActionResult HandleAsync([FromQuery] int id)
     {
-        if (!_authService.IsLogged())
-            return BadRequest("You are not logged in!");
-
         var employee = _db.Employee.FirstOrDefault(x => x.Id == id);
         if (employee == null)
             return NotFound("Employee not found.");

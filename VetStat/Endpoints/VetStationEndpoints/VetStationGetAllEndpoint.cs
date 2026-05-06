@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
@@ -6,6 +7,7 @@ using VetStat.Models;
 
 namespace VetStat.Endpoints.VetStationEndpoints;
 
+[AllowAnonymous]
 [Route("api/VetStation")]
 public class VetStationGetAllEndpoint : MyEndpointBaseAsync
     .WithoutRequest

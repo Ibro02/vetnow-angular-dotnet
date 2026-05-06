@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -7,6 +8,7 @@ using static VetStat.Endpoints.ProfileEndpoints.ProfileGetUserInfoEndpoint;
 
 namespace VetStat.Endpoints.ProfileEndpoints;
 
+[Authorize]
 [Route("api/ProfileEndpoint")]
 public class ProfileGetUserInfoEndpoint : MyEndpointBase
 {
@@ -22,24 +24,21 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
     [HttpGet("GetUserInfo/{token}")]
     public ActionResult<Person> HandleAsync(string token)
     {
-        if (_authService.IsLogged())
+        var _token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
+        if (_token == null)
+            return Unauthorized("Invalid token.");
+
+        try
         {
-            var _token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
-
-            try
-            {
-                var person = _db.Person.SingleOrDefault<Person>(x => x.Id == _token.UserProfileId);
-                var employee = _db.Employee.SingleOrDefault(x => x.Id == person.Id);
-                var userProfile = new ProfileGetUserInfoResponse(person, employee);
-                return Ok(userProfile);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            var person = _db.Person.SingleOrDefault<Person>(x => x.Id == _token.UserProfileId);
+            var employee = _db.Employee.SingleOrDefault(x => x.Id == person.Id);
+            var userProfile = new ProfileGetUserInfoResponse(person, employee);
+            return Ok(userProfile);
         }
-
-        return BadRequest("You are not logged!");
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     public class ProfileGetUserInfoResponse

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
@@ -6,6 +7,7 @@ using static VetStat.Endpoints.AnimalEndpoints.AnimalGetByOwnerIdEndpoint;
 
 namespace VetStat.Endpoints.AnimalEndpoints;
 
+[Authorize]
 [Route("api/Animal")]
 public class AnimalGetByOwnerIdEndpoint : MyEndpointBaseAsync
     .WithRequest<AnimalGetByOwnerIdRequest>

@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Auth;
 using VetStat.Models;
 using VetStat.Validators;
 using static VetStat.Endpoints.EmployeeEndpoints.EmployeeAddNewEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
+[Authorize(Policy = AuthorizationPolicies.AtLeastMainVet)]
 [Route("api/EmployeeEndpoint")]
 public class EmployeeAddNewEndpoint : MyEndpointBase
 {
