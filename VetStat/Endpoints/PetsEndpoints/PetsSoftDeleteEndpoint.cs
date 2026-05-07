@@ -22,9 +22,16 @@ public class PetsSoftDeleteEndpoint : MyEndpointBase
     [HttpDelete("SoftDelete")]
     public ActionResult HandleAsync([FromQuery] int id)
     {
+        var currentUserId = _authService.GetCurrentUserId();
+        if (currentUserId == null)
+            return Unauthorized("Invalid token.");
+
         var animal = _db.Animal.FirstOrDefault(x => x.Id == id);
         if (animal == null)
             return NotFound("Pet not found.");
+
+        if (animal.OwnerId != currentUserId && !_authService.IsAtLeastEmployee())
+            return Forbid();
 
         animal.IsDeleted = true;
         _db.SaveChanges();

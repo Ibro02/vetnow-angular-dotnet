@@ -55,6 +55,9 @@ public class PetsUpdateOrInsertEndpoint : MyEndpointBaseAsync
             animal = await _db.Animal.SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
             if (animal == null)
                 return NotFound("Animal not found.");
+
+            if (animal.OwnerId != authToken.UserProfileId && !_authService.IsAtLeastEmployee())
+                return Forbid();
         }
 
         if (!string.IsNullOrEmpty(request.Name))

@@ -27,20 +27,22 @@ public class PetsGetByIdEndpoint : MyEndpointBase
         [FromQuery] PetsGetByIdRequest request,
         CancellationToken cancellationToken = default)
     {
+        var currentUserId = _authService.GetCurrentUserId();
+        if (currentUserId == null)
+            return Unauthorized("Invalid token.");
+
         int ownerId;
 
-        if (request.Id.HasValue)
+        if (request.Id.HasValue && request.Id.Value != currentUserId.Value)
         {
+            // Only employees+ can view another user's pets (e.g. for appointments)
+            if (!_authService.IsAtLeastEmployee())
+                return Forbid();
             ownerId = request.Id.Value;
         }
         else
         {
-            string token = HttpContext.Request.Headers["my-auth-token"];
-            var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
-            if (authToken == null)
-                return Unauthorized("Invalid token.");
-
-            ownerId = authToken.UserProfileId;
+            ownerId = currentUserId.Value;
         }
 
         try

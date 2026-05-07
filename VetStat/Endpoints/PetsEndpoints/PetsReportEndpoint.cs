@@ -30,9 +30,16 @@ public class PetsReportEndpoint : MyEndpointBase
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
+        var currentUserId = _authService.GetCurrentUserId();
+        if (currentUserId == null)
+            return Unauthorized("Invalid token.");
+
+        // Regular users can only generate reports for their own pets
+        if (request.OwnerId != currentUserId && !_authService.IsAtLeastEmployee())
+            return Forbid();
+
         try
         {
-            // Dohvaćanje podataka filtrirano samo po OwnerId
             var pets = await _db.Animal
                 .Where(x => x.OwnerId == request.OwnerId &&
                             (x.IsDeleted == null || x.IsDeleted == false))
