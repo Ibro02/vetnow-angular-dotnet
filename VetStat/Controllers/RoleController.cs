@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers.Auth;
 using VetStat.Models;
 
 namespace VetStat.Controllers
 {
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class RoleController : ControllerBase

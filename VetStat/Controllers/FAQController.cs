@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
 {
+    [Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class FAQController : Controller
@@ -18,6 +21,7 @@ namespace VetStat.Controllers
         }
 
         //api/FAQ/GetAll
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult<List<FAQ>> GetAll()
         {
@@ -27,6 +31,7 @@ namespace VetStat.Controllers
             return NoContent();
         }
         //api/FAQ/Get/:id
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public ActionResult<FAQ> Get(int id)
         {

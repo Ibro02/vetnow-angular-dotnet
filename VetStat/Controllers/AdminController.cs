@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading;
 using VetStat.Data;
+using VetStat.Helpers.Auth;
 using VetStat.Models;
 using VetStat.Helpers;
 using VetStat.Helpers.Validators;
 
 namespace VetStat.Controllers
 {
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : Controller

@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.Helpers.Auth;
 using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
 {
+    [Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class InventoryController : Controller
