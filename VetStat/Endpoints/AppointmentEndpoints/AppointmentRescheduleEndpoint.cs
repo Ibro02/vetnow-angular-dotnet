@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
@@ -10,10 +11,12 @@ namespace VetStat.Endpoints.AppointmentEndpoints;
 public class AppointmentRescheduleEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
+    private readonly AuthService _authService;
 
-    public AppointmentRescheduleEndpoint(DataContext db)
+    public AppointmentRescheduleEndpoint(DataContext db, AuthService authService)
     {
         _db = db;
+        _authService = authService;
     }
 
     [HttpPut("Reschedule")]
@@ -21,9 +24,17 @@ public class AppointmentRescheduleEndpoint : MyEndpointBase
     {
         try
         {
+            var currentUserId = _authService.GetCurrentUserId();
+            if (currentUserId == null)
+                return Unauthorized("Could not identify the authenticated user.");
+
             var appointment = _db.Appointment.FirstOrDefault(a => a.Id == request.AppointmentId);
             if (appointment == null)
                 return NotFound("Appointment not found.");
+
+            // Only the customer who booked or an employee+ can reschedule
+            if (appointment.CustomerId != currentUserId.Value && !_authService.IsAtLeastEmployee())
+                return Forbid();
 
             // Validate the new time slot exists and is available
             var newSlot = _db.TimeSlot.FirstOrDefault(t => t.Id == request.NewTimeSlotId);
@@ -31,6 +42,10 @@ public class AppointmentRescheduleEndpoint : MyEndpointBase
                 return NotFound("New time slot not found.");
             if (!newSlot.IsAvailable)
                 return Conflict("The selected time slot is no longer available.");
+
+            // Verify the new slot belongs to the same employee
+            if (newSlot.SlotEmployeeId != appointment.EmployeeId)
+                return BadRequest("The new time slot does not belong to the same employee.");
 
             // Free the old time slot
             if (appointment.TimeSlotId != null)

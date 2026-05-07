@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
@@ -10,10 +11,12 @@ namespace VetStat.Endpoints.AppointmentEndpoints;
 public class AppointmentCancelEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
+    private readonly AuthService _authService;
 
-    public AppointmentCancelEndpoint(DataContext db)
+    public AppointmentCancelEndpoint(DataContext db, AuthService authService)
     {
         _db = db;
+        _authService = authService;
     }
 
     [HttpDelete("Cancel")]
@@ -21,9 +24,17 @@ public class AppointmentCancelEndpoint : MyEndpointBase
     {
         try
         {
+            var currentUserId = _authService.GetCurrentUserId();
+            if (currentUserId == null)
+                return Unauthorized("Could not identify the authenticated user.");
+
             var appointment = _db.Appointment.FirstOrDefault(a => a.Id == appointmentId);
             if (appointment == null)
                 return NotFound("Appointment not found.");
+
+            // Only the customer who booked or an employee+ can cancel
+            if (appointment.CustomerId != currentUserId.Value && !_authService.IsAtLeastEmployee())
+                return Forbid();
 
             // Restore the time slot to available
             if (appointment.TimeSlotId != null)
