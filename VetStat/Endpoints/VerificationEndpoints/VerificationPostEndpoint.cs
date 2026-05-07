@@ -35,6 +35,13 @@ public class VerificationPostEndpoint : MyEndpointBase
         if (tokenObj == null || user == null)
             return BadRequest("The token wasn't created!");
 
+        if (tokenObj.ExpiresAt < DateTime.UtcNow)
+        {
+            _db.TwoFaVerificationTokens.Remove(tokenObj);
+            _db.SaveChanges();
+            return BadRequest("Verification token has expired. Please log in again to receive a new one.");
+        }
+
         if (tokenObj.Token == loginValue.token)
         {
             user.verified = true;
