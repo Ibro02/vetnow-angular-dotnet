@@ -58,7 +58,6 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
         public bool verified { get; set; }
         public DateTime BirthDate { get; set; } = DateTime.Now;
         public string? Username { get; set; }
-        public string? Password { get; set; }
         public int? CityId { get; set; }
         public int? RoleId { get; set; }
         public string Role { get; set; } = "User";
@@ -95,7 +94,7 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
             }
             BirthDate = person.BirthDate;
             Username = person.Username;
-            Password = person.Password;
+            // Password is intentionally excluded — never send hashes to the client.
             verified = person.verified;
         }
     }

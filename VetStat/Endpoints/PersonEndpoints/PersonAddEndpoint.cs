@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
+using VetStat.Helpers.Services;
 using VetStat.Validators;
 
 namespace VetStat.Endpoints.PersonEndpoints;
@@ -38,9 +39,12 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
             if (!_db.Person.ToList<Person>().Where(x => x.Email == person.Email).IsNullOrEmpty())
                 throw new Exception("Email already in use");
 
+            person.Password = PasswordHasher.Hash(person.Password);
+
             _db.Person.Add(person);
             _db.SaveChanges();
 
+            person.Password = null!; // never return hash to client
             return Ok(person);
         }
         catch (Exception ex)

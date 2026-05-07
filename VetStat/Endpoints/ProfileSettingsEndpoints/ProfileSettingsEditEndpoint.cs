@@ -57,7 +57,7 @@ public class ProfileSettingsEditEndpoint : MyEndpointBase
                 person.Username = request.Username;
 
             if (!string.IsNullOrEmpty(request.Password))
-                person.Password = request.Password;
+                person.Password = PasswordHasher.Hash(request.Password);
 
             if (!string.IsNullOrEmpty(request.City))
                 person.City = request.City;

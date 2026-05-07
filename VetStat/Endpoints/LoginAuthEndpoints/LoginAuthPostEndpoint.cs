@@ -34,10 +34,9 @@ public class LoginAuthPostEndpoint : MyEndpointBase
         if (!_authService.IsLogged())
         {
             Person? userProfile = _db.Person.FirstOrDefault(user =>
-                (user.Username == loginValue.usernameOrEmail || user.Email == loginValue.usernameOrEmail) &&
-                loginValue.password == user.Password);
+                user.Username == loginValue.usernameOrEmail || user.Email == loginValue.usernameOrEmail);
 
-            if (userProfile == null)
+            if (userProfile == null || !PasswordHasher.Verify(loginValue.password, userProfile.Password))
                 return NotFound("User does not exist!");
 
             if (!userProfile.verified)

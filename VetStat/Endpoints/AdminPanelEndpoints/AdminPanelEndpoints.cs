@@ -112,6 +112,7 @@ public class AdminPanelEndpoints : MyEndpointBase
         }
 
         _db.SaveChanges();
+        person.Password = null!; // never return hash to client
         return Ok(person);
     }
 
@@ -237,7 +238,7 @@ public class AdminPanelEndpoints : MyEndpointBase
             LastName = request.LastName,
             Email = request.Email,
             Username = request.Username,
-            Password = request.Password,
+            Password = PasswordHasher.Hash(request.Password),
             Phone = request.Phone,
             City = request.City,
             Country = request.Country,
@@ -249,6 +250,7 @@ public class AdminPanelEndpoints : MyEndpointBase
 
         _db.Person.Add(person);
         _db.SaveChanges();
+        person.Password = null!; // never return hash to client
         return Ok(person);
     }
 
@@ -449,7 +451,7 @@ public class AdminPanelEndpoints : MyEndpointBase
             LastName = request.LastName,
             Email = request.Email,
             Username = request.Username,
-            Password = request.Password,
+            Password = PasswordHasher.Hash(request.Password),
             Phone = request.Phone,
             City = request.City,
             Country = request.Country,
@@ -463,6 +465,7 @@ public class AdminPanelEndpoints : MyEndpointBase
 
         _db.Employee.Add(employee);
         _db.SaveChanges();
+        employee.Password = null!; // never return hash to client
         return Ok(employee);
     }
 

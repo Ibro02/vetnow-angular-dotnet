@@ -5,6 +5,7 @@ using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Auth;
 using VetStat.Models;
+using VetStat.Helpers.Services;
 using VetStat.Validators;
 using static VetStat.Endpoints.EmployeeEndpoints.EmployeeAddNewEndpoint;
 
@@ -49,12 +50,13 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
                     Phone = newEmployee.Phone,
                     RoleId = newEmployee.RoleId,
                     VetStationId = newEmployee.VetStationId,
-                    Password = newEmployee.Password,
+                    Password = PasswordHasher.Hash(newEmployee.Password),
                     Username = newEmployee.Username,
                 };
                 _db.Employee.Add(_newEmployee);
                 _db.SaveChanges();
 
+                _newEmployee.Password = null!; // never return hash to client
                 return Ok(_newEmployee);
             }
             return BadRequest("Employee already exists!");
