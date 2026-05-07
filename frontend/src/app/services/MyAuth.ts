@@ -34,9 +34,9 @@ export class MyAuthService
     // Re-read the token from storage so we use the freshly stored one after login
     this.token = window.localStorage.getItem("my-auth-token") ?? window.sessionStorage.getItem("my-auth-token");
 
-    var link = Config.address + "api/ProfileEndpoint/GetUserInfo/";
+    var link = Config.address + "api/ProfileEndpoint/GetUserInfo";
     try{
-      const response = await axios.get(link + this.token,{headers:{'my-auth-token': this.token}});
+      const response = await axios.get(link, {headers:{'my-auth-token': this.token}});
       this.userProfile = response?.data;
     } catch (error) {
       console.log(error);

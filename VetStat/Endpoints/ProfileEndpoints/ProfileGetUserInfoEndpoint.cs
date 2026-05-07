@@ -21,9 +21,10 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
         _authService = authService;
     }
 
-    [HttpGet("GetUserInfo/{token}")]
-    public ActionResult<Person> HandleAsync(string token)
+    [HttpGet("GetUserInfo")]
+    public ActionResult<Person> HandleAsync()
     {
+        string token = HttpContext.Request.Headers["my-auth-token"];
         var _token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
         if (_token == null)
             return Unauthorized("Invalid token.");
