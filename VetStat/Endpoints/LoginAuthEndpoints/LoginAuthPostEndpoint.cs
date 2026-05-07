@@ -63,6 +63,9 @@ public class LoginAuthPostEndpoint : MyEndpointBase
                     _db.TwoFaVerificationTokens.Remove(oldTokens.First());
 
                 _db.TwoFaVerificationTokens.Add(twoFaVerificationToken);
+                _db.SaveChanges();
+
+                return Unauthorized("Account not verified. A verification code has been sent to your email.");
             }
 
             string newToken = Helpers.Validators.Services.GenerateToken(10);
