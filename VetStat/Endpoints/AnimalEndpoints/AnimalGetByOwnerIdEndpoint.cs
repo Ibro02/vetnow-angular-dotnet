@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 using VetStat.Models;
 using static VetStat.Endpoints.AnimalEndpoints.AnimalGetByOwnerIdEndpoint;
 
@@ -14,16 +15,26 @@ public class AnimalGetByOwnerIdEndpoint : MyEndpointBaseAsync
     .WithActionResult<Animal>
 {
     private readonly DataContext _db;
+    private readonly AuthService _authService;
 
-    public AnimalGetByOwnerIdEndpoint(DataContext db)
+    public AnimalGetByOwnerIdEndpoint(DataContext db, AuthService authService)
     {
         _db = db;
+        _authService = authService;
     }
 
     [HttpGet("GetByOwnerId")]
     public override async Task<ActionResult<Animal>> HandleAsync(
         [FromQuery] AnimalGetByOwnerIdRequest request, CancellationToken cancellationToken = default)
     {
+        var currentUserId = _authService.GetCurrentUserId();
+        if (currentUserId == null)
+            return Unauthorized("Invalid token.");
+
+        // Regular users can only query their own animals; employees+ can look up any owner's pets
+        if (request.Id != currentUserId && !_authService.IsAtLeastEmployee())
+            return Forbid();
+
         try
         {
             return Ok(_db.Animal.Where(x => x.OwnerId == request.Id));
