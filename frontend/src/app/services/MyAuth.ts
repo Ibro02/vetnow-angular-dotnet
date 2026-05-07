@@ -50,8 +50,9 @@ LogOut():void
   window.localStorage.removeItem("my-auth-token");
   window.sessionStorage.removeItem("my-auth-token");
 
-  let link = Config.address + "api/LoginAuth/Delete/"
-  axios.delete(link+this.token).catch(x=>console.log(x));
+  let link = Config.address + "api/LoginAuth/Delete";
+  const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
+  axios.delete(link, { headers: { 'my-auth-token': token } }).catch(x=>console.log(x));
 
   this.router.navigate(["/"]);
 }

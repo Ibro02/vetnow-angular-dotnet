@@ -5,7 +5,7 @@ using VetStat.Helpers.Api;
 
 namespace VetStat.Endpoints.LoginAuthEndpoints;
 
-[AllowAnonymous]
+[Authorize]
 [Route("api/LoginAuth")]
 public class LoginAuthDeleteEndpoint : MyEndpointBase
 {
@@ -16,20 +16,17 @@ public class LoginAuthDeleteEndpoint : MyEndpointBase
         _db = db;
     }
 
-    [HttpDelete("Delete/{token}")]
-    public ActionResult HandleAsync(string token)
+    [HttpDelete("Delete")]
+    public ActionResult HandleAsync()
     {
-        var _token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
+        string token = HttpContext.Request.Headers["my-auth-token"];
+        var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
 
-        try
-        {
-            _db.AuthentificationToken.Remove(_token);
-            _db.SaveChanges();
-            return Ok("Token deleted!");
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        if (authToken == null)
+            return NotFound("Token not found.");
+
+        _db.AuthentificationToken.Remove(authToken);
+        _db.SaveChanges();
+        return Ok("Logged out successfully.");
     }
 }
