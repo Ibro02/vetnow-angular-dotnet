@@ -28,7 +28,6 @@ export class VerificationPageComponent {
     this.profileService.getUserContent();
   }
   verifyUser() {
-    console.log(this.profileService.userProfile?.id);
     let url = Config.address + "Verification"
     axios.post(url, {token: this.token, userId: this.profileService.userProfile?.id}).then(value => {
       this.router.navigate(['/home-page']);

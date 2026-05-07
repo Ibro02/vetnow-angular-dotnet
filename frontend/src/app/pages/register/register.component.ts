@@ -100,7 +100,6 @@ export class RegisterComponent implements OnInit {
       this.toaster.success('Success!', 'You have been registered successfully!');
     })
     .catch(err => {
-      console.log(err);
       if (!err.response.data.errors)
         this.toaster.error("Error", err.response.data);
       else {

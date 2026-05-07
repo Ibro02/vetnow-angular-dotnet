@@ -148,7 +148,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       })
       .catch(err => {
-        console.error('Reverse geocoding error:', err);
+        // reverse geocoding failed
       });
   }
 
@@ -197,7 +197,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
 
       })
       .catch((error: Error) => {
-        console.error('Error fetching vet station:', error);
+        // failed to fetch vet station
       });
   };
 

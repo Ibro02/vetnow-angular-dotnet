@@ -82,8 +82,7 @@ export class OtherSignUpMethodsComponent implements OnInit, AfterViewInit {
     this.ngZone.run(async () => {
       const idToken: string = response.credential;
       if (!idToken) {
-        console.error('Google Sign-In did not return a credential.');
-        return;
+        return; // Google Sign-In did not return a credential
       }
 
       const success = await this.myAuthService.loginWithGoogle(idToken);
@@ -93,8 +92,6 @@ export class OtherSignUpMethodsComponent implements OnInit, AfterViewInit {
         } else {
           this.router.navigate(['verification']);
         }
-      } else {
-        console.error('Backend rejected the Google token.');
       }
     });
   }

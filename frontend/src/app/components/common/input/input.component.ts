@@ -24,7 +24,6 @@ export class InputComponent {
 
   // @Input() public value:any;
 test() {
-  console.log(this.formControl.value)
 }
   /**
    *
@@ -56,7 +55,6 @@ test() {
 // this.value = _value;
 // this.itemEvent.emit(this.value);
 
-// //console.log(_value);
 //   } //another method for state management
 
 

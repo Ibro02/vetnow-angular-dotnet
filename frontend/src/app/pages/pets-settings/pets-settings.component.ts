@@ -243,7 +243,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       this.currentPage = data.currentPage;
       this.pageSize = data.pageSize;
     } catch (error) {
-      console.error('Failed to fetch pets:', error);
+      // failed to fetch pets
     }
   }
 
@@ -316,7 +316,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
-      console.error('Failed to delete pet:', error);
+      // failed to delete pet
     }
   }
 
@@ -329,7 +329,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
-      console.error('Failed to restore pet:', error);
+      // failed to restore pet
     }
   }
 
@@ -362,7 +362,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   }
 
   downloadPdf(petId: number): void {
-    console.log('Download PDF:', petId);
+    // download PDF
   }
 
   addPet(): void {
@@ -399,7 +399,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       this.editingPetData = null;
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
-      console.error('Failed to save pet:', error);
+      // failed to save pet
     }
   }
 
@@ -437,7 +437,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       window.URL.revokeObjectURL(downloadUrl);
 
     } catch (error) {
-      console.error('Failed while generating PDF', error);
+      // failed to generate PDF
       alert('Failed while generating PDF');
     }
   }

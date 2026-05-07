@@ -24,8 +24,8 @@ export class ProfileService {
     try{
     const response = await axios.get(link, {headers:{'my-auth-token': token}});
     this.userProfile = response?.data;
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // silently fail — profile will remain null
     }
   }
 

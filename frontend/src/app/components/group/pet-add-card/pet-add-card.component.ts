@@ -142,7 +142,7 @@ export class DynamicFormCardComponent implements OnChanges {
         try {
           this.fieldOptions[f.key] = await f.loadOptions!();
         } catch (e) {
-          console.error(`Failed to load options for "${f.key}"`, e);
+          // failed to load options
           this.fieldOptions[f.key] = [];
         }
       })
@@ -167,7 +167,6 @@ export class DynamicFormCardComponent implements OnChanges {
         try {
           this.fieldOptions[field.key] = await field.loadOptions!(parentValue);
         } catch (e) {
-          console.error(`Failed to load dependent options for "${field.key}"`, e);
           this.fieldOptions[field.key] = [];
         }
       }
@@ -203,7 +202,7 @@ export class DynamicFormCardComponent implements OnChanges {
         try {
           this.fieldOptions[depField.key] = await depField.loadOptions(value);
         } catch (e) {
-          console.error(`Failed to reload options for "${depField.key}"`, e);
+          this.fieldOptions[depField.key] = [];
         }
       }
     }

@@ -17,8 +17,6 @@ export class AuthorizationGuard implements CanActivate {
 
       //let isStudent = this.myAuthService.isCustomer(); //@e.g. customer cannot access routes that vet can
 
-        console.log("IsLogged() => " + this.myAuthService.IsLogged());
-        console.log("IsVerified() => " + await this.myAuthService.IsVerified());
       if (this.myAuthService.IsLogged() && await this.myAuthService.IsVerified())
       {
 

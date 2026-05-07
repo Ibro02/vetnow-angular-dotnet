@@ -38,8 +38,8 @@ export class MyAuthService
     try{
       const response = await axios.get(link, {headers:{'my-auth-token': this.token}});
       this.userProfile = response?.data;
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // silently fail — user will be treated as unverified
     }
 
 
@@ -52,7 +52,7 @@ LogOut():void
 
   let link = Config.address + "api/LoginAuth/Delete";
   const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-  axios.delete(link, { headers: { 'my-auth-token': token } }).catch(x=>console.log(x));
+  axios.delete(link, { headers: { 'my-auth-token': token } }).catch(() => {});
 
   this.router.navigate(["/"]);
 }
@@ -79,8 +79,7 @@ LogOut():void
       }
       this.token = newToken;
       return newToken;
-    } catch (err) {
-      console.log(err);
+    } catch {
       return " ";
     }
   }
@@ -98,8 +97,7 @@ LogOut():void
       window.localStorage.setItem('my-auth-token', newToken);
       this.token = newToken;
       return true;
-    } catch (err) {
-      console.log("Google login failed:", err);
+    } catch {
       return false;
     }
   }

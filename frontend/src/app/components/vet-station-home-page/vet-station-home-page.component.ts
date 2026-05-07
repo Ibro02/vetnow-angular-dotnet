@@ -93,7 +93,7 @@ export class VetStationHomePageComponent implements OnInit {
       const { data } = await axios.get(Config.address + "api/VetStation/Get/", { params: { id: this.vetStationId }, headers: { 'my-auth-token': token } });
       this.vetStation = data[0];
       this.vetStationFullAddress = `${this.vetStation.address}, ${this.vetStation.city},\n${this.vetStation.country}`
-    } catch (error) { console.error(error); }
+    } catch { /* failed to load vet station */ }
   }
 
   async fetchPets() {

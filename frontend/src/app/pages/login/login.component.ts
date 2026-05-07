@@ -52,7 +52,6 @@ isError:boolean = false;
           'my-auth-token': (!this.myAuthService.rememberMe ?
             window.localStorage.getItem('my-auth-token'):window.sessionStorage.getItem('my-auth-token'))
         }}).then(async (x)=> {
-        console.log(x);
         this.myAuthService.rememberMe ?
         window.localStorage.setItem('my-auth-token',x.data):window.sessionStorage.setItem('my-auth-token',x.data);
         if (await this.myAuthService.IsVerified())
@@ -61,7 +60,7 @@ isError:boolean = false;
           this.router.navigate(["verification"]);
 
 
-      }).catch(err=>console.log(err.message));
+      }).catch(() => { this.isError = true; });
 
       this.isError = false;
 

@@ -169,7 +169,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
         }
       })
       .catch(err => {
-        console.error('Reverse geocoding error:', err);
+        // reverse geocoding failed
       });
   }
 
@@ -200,7 +200,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
         this.profileSettingsFormGroup.controls.picture.setValue(data.picture);
       }
     } catch (err) {
-      console.error('Error fetching profile info:', err);
+      // failed to fetch profile info
     }
   }
 

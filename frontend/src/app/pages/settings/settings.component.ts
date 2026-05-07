@@ -43,7 +43,6 @@ export class SettingsComponent implements OnInit{
   }
 
   showToast() {
-    console.log("First time in settings!");
     this.toaster.info('Short Cut', 'To access settings easily use: ALT + S');
   }
 

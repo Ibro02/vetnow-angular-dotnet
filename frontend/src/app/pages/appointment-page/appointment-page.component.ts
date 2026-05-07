@@ -157,7 +157,6 @@ export class AppointmentPageComponent {
       this.router.navigate(['/home-page']);
     } catch (err: any) {
       this.toaster.error("Booking failed", "Something went wrong. Please try again.");
-      console.error(err?.message);
     } finally {
       this.appointmentTime = null;
       this.newAppointment = null;
