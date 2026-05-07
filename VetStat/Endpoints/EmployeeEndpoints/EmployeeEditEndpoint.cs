@@ -8,7 +8,7 @@ using static VetStat.Endpoints.EmployeeEndpoints.EmployeeEditEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
-[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
+[Authorize(Policy = AuthorizationPolicies.AtLeastMainVet)]
 [Route("api/Employee")]
 public class EmployeeEditEndpoint : MyEndpointBase
 {

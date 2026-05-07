@@ -7,7 +7,7 @@ using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
-[Authorize(Policy = AuthorizationPolicies.AtLeastEmployee)]
+[Authorize(Policy = AuthorizationPolicies.AtLeastMainVet)]
 [Route("api/Employee")]
 public class EmployeeDeleteEndpoint : MyEndpointBase
 {
