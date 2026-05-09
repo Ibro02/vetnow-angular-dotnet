@@ -24,8 +24,8 @@ namespace VetStat.Helpers.Validators
         public static bool CustomerValidator(Person customer) //todo -> make interfaces for generic method Validator<T>(T obj) where T : IPerson, ICustomer...
         {
             PersonValidator(customer);
-                if (!(customer.MembershipLoyalty > 1 && customer.MembershipLoyalty < 0))
-                    return true;
+            if (!(customer.MembershipLoyalty > 1 || customer.MembershipLoyalty < 0))
+                return true;
             else throw new Exception("MembershipLoyalty range can be from 0 to 1 (0.0f)");
   
         }
