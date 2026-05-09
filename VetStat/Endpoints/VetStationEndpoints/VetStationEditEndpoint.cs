@@ -37,16 +37,14 @@ public class VetStationEditEndpoint : MyEndpointBase
                 _vetStation.Name = vetStation.Name;
             if (!string.IsNullOrEmpty(vetStation.ContactNumber))
                 _vetStation.ContactNumber = vetStation.ContactNumber;
-            if (_vetStation.InOffice != null)
-                _vetStation.InOffice = vetStation.InOffice;
-            if (_vetStation.OnField != null)
-                _vetStation.OnField = vetStation.OnField;
-            if (_vetStation.Parking != null)
-                _vetStation.Parking = vetStation.Parking;
-            if (_vetStation.Wheelchair != null)
-                _vetStation.Wheelchair = vetStation.Wheelchair;
-            if (_vetStation.Wifi != null)
-                _vetStation.Wifi = vetStation.Wifi;
+
+            // Bool fields: always apply the incoming value from the request
+            _vetStation.InOffice = vetStation.InOffice;
+            _vetStation.OnField = vetStation.OnField;
+            _vetStation.Parking = vetStation.Parking;
+            _vetStation.Wheelchair = vetStation.Wheelchair;
+            _vetStation.Wifi = vetStation.Wifi;
+
             if (!string.IsNullOrEmpty(vetStation.City))
                 _vetStation.City = vetStation.City;
             if (!string.IsNullOrEmpty(vetStation.Country))
@@ -57,12 +55,12 @@ public class VetStationEditEndpoint : MyEndpointBase
                 _vetStation.Email = vetStation.Email;
             if (!string.IsNullOrEmpty(vetStation.Description))
                 _vetStation.Description = vetStation.Description;
-            if (!string.IsNullOrEmpty(vetStation.Description))
+            if (!string.IsNullOrEmpty(vetStation.StationImage))
             {
-                var imageSize = System.Text.ASCIIEncoding.ASCII.GetByteCount(vetStation.StationImage);
+                var imageSize = System.Text.Encoding.ASCII.GetByteCount(vetStation.StationImage);
                 if (imageSize > 2097152) //2MB
                 {
-                    return BadRequest();
+                    return BadRequest("Station image exceeds the 2 MB limit.");
                 }
                 _vetStation.StationImage = vetStation.StationImage;
             }

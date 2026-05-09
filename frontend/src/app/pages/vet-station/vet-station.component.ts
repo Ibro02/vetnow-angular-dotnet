@@ -13,6 +13,8 @@ import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } 
 import axios, { AxiosResponse } from 'axios';
 import * as L from 'leaflet';
 import {ToasterService} from "../../services/toaster.service";
+import {MyAuthService} from "../../services/MyAuth";
+import {Config} from "../../config";
 
 @Component({
   selector: 'app-vet-station',
@@ -72,7 +74,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
     stationImage:  new FormControl(''),
   });
 
-  constructor(private fb: FormBuilder, public toaster: ToasterService) {
+  constructor(private fb: FormBuilder, public toaster: ToasterService, private myAuthService: MyAuthService) {
     this.fetchVetStationInfo();
   }
 
@@ -158,10 +160,13 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const apiUrl = `https://localhost:44308/api/VetStation/Edit/${this.id}`;
+    const token = localStorage.getItem('my-auth-token') || sessionStorage.getItem('my-auth-token');
+    const apiUrl = Config.address + `api/VetStation/Edit/${this.id}`;
 
     await axios
-      .put(apiUrl, this.vetStationFormGroup.value)
+      .put(apiUrl, this.vetStationFormGroup.value, {
+        headers: { 'my-auth-token': token }
+      })
       .then(() => {
         this.toaster.success("Changes saved successfully!");
       })
@@ -172,10 +177,13 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   fetchVetStationInfo = async () => {
 
-    const apiUrl = `https://localhost:44308/api/VetStation/Get?id=${this.id}`;
+    const token = localStorage.getItem('my-auth-token') || sessionStorage.getItem('my-auth-token');
+    const apiUrl = Config.address + `api/VetStation/Get?id=${this.id}`;
 
     await axios
-      .get(apiUrl)
+      .get(apiUrl, {
+        headers: { 'my-auth-token': token }
+      })
       .then((response: AxiosResponse<IVetStation[]>) => {
 
         const data = response.data[0];
