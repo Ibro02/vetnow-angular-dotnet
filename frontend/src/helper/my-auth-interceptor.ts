@@ -1,38 +1,31 @@
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 
-import {Injectable} from "@angular/core";
-import {HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
-import {MyAuthService} from "../app/services/MyAuth";
-import {tap} from "rxjs";
-import {Router} from "@angular/router";
+/**
+ * Functional HTTP interceptor that:
+ * 1. Reads the auth token synchronously from storage
+ * 2. Attaches it as the 'my-auth-token' header
+ * 3. Redirects to login on 401 responses
+ */
+export const myAuthInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
 
-@Injectable()
-export class MyAuthInterceptor implements HttpInterceptor {
-  constructor(
-    private auth: MyAuthService,
-    private router: Router) {
-  }
+  const token =
+    window.localStorage.getItem('my-auth-token') ??
+    window.sessionStorage.getItem('my-auth-token');
 
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    // Get the auth token from the service.
-    const authToken = this.auth.getAuthorizationToken()??"";
-    // Clone the request and replace the original headers with
-    // cloned headers, updated with the authorization.
-    const authReq = req.clone({
-      //headers: req.headers.set('my-auth-token', authToken)
-    });
+  const authReq = token
+    ? req.clone({ setHeaders: { 'my-auth-token': token } })
+    : req;
 
-    // send cloned request with header to the next handler.
-    return next.handle(authReq).pipe(
-      tap(()=>{}, err=>{
-        if (err instanceof HttpErrorResponse)
-        {
-          if (err.status !== 401){
-            return;
-          }
-
-          this.router.navigateByUrl('');
-        }
-      })
-    );
-  }
-}
+  return next(authReq).pipe(
+    catchError((err: HttpErrorResponse) => {
+      if (err.status === 401) {
+        router.navigateByUrl('/');
+      }
+      return throwError(() => err);
+    })
+  );
+};

@@ -1,34 +1,26 @@
-// google-login.service.ts
 import { Injectable } from '@angular/core';
-import {UserProfile} from "./interfaces/UserProfile";
-import axios from "axios";
-import {MyAuthService} from "./MyAuth";
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { UserProfile } from './interfaces/UserProfile';
 import { Config } from '../config';
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProfileService {
 
-  userProfile:UserProfile|null = null;
+  userProfile: UserProfile | null = null;
 
-  constructor(private myAuthService:MyAuthService) {
-  }
+  constructor(private http: HttpClient) {}
 
- async getUserContent(): Promise<void>
-  {
-    var link = Config.address + "api/ProfileEndpoint/GetUserInfo";
-    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-
-    try{
-    const response = await axios.get(link, {headers:{'my-auth-token': token}});
-    this.userProfile = response?.data;
+  async getUserContent(): Promise<void> {
+    const link = Config.address + 'api/ProfileEndpoint/GetUserInfo';
+    try {
+      this.userProfile = await firstValueFrom(
+        this.http.get<UserProfile>(link)
+      );
     } catch {
       // silently fail — profile will remain null
     }
   }
-
-
-
 }

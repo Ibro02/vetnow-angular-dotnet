@@ -9,7 +9,8 @@ import { ToasterService } from '../../services/toaster.service';
 import { TableComponent, TableColumn, TableAction } from '../../components/common/table/table.component';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
 import { CalendarComponent } from '../../components/common/calendar/calendar.component';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Config } from '../../config';
 import { listStagger, fadeIn, scaleIn } from '../../animations/shared.animations';
 
@@ -63,7 +64,8 @@ export class MyAppointmentsComponent implements OnInit {
     private profileService: ProfileService,
     private appointmentService: AppointmentService,
     private toaster: ToasterService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
   ) {}
 
   async ngOnInit() {
@@ -156,8 +158,10 @@ export class MyAppointmentsComponent implements OnInit {
 
     try {
       const dateStr = appt.slotDateTime.split('T')[0];
-      const { data } = await axios.get(
-        Config.address + `api/TimeSlot/Get?employeeid=${appt.employeeId}&date=${dateStr}`
+      const data = await firstValueFrom(
+        this.http.get<any[]>(
+          Config.address + `api/TimeSlot/Get?employeeid=${appt.employeeId}&date=${dateStr}`
+        )
       );
       this.availableSlots = Array.isArray(data) ? data : [];
     } catch {

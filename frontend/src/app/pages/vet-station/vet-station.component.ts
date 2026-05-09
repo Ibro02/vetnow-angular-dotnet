@@ -10,7 +10,8 @@ import { HeaderTitleComponent } from "../../components/common/header-title/heade
 import { NgFor, NgIf } from '@angular/common';
 import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import axios, { AxiosResponse } from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
 import {ToasterService} from "../../services/toaster.service";
 import {MyAuthService} from "../../services/MyAuth";
@@ -74,7 +75,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
     stationImage:  new FormControl(''),
   });
 
-  constructor(private fb: FormBuilder, public toaster: ToasterService, private myAuthService: MyAuthService) {
+  constructor(private fb: FormBuilder, public toaster: ToasterService, private myAuthService: MyAuthService, private http: HttpClient) {
     this.fetchVetStationInfo();
   }
 
@@ -160,53 +161,44 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const token = localStorage.getItem('my-auth-token') || sessionStorage.getItem('my-auth-token');
     const apiUrl = Config.address + `api/VetStation/Edit/${this.id}`;
 
-    await axios
-      .put(apiUrl, this.vetStationFormGroup.value, {
-        headers: { 'my-auth-token': token }
-      })
-      .then(() => {
-        this.toaster.success("Changes saved successfully!");
-      })
-      .catch((err) => {
-        this.toaster.error("Whops!", err.message);
-      });
+    try {
+      await firstValueFrom(
+        this.http.put(apiUrl, this.vetStationFormGroup.value)
+      );
+      this.toaster.success("Changes saved successfully!");
+    } catch (err: any) {
+      this.toaster.error("Whops!", err.message);
+    }
   }
 
   fetchVetStationInfo = async () => {
-
-    const token = localStorage.getItem('my-auth-token') || sessionStorage.getItem('my-auth-token');
     const apiUrl = Config.address + `api/VetStation/Get?id=${this.id}`;
 
-    await axios
-      .get(apiUrl, {
-        headers: { 'my-auth-token': token }
-      })
-      .then((response: AxiosResponse<IVetStation[]>) => {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<IVetStation[]>(apiUrl)
+      );
+      const data = response[0];
 
-        const data = response.data[0];
-
-        this.vetStationFormGroup.patchValue({
-          name: data.name,
-          country: data.country,
-          city: data.city,
-          contactNumber: data.contactNumber,
-          email: data.email,
-          address: data.address,
-          description: data.description,
-          onField: data.onField,
-          inOffice: data.inOffice,
-          parking: data.parking,
-          wheelchair: data.wheelchair,
-          wifi: data.wifi,
-        });
-
-      })
-      .catch((error: Error) => {
-        // failed to fetch vet station
+      this.vetStationFormGroup.patchValue({
+        name: data.name,
+        country: data.country,
+        city: data.city,
+        contactNumber: data.contactNumber,
+        email: data.email,
+        address: data.address,
+        description: data.description,
+        onField: data.onField,
+        inOffice: data.inOffice,
+        parking: data.parking,
+        wheelchair: data.wheelchair,
+        wifi: data.wifi,
       });
+    } catch {
+      // failed to fetch vet station
+    }
   };
 
   handleChange(id: number) {

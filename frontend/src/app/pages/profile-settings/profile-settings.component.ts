@@ -10,7 +10,8 @@ import {PageTitleContainerComponent} from "../../components/common/page-title-co
 import {TitleComponent} from "../../components/common/title/title.component";
 import {VetCardComponent} from "../../components/group/vet-card/vet-card.component";
 import {SettingsCardComponent} from "../../components/group/settings-card/settings-card.component";
-import axios, {AxiosResponse} from "axios";
+import { HttpClient } from "@angular/common/http";
+import { firstValueFrom } from "rxjs";
 import {NgIf} from "@angular/common";
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
@@ -62,6 +63,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
     private toaster: ToasterService,
     private router: Router,
     public i18n: I18nService,
+    private http: HttpClient,
   ) {}
 
   readonly passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,128}$/;
@@ -174,15 +176,12 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
   }
 
   async fetchProfileInfo() {
-    const token = this.myAuthService.token;
-    if (!token) return;
+    if (!this.myAuthService.getToken()) return;
 
     try {
-      const response = await axios.get(
-        Config.address + 'api/ProfileSettings/Get',
-        { headers: { 'my-auth-token': token } }
+      const data: any = await firstValueFrom(
+        this.http.get(Config.address + 'api/ProfileSettings/Get')
       );
-      const data = response.data;
 
       this.profileSettingsFormGroup.patchValue({
         firstName: data.firstName || '',
@@ -217,18 +216,15 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
       this.toaster.error('Validation Error', 'Password must be 8–128 characters with uppercase, lowercase, digit, and special character.');
       return;
     }
-    const token = this.myAuthService.token;
     const apiUrl = Config.address + 'api/ProfileSettings/Edit';
-    await axios
-      .put(apiUrl, this.profileSettingsFormGroup.value, {
-        headers: { 'my-auth-token': token }
-      })
-      .then((response: AxiosResponse<any>) => {
-        this.toaster.success('Success!', 'Your operation completed successfully.');
-      })
-      .catch((err) => {
-        this.toaster.error('Error occurred.', err);
-      });
+    try {
+      await firstValueFrom(
+        this.http.put(apiUrl, this.profileSettingsFormGroup.value)
+      );
+      this.toaster.success('Success!', 'Your operation completed successfully.');
+    } catch (err) {
+      this.toaster.error('Error occurred.', 'Failed to save changes.');
+    }
   }
 
   receiveImageURL(event: string) {

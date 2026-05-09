@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { Subject, firstValueFrom } from 'rxjs';
 import { Config } from '../config';
-import { MyAuthService } from './MyAuth';
 
 export interface AppointmentDto {
   id: number;
@@ -29,41 +28,41 @@ export class AppointmentService {
   /** Emits whenever appointments are modified (cancel, reschedule) */
   changed$ = new Subject<void>();
 
-  constructor(private authService: MyAuthService) {}
-
-  private get headers() {
-    return { 'my-auth-token': this.authService.token ?? '' };
-  }
+  constructor(private http: HttpClient) {}
 
   async getByCustomerId(customerId: number): Promise<AppointmentDto[]> {
-    const { data } = await axios.get(
-      Config.address + `api/Appointment/GetByCustomerId?customerId=${customerId}`,
-      { headers: this.headers }
+    const data = await firstValueFrom(
+      this.http.get<AppointmentDto[]>(
+        Config.address + `api/Appointment/GetByCustomerId?customerId=${customerId}`
+      )
     );
     return Array.isArray(data) ? data : [];
   }
 
   async getByEmployeeId(employeeId: number): Promise<AppointmentDto[]> {
-    const { data } = await axios.get(
-      Config.address + `api/Appointment/GetByEmployeeId?employeeId=${employeeId}`,
-      { headers: this.headers }
+    const data = await firstValueFrom(
+      this.http.get<AppointmentDto[]>(
+        Config.address + `api/Appointment/GetByEmployeeId?employeeId=${employeeId}`
+      )
     );
     return Array.isArray(data) ? data : [];
   }
 
   async cancel(appointmentId: number): Promise<void> {
-    await axios.delete(
-      Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`,
-      { headers: this.headers }
+    await firstValueFrom(
+      this.http.delete(
+        Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`
+      )
     );
     this.changed$.next();
   }
 
   async reschedule(appointmentId: number, newTimeSlotId: number): Promise<void> {
-    await axios.put(
-      Config.address + `api/Appointment/Reschedule`,
-      { appointmentId, newTimeSlotId },
-      { headers: this.headers }
+    await firstValueFrom(
+      this.http.put(
+        Config.address + `api/Appointment/Reschedule`,
+        { appointmentId, newTimeSlotId }
+      )
     );
     this.changed$.next();
   }

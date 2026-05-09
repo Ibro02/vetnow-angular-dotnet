@@ -9,7 +9,8 @@ import { TableComponent, TableColumn } from '../../components/common/table/table
 import { ProfileService } from '../../services/ProfileService';
 import { MyAuthService } from '../../services/MyAuth';
 import { Config } from '../../config';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import {
   DynamicFormCardComponent,
   DynamicFormConfig,
@@ -126,6 +127,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   constructor(
     private profileService: ProfileService,
     private authService: MyAuthService,
+    private http: HttpClient,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -150,9 +152,8 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           type:     'dropdown',
           required: true,
           loadOptions: async () => {
-            const { data } = await axios.get<any[]>(
-              Config.address + 'api/SpeciesGetAll/Get',
-              { headers: { 'my-auth-token': this.authService.token ?? '' } }
+            const data = await firstValueFrom(
+              this.http.get<any[]>(Config.address + 'api/SpeciesGetAll/Get')
             );
             return data.map((s: any) => ({
               id:   s.id,
@@ -166,9 +167,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           type:      'dropdown',
           dependsOn: 'animalSpeciesId',
           loadOptions: async (speciesId: any) => {
-            const { data } = await axios.get<any[]>(
-              Config.address + 'api/BreedGetBySpecies/Get?speciesId=' + speciesId,
-              { headers: { 'my-auth-token': this.authService.token ?? '' } }
+            const data = await firstValueFrom(
+              this.http.get<any[]>(
+                Config.address + 'api/BreedGetBySpecies/Get?speciesId=' + speciesId
+              )
             );
             return data.map((b: any) => ({
               id:   b.id,
@@ -233,9 +235,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
         .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
         .join('&');
 
-      const { data } = await axios.get<PagedResponse<PetResponse>>(
-        Config.address + url + '?' + queryString,
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
+      const data = await firstValueFrom(
+        this.http.get<PagedResponse<PetResponse>>(
+          Config.address + url + '?' + queryString
+        )
       );
 
       this.pets = data.dataItems;
@@ -310,9 +313,8 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
   async deletePet(petId: number): Promise<void> {
     try {
-      await axios.delete(
-        Config.address + 'api/Pets/SoftDelete?id=' + petId,
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
+      await firstValueFrom(
+        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + petId)
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
@@ -322,10 +324,8 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
   async restorePet(petId: number): Promise<void> {
     try {
-      await axios.put(
-        Config.address + 'api/Pets/Restore?id=' + petId,
-        {},
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
+      await firstValueFrom(
+        this.http.put(Config.address + 'api/Pets/Restore?id=' + petId, {})
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
@@ -389,10 +389,8 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
         requestBody.picture = formData['picture'];
       }
 
-      await axios.post(
-        Config.address + 'api/PetsUpdateOrInsert/Save',
-        requestBody,
-        { headers: { 'my-auth-token': this.authService.token ?? '' } }
+      await firstValueFrom(
+        this.http.post(Config.address + 'api/PetsUpdateOrInsert/Save', requestBody)
       );
 
       this.showPetForm = false;
@@ -419,11 +417,9 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     try {
       const url = `${Config.address}api/PetsReport/Generate?OwnerId=${ownerId}`;
 
-      const response = await axios.get(url, {
-        headers: { 'my-auth-token': this.authService.token ?? '' },
-        responseType: 'blob'
-      });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = await firstValueFrom(
+        this.http.get(url, { responseType: 'blob' })
+      );
       const downloadUrl = window.URL.createObjectURL(blob);
 
       const link = document.createElement('a');

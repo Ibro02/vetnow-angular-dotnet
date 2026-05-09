@@ -3,7 +3,8 @@ import { CalendarComponent } from '../common/calendar/calendar.component'; // Im
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForOf, NgIf, NgClass, DatePipe } from "@angular/common";
 import { FormsModule } from '@angular/forms';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Config } from '../../config';
 import { Employee } from "./Employee";
 import { Animal } from "../../pages/appointment-page/Animal";
@@ -72,7 +73,8 @@ export class VetStationHomePageComponent implements OnInit {
     private router: Router,
     private profileService: ProfileService,
     private toaster: ToasterService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private http: HttpClient,
   ) {
     this.route.params.subscribe(params => this.vetStationId = +params["id"]);
   }
@@ -83,23 +85,21 @@ export class VetStationHomePageComponent implements OnInit {
     this.fetchPets();
   }
 
-  private getToken(): string | null {
-    return window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-  }
-
   async fetchVetStats() {
     try {
-      const token = this.getToken();
-      const { data } = await axios.get(Config.address + "api/VetStation/Get/", { params: { id: this.vetStationId }, headers: { 'my-auth-token': token } });
+      const data: any[] = await firstValueFrom(
+        this.http.get<any[]>(Config.address + 'api/VetStation/Get/', { params: { id: this.vetStationId } })
+      );
       this.vetStation = data[0];
-      this.vetStationFullAddress = `${this.vetStation.address}, ${this.vetStation.city},\n${this.vetStation.country}`
+      this.vetStationFullAddress = `${this.vetStation.address}, ${this.vetStation.city},\n${this.vetStation.country}`;
     } catch { /* failed to load vet station */ }
   }
 
   async fetchPets() {
     try {
-      const token = this.getToken();
-      const { data } = await axios.get(Config.address + `api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`, { headers: { 'my-auth-token': token } });
+      const data = await firstValueFrom(
+        this.http.get<Animal[]>(Config.address + `api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`)
+      );
       this.pets = Array.isArray(data) ? data : [];
     } catch { this.pets = []; }
   }
@@ -108,8 +108,9 @@ export class VetStationHomePageComponent implements OnInit {
     if (!this.selectedEmployee) return;
     this.isLoadingSlots = true;
     try {
-      const token = this.getToken();
-      const { data } = await axios.get(Config.address + `api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`, { headers: { 'my-auth-token': token } });
+      const data = await firstValueFrom(
+        this.http.get<TimeSlot[]>(Config.address + `api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`)
+      );
       this.timeSlots = Array.isArray(data) ? data : [];
     } catch { this.timeSlots = []; }
     finally { this.isLoadingSlots = false; }
@@ -118,8 +119,9 @@ export class VetStationHomePageComponent implements OnInit {
   async selectService(service: any) {
     this.selectedServiceId = service.id;
     this.selectedEmployee = undefined;
-    const token = this.getToken();
-    const { data } = await axios.get(Config.address + service.api, { params: { id: this.vetStationId }, headers: { 'my-auth-token': token } });
+    const data = await firstValueFrom(
+      this.http.get<Employee[]>(Config.address + service.api, { params: { id: this.vetStationId } })
+    );
     this.employeeList = data;
   }
   toggleGallery(state: boolean) {
@@ -165,8 +167,9 @@ export class VetStationHomePageComponent implements OnInit {
   async confirmBooking() {
     if (!this.selectedPet) return this.toaster.error("Selection Required", "Please select a pet.");
     try {
-      const token = this.getToken();
-      await axios.post(Config.address + "api/Appointment/Add", this.newAppointment, { headers: { 'my-auth-token': token } });
+      await firstValueFrom(
+        this.http.post(Config.address + 'api/Appointment/Add', this.newAppointment)
+      );
       this.toaster.success("Booked!", "See you soon.");
       this.router.navigate(['/home-page']);
     } catch { this.toaster.error("Error", "Booking failed."); }

@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
 import { MyAuthService } from '../../services/MyAuth';
 import { ToasterService } from '../../services/toaster.service';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../enviroment';
 
 @Component({
@@ -22,21 +23,18 @@ export class AvailabilitySettingsComponent implements OnInit {
   employees: any[] = [];
   selectedEmployeeId: number | null = null;
 
-  private get headers() {
-    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-    return { 'my-auth-token': token ?? '' };
-  }
-
   constructor(
     public auth: MyAuthService,
     private toaster: ToasterService,
+    private http: HttpClient,
   ) {}
 
   async ngOnInit() {
     if (this.auth.isAdminUser()) {
       try {
-        const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/Employees`, { headers: this.headers });
-        this.employees = data;
+        this.employees = await firstValueFrom(
+          this.http.get<any[]>(`${environment.apiUrl}/api/AdminPanel/Employees`)
+        );
       } catch {}
     }
   }
@@ -60,19 +58,21 @@ export class AvailabilitySettingsComponent implements OnInit {
 
     this.loading = true;
     try {
-      await axios.post(`${environment.apiUrl}/api/Availability/Add`, {
-        employeeId: employeeId,
-        availableFrom: '09:00',
-        availableTo: '17:00',
-        breakFrom: '10:30',
-        breakTo: '11:00',
-        appointmentDuaration: '35',
-      }, { headers: this.headers });
+      await firstValueFrom(
+        this.http.post(`${environment.apiUrl}/api/Availability/Add`, {
+          employeeId: employeeId,
+          availableFrom: '09:00',
+          availableTo: '17:00',
+          breakFrom: '10:30',
+          breakTo: '11:00',
+          appointmentDuaration: '35',
+        })
+      );
 
       this.toaster.success('Success', 'Availability generated successfully!');
       this.generated = true;
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to generate availability');
+      this.toaster.error('Error', err.error ?? 'Failed to generate availability');
     } finally {
       this.loading = false;
     }

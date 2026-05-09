@@ -3,7 +3,8 @@ import { NgIf, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableComponent, TableColumn, TableAction } from '../../components/common/table/table.component';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
-import axios from 'axios';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../enviroment';
 import { ToasterService } from '../../services/toaster.service';
 
@@ -112,12 +113,7 @@ export class AdminPanelComponent implements OnInit {
 
   detailTab: 'employees' | 'info' = 'employees';
 
-  private get headers() {
-    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-    return { 'my-auth-token': token ?? '' };
-  }
-
-  constructor(private toaster: ToasterService) {}
+  constructor(private toaster: ToasterService, private http: HttpClient) {}
 
   async ngOnInit() {
     await this.loadRoles();
@@ -139,14 +135,13 @@ export class AdminPanelComponent implements OnInit {
     try {
       const params: any = { page: this.usersPage, pageSize: this.usersPageSize };
       if (this.usersSearch) params.search = this.usersSearch;
-      const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/Users`, {
-        params,
-        headers: this.headers,
-      });
+      const data: any = await firstValueFrom(
+        this.http.get(`${environment.apiUrl}/api/AdminPanel/Users`, { params })
+      );
       this.users = data.users;
       this.usersTotalCount = data.totalCount;
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to load users');
+      this.toaster.error('Error', err.error ?? 'Failed to load users');
     }
   }
 
@@ -174,13 +169,13 @@ export class AdminPanelComponent implements OnInit {
     } else if (event.action === 'delete') {
       if (!confirm(`Delete user "${event.row.username}"?`)) return;
       try {
-        await axios.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, {
-          params: { id: event.row.id }, headers: this.headers,
-        });
+        await firstValueFrom(
+          this.http.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, { params: { id: event.row.id } })
+        );
         this.toaster.success('Success', 'User deleted');
         await this.loadUsers();
       } catch (err: any) {
-        this.toaster.error('Error', err.response?.data ?? 'Failed to delete user');
+        this.toaster.error('Error', err.error ?? 'Failed to delete user');
       }
     }
   }
@@ -221,39 +216,45 @@ export class AdminPanelComponent implements OnInit {
     }
     try {
       if (this.isNewUser) {
-        await axios.post(`${environment.apiUrl}/api/AdminPanel/Users/Add`, this.userForm, { headers: this.headers });
+        await firstValueFrom(
+          this.http.post(`${environment.apiUrl}/api/AdminPanel/Users/Add`, this.userForm)
+        );
         this.toaster.success('Success', 'User created');
       } else {
-        await axios.put(`${environment.apiUrl}/api/AdminPanel/Users/Update`, {
-          id: this.userForm.id,
-          firstName: this.userForm.firstName,
-          lastName: this.userForm.lastName,
-          email: this.userForm.email,
-          username: this.userForm.username,
-          phone: this.userForm.phone,
-          city: this.userForm.city,
-          country: this.userForm.country,
-          roleId: this.userForm.roleId,
-        }, { headers: this.headers });
+        await firstValueFrom(
+          this.http.put(`${environment.apiUrl}/api/AdminPanel/Users/Update`, {
+            id: this.userForm.id,
+            firstName: this.userForm.firstName,
+            lastName: this.userForm.lastName,
+            email: this.userForm.email,
+            username: this.userForm.username,
+            phone: this.userForm.phone,
+            city: this.userForm.city,
+            country: this.userForm.country,
+            roleId: this.userForm.roleId,
+          })
+        );
         this.toaster.success('Success', 'User updated');
       }
       this.showUserModal = false;
       await this.loadUsers();
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to save user');
+      this.toaster.error('Error', err.error ?? 'Failed to save user');
     }
   }
 
   async saveRole() {
     try {
-      await axios.put(`${environment.apiUrl}/api/AdminPanel/Users/Update`, {
-        id: this.selectedUser.id, roleId: this.selectedRoleId,
-      }, { headers: this.headers });
+      await firstValueFrom(
+        this.http.put(`${environment.apiUrl}/api/AdminPanel/Users/Update`, {
+          id: this.selectedUser.id, roleId: this.selectedRoleId,
+        })
+      );
       this.toaster.success('Success', 'Role updated');
       this.showRoleModal = false;
       await this.loadUsers();
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to update role');
+      this.toaster.error('Error', err.error ?? 'Failed to update role');
     }
   }
 
@@ -265,14 +266,13 @@ export class AdminPanelComponent implements OnInit {
     try {
       const params: any = { page: this.stationsPage, pageSize: this.stationsPageSize };
       if (this.stationsSearch) params.search = this.stationsSearch;
-      const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/VetStations`, {
-        params,
-        headers: this.headers,
-      });
+      const data: any = await firstValueFrom(
+        this.http.get(`${environment.apiUrl}/api/AdminPanel/VetStations`, { params })
+      );
       this.stations = data.stations;
       this.stationsTotalCount = data.totalCount;
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to load stations');
+      this.toaster.error('Error', err.error ?? 'Failed to load stations');
     }
   }
 
@@ -330,10 +330,14 @@ export class AdminPanelComponent implements OnInit {
     }
     try {
       if (this.isNewStation) {
-        await axios.post(`${environment.apiUrl}/api/AdminPanel/VetStations/Add`, this.stationForm, { headers: this.headers });
+        await firstValueFrom(
+          this.http.post(`${environment.apiUrl}/api/AdminPanel/VetStations/Add`, this.stationForm)
+        );
         this.toaster.success('Success', 'Vet station created');
       } else {
-        await axios.put(`${environment.apiUrl}/api/AdminPanel/VetStations/Update`, this.stationForm, { headers: this.headers });
+        await firstValueFrom(
+          this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/Update`, this.stationForm)
+        );
         this.toaster.success('Success', 'Vet station updated');
       }
       this.showStationModal = false;
@@ -342,21 +346,21 @@ export class AdminPanelComponent implements OnInit {
         await this.openStationDetail(this.stationForm.id);
       }
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to save station');
+      this.toaster.error('Error', err.error ?? 'Failed to save station');
     }
   }
 
   async deleteStation(row: any) {
     if (!confirm(`Delete station "${row.name}"?`)) return;
     try {
-      await axios.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, {
-        params: { id: row.id }, headers: this.headers,
-      });
+      await firstValueFrom(
+        this.http.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, { params: { id: row.id } })
+      );
       this.toaster.success('Success', 'Vet station deleted');
       this.showStationDetail = false;
       await this.loadStations();
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to delete station');
+      this.toaster.error('Error', err.error ?? 'Failed to delete station');
     }
   }
 
@@ -366,9 +370,9 @@ export class AdminPanelComponent implements OnInit {
 
   async openStationDetail(stationId: number) {
     try {
-      const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/VetStations/Details/${stationId}`, {
-        headers: this.headers,
-      });
+      const data: any = await firstValueFrom(
+        this.http.get(`${environment.apiUrl}/api/AdminPanel/VetStations/Details/${stationId}`)
+      );
       this.stationDetail = data.station;
       this.stationEmployees = data.employees;
       this.stationMetrics = data.metrics;
@@ -376,7 +380,7 @@ export class AdminPanelComponent implements OnInit {
       this.showStationDetail = true;
       this.detailTab = 'employees';
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to load station details');
+      this.toaster.error('Error', err.error ?? 'Failed to load station details');
     }
   }
 
@@ -388,31 +392,37 @@ export class AdminPanelComponent implements OnInit {
   async onStationEmpAction(event: { action: string; row: any }) {
     if (event.action === 'setMainVet') {
       try {
-        await axios.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignMainVet`, {
-          employeeId: event.row.id, vetStationId: this.stationDetail.id,
-        }, { headers: this.headers });
+        await firstValueFrom(
+          this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignMainVet`, {
+            employeeId: event.row.id, vetStationId: this.stationDetail.id,
+          })
+        );
         this.toaster.success('Success', `${event.row.firstName} ${event.row.lastName} set as Main Vet`);
         await this.openStationDetail(this.stationDetail.id);
       } catch (err: any) {
-        this.toaster.error('Error', err.response?.data ?? 'Failed to assign main vet');
+        this.toaster.error('Error', err.error ?? 'Failed to assign main vet');
       }
     } else if (event.action === 'remove') {
       if (!confirm(`Remove ${event.row.firstName} ${event.row.lastName} from this station?`)) return;
       try {
-        await axios.put(`${environment.apiUrl}/api/AdminPanel/VetStations/RemoveEmployee`, {
-          employeeId: event.row.id, vetStationId: this.stationDetail.id,
-        }, { headers: this.headers });
+        await firstValueFrom(
+          this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/RemoveEmployee`, {
+            employeeId: event.row.id, vetStationId: this.stationDetail.id,
+          })
+        );
         this.toaster.success('Success', 'Employee removed from station');
         await this.openStationDetail(this.stationDetail.id);
       } catch (err: any) {
-        this.toaster.error('Error', err.response?.data ?? 'Failed to remove employee');
+        this.toaster.error('Error', err.error ?? 'Failed to remove employee');
       }
     }
   }
 
   async openAssignEmployee() {
     try {
-      const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/Employees/Unassigned`, { headers: this.headers });
+      const data: any = await firstValueFrom(
+        this.http.get(`${environment.apiUrl}/api/AdminPanel/Employees/Unassigned`)
+      );
       this.unassignedEmployees = data;
       this.selectedAssignEmployeeId = null;
       this.assignMode = 'select';
@@ -430,14 +440,16 @@ export class AdminPanelComponent implements OnInit {
       return;
     }
     try {
-      await axios.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignEmployee`, {
-        employeeId: this.selectedAssignEmployeeId, vetStationId: this.stationDetail.id,
-      }, { headers: this.headers });
+      await firstValueFrom(
+        this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignEmployee`, {
+          employeeId: this.selectedAssignEmployeeId, vetStationId: this.stationDetail.id,
+        })
+      );
       this.toaster.success('Success', 'Employee assigned to station');
       this.showAssignModal = false;
       await this.openStationDetail(this.stationDetail.id);
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to assign employee');
+      this.toaster.error('Error', err.error ?? 'Failed to assign employee');
     }
   }
 
@@ -468,15 +480,17 @@ export class AdminPanelComponent implements OnInit {
       return;
     }
     try {
-      await axios.post(`${environment.apiUrl}/api/AdminPanel/Employees/Add`, {
-        ...this.newEmployeeForm,
-        vetStationId: this.stationDetail.id,
-      }, { headers: this.headers });
+      await firstValueFrom(
+        this.http.post(`${environment.apiUrl}/api/AdminPanel/Employees/Add`, {
+          ...this.newEmployeeForm,
+          vetStationId: this.stationDetail.id,
+        })
+      );
       this.toaster.success('Success', 'Employee created and assigned');
       this.showAssignModal = false;
       await this.openStationDetail(this.stationDetail.id);
     } catch (err: any) {
-      this.toaster.error('Error', err.response?.data ?? 'Failed to create employee');
+      this.toaster.error('Error', err.error ?? 'Failed to create employee');
     }
   }
 
@@ -484,8 +498,9 @@ export class AdminPanelComponent implements OnInit {
 
   async loadRoles() {
     try {
-      const { data } = await axios.get(`${environment.apiUrl}/api/AdminPanel/Roles`, { headers: this.headers });
-      this.roles = data;
+      this.roles = await firstValueFrom(
+        this.http.get<any[]>(`${environment.apiUrl}/api/AdminPanel/Roles`)
+      );
     } catch {}
   }
 }

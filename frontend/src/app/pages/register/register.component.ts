@@ -3,9 +3,10 @@ import { OtherSignUpMethodsComponent } from "../../components/other-sign-up-meth
 import { SignInInputComponent } from "../../components/common/sign-in-input/sign-in-input.component";
 import { PasswordStrengthMeterComponent } from "../../components/common/password-strength-meter/password-strength-meter.component";
 import { MyAuthService } from '../../services/MyAuth';
-import axios from "axios";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Router, RouterLink } from "@angular/router";
 import { ToasterService } from '../../services/toaster.service';
+import { Config } from '../../config';
 import { shake, fadeIn, slideStep } from '../../animations/shared.animations';
 
 @Component({
@@ -25,7 +26,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     public router: Router,
     private myAuthService: MyAuthService,
-    private toaster: ToasterService
+    private toaster: ToasterService,
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {}
@@ -89,24 +91,21 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    let link = "https://localhost:44308/api/Person/Add";
-    axios.post(link, this.newUser, {
-      headers: {
-        'my-auth-token': (window.sessionStorage.getItem('my-auth-token'))
-      }
-    })
-    .then(x => {
-      this.router.navigate(["home-page"]);
-      this.toaster.success('Success!', 'You have been registered successfully!');
-    })
-    .catch(err => {
-      if (!err.response.data.errors)
-        this.toaster.error("Error", err.response.data);
-      else {
-        for (let i in err?.response.data?.errors) {
-          this.toaster.error("Error", err?.response.data?.errors[i][0]);
+    const link = Config.address + 'api/Person/Add';
+    this.http.post(link, this.newUser).subscribe({
+      next: () => {
+        this.router.navigate(['home-page']);
+        this.toaster.success('Success!', 'You have been registered successfully!');
+      },
+      error: (err: HttpErrorResponse) => {
+        if (!err.error?.errors)
+          this.toaster.error('Error', err.error);
+        else {
+          for (const i in err.error?.errors) {
+            this.toaster.error('Error', err.error?.errors[i][0]);
+          }
         }
-      }
+      },
     });
   }
 

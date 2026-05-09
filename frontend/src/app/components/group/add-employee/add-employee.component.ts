@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { ButtonComponent } from "../../common/button/button.component";
 import { ToasterService } from '../../../services/toaster.service';
-import axios from 'axios';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Config } from '../../../config';
 
 /** Birth date must be in the past and the employee must be at least 18 years old. */
@@ -67,7 +67,7 @@ export class AddEmployeeComponent implements OnInit {
     this.openModal();
   }
 
-  constructor(private fb: FormBuilder, private toaster: ToasterService) {
+  constructor(private fb: FormBuilder, private toaster: ToasterService, private http: HttpClient) {
     this.employeeForm = this.fb.group({
       firstName:           ['', [Validators.required, Validators.maxLength(50),
                                   Validators.pattern(/^[a-zA-Z\u00C0-\u024F\s'\-]+$/)]],
@@ -134,42 +134,42 @@ export class AddEmployeeComponent implements OnInit {
     }
 
     if (this.isEditMode) {
-      const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
       const updatePayload: any = { id: this.editEmployee.id, ...newEmployee };
       // Remove password if empty (not changed)
       if (!updatePayload.password) delete updatePayload.password;
 
       const url = `${Config.address}api/Employee/Edit`;
-      axios.put(url, updatePayload, { headers: { 'my-auth-token': token } })
-        .then(() => {
+      this.http.put(url, updatePayload).subscribe({
+        next: () => {
           this.toaster.success('Success', 'Employee updated successfully.');
           this.event.emit();
           this.closeModal();
-        })
-        .catch((error) => {
-          const raw: string = error.response?.data ?? error.message ?? 'An unexpected error occurred.';
+        },
+        error: (error: HttpErrorResponse) => {
+          const raw: string = error.error ?? error.message ?? 'An unexpected error occurred.';
           raw.split(';')
              .map((s: string) => s.trim())
              .filter(Boolean)
              .forEach((msg: string) => this.toaster.error('Error', msg));
-        });
+        },
+      });
     } else {
-      const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
       const url = `${Config.address}api/EmployeeEndpoint/AddNewEmployee`;
-      axios.post(url, newEmployee, { headers: { 'my-auth-token': token } })
-        .then(() => {
+      this.http.post(url, newEmployee).subscribe({
+        next: () => {
           this.toaster.success('Success', 'Employee added successfully.');
           this.event.emit();
           this.closeModal();
-        })
-        .catch((error) => {
+        },
+        error: (error: HttpErrorResponse) => {
           // Backend returns semicolon-separated error messages — show each as its own toast.
-          const raw: string = error.response?.data ?? error.message ?? 'An unexpected error occurred.';
+          const raw: string = error.error ?? error.message ?? 'An unexpected error occurred.';
           raw.split(';')
              .map((s: string) => s.trim())
              .filter(Boolean)
              .forEach((msg: string) => this.toaster.error('Validation Error', msg));
-        });
+        },
+      });
     }
   }
 

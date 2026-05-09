@@ -4,7 +4,8 @@ import { TableComponent, TableColumn, TableAction } from '../../components/commo
 import { AddEmployeeComponent } from '../../components/group/add-employee/add-employee.component';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
 import { MyAuthService } from '../../services/MyAuth';
-import axios from 'axios';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import {environment} from "../../../enviroment";
 import {ToasterService} from "../../services/toaster.service";
 
@@ -53,13 +54,13 @@ export class EmployeeListComponent implements OnInit {
   constructor(
     public toaster: ToasterService,
     public auth: MyAuthService,
+    private http: HttpClient,
   ) {}
 
   async ngOnInit(): Promise<void> {
-    const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-    const { data } = await axios.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`, {
-      headers: { 'my-auth-token': token }
-    });
+    const data: any = await firstValueFrom(
+      this.http.get(`${environment.apiUrl}/api/Employee/GetAllEmployees`)
+    );
     this.employees = data.dataItems;
   }
 
@@ -69,13 +70,14 @@ export class EmployeeListComponent implements OnInit {
       this.editingEmployee = event.row;
       this.showAddEmployee = true;
     } else if (event.action === 'delete') {
-      let url: string = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
-      const token = window.localStorage.getItem('my-auth-token') ?? window.sessionStorage.getItem('my-auth-token');
-      axios.delete(url, { headers: { 'my-auth-token': token } }).then(() => {
-        this.toaster.success("Success", "Employee deleted successfully!");
-        this.ngOnInit();
-      })
-        .catch((er) => this.toaster.error("Whops!", `Something went wrong!\n ${er.message}`));
+      const url = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
+      this.http.delete(url).subscribe({
+        next: () => {
+          this.toaster.success('Success', 'Employee deleted successfully!');
+          this.ngOnInit();
+        },
+        error: (er) => this.toaster.error('Whops!', `Something went wrong!\n ${er.message}`),
+      });
     }
   }
 }
