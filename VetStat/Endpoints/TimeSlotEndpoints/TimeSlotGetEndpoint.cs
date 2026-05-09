@@ -27,7 +27,7 @@ public class TimeSlotGetEndpoint : MyEndpointBase
             return Ok(_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid)
                 .Where(x => x.SlotDateTime.Day == _date.Day &&
                     x.SlotDateTime.Month == _date.Month &&
-                    x.SlotDateTime.Day == _date.Day).Where(x => x.IsAvailable).Select(x => new
+                    x.SlotDateTime.Year == _date.Year).Where(x => x.IsAvailable).Select(x => new
                     {
                         x.Id,
                         appointmentTime = x.AppointmentTime.ToString(@"hh\:mm"),
