@@ -170,7 +170,7 @@ export class AdminPanelComponent implements OnInit {
       if (!confirm(`Delete user "${event.row.username}"?`)) return;
       try {
         await firstValueFrom(
-          this.http.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, { params: { id: event.row.id } })
+          this.http.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, { params: { id: event.row.id }, responseType: 'text' })
         );
         this.toaster.success('Success', 'User deleted');
         await this.loadUsers();
@@ -354,7 +354,7 @@ export class AdminPanelComponent implements OnInit {
     if (!confirm(`Delete station "${row.name}"?`)) return;
     try {
       await firstValueFrom(
-        this.http.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, { params: { id: row.id } })
+        this.http.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, { params: { id: row.id }, responseType: 'text' })
       );
       this.toaster.success('Success', 'Vet station deleted');
       this.showStationDetail = false;
@@ -395,7 +395,7 @@ export class AdminPanelComponent implements OnInit {
         await firstValueFrom(
           this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignMainVet`, {
             employeeId: event.row.id, vetStationId: this.stationDetail.id,
-          })
+          }, { responseType: 'text' })
         );
         this.toaster.success('Success', `${event.row.firstName} ${event.row.lastName} set as Main Vet`);
         await this.openStationDetail(this.stationDetail.id);
@@ -408,12 +408,12 @@ export class AdminPanelComponent implements OnInit {
         await firstValueFrom(
           this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/RemoveEmployee`, {
             employeeId: event.row.id, vetStationId: this.stationDetail.id,
-          })
+          }, { responseType: 'text' })
         );
         this.toaster.success('Success', 'Employee removed from station');
         await this.openStationDetail(this.stationDetail.id);
       } catch (err: any) {
-        this.toaster.error('Error', err.error ?? 'Failed to remove employee');
+        this.toaster.error('Error', err.message ?? 'Failed to remove employee');
       }
     }
   }
@@ -443,13 +443,13 @@ export class AdminPanelComponent implements OnInit {
       await firstValueFrom(
         this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/AssignEmployee`, {
           employeeId: this.selectedAssignEmployeeId, vetStationId: this.stationDetail.id,
-        })
+        }, { responseType: 'text' })
       );
       this.toaster.success('Success', 'Employee assigned to station');
       this.showAssignModal = false;
       await this.openStationDetail(this.stationDetail.id);
     } catch (err: any) {
-      this.toaster.error('Error', err.error ?? 'Failed to assign employee');
+      this.toaster.error('Error', err.message ?? 'Failed to assign employee');
     }
   }
 

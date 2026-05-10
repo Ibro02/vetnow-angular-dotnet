@@ -80,7 +80,7 @@ export class MyAuthService {
       // Send the DELETE with explicit header since we just cleared storage
       // (the interceptor would read null from storage at this point)
       this.http
-        .delete(link, { headers: { 'my-auth-token': token } })
+        .delete(link, { headers: { 'my-auth-token': token }, responseType: 'text' })
         .subscribe({ error: () => {} });
     }
 

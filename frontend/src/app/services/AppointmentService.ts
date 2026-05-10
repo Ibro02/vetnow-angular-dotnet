@@ -51,7 +51,8 @@ export class AppointmentService {
   async cancel(appointmentId: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(
-        Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`
+        Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`,
+        { responseType: 'text' }
       )
     );
     this.changed$.next();
@@ -61,7 +62,8 @@ export class AppointmentService {
     await firstValueFrom(
       this.http.put(
         Config.address + `api/Appointment/Reschedule`,
-        { appointmentId, newTimeSlotId }
+        { appointmentId, newTimeSlotId },
+        { responseType: 'text' }
       )
     );
     this.changed$.next();

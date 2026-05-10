@@ -71,7 +71,7 @@ export class EmployeeListComponent implements OnInit {
       this.showAddEmployee = true;
     } else if (event.action === 'delete') {
       const url = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
-      this.http.delete(url).subscribe({
+      this.http.delete(url, { responseType: 'text' }).subscribe({
         next: () => {
           this.toaster.success('Success', 'Employee deleted successfully!');
           this.ngOnInit();

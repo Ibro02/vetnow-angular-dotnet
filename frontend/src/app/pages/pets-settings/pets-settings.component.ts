@@ -314,7 +314,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   async deletePet(petId: number): Promise<void> {
     try {
       await firstValueFrom(
-        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + petId)
+        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + petId, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
@@ -325,7 +325,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
   async restorePet(petId: number): Promise<void> {
     try {
       await firstValueFrom(
-        this.http.put(Config.address + 'api/Pets/Restore?id=' + petId, {})
+        this.http.put(Config.address + 'api/Pets/Restore?id=' + petId, {}, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {

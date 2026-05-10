@@ -1,15 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Diagnostics.CodeAnalysis;
 
 namespace VetStat.Models
 {
+    /// <summary>
+    /// Employee inherits Person via TPT (Table-Per-Type).
+    /// Id is inherited from Person — do NOT redeclare it here.
+    /// The Employee table in the DB has its own Id column that is both PK
+    /// and FK to Person.Id; EF Core manages this automatically via TPT.
+    /// </summary>
     public class Employee : Person
     {
-        [Key, JsonIgnore]
-        public int Id { get; set; }
-
         [ForeignKey("VetStation")]
         public int? VetStationId { get; set; }
 
@@ -20,8 +22,5 @@ namespace VetStat.Models
         public DateTime DateOfEmployment { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-
-        [JsonIgnore]
-        public Person? Person { get; set; }
     }
 }

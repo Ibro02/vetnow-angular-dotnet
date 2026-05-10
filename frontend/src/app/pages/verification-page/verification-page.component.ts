@@ -28,7 +28,7 @@ export class VerificationPageComponent {
   }
   verifyUser() {
     const url = Config.address + 'Verification';
-    this.http.post(url, { token: this.token, userId: this.profileService.userProfile?.id })
+    this.http.post(url, { token: this.token, userId: this.profileService.userProfile?.id }, { responseType: 'text' })
       .subscribe({
         next: () => this.router.navigate(['/home-page']),
         error: () => alert('Verification Error!'),

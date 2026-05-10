@@ -219,7 +219,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
     const apiUrl = Config.address + 'api/ProfileSettings/Edit';
     try {
       await firstValueFrom(
-        this.http.put(apiUrl, this.profileSettingsFormGroup.value)
+        this.http.put(apiUrl, this.profileSettingsFormGroup.value, { responseType: 'text' })
       );
       this.toaster.success('Success!', 'Your operation completed successfully.');
     } catch (err) {

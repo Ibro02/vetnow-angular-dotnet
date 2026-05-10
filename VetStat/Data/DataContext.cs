@@ -18,17 +18,14 @@ namespace VetStat.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // TPT (Table-Per-Type) mapping: each type in the inheritance chain
+            // gets its own table. EF Core manages the shared PK/FK automatically.
+            modelBuilder.Entity<Person>().ToTable("Person");
+            modelBuilder.Entity<Employee>().ToTable("Employee");
             modelBuilder.Entity<Vet>().ToTable("Vet");
             modelBuilder.Entity<Nurse>().ToTable("Nurse");
             modelBuilder.Entity<Barber>().ToTable("Barber");
-            modelBuilder.Entity<Person>().ToTable("Person");
-            modelBuilder.Entity<MainVet>().ToTable("MainVet");   
-
-            modelBuilder.Entity<Employee>()
-            .HasOne(s => s.Person)
-            .WithMany()
-            .HasForeignKey(e => e.Id)
-            .IsRequired(false);
+            modelBuilder.Entity<MainVet>().ToTable("MainVet");
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Employee)

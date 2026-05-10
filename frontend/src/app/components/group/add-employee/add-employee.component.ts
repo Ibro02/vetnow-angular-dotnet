@@ -139,7 +139,7 @@ export class AddEmployeeComponent implements OnInit {
       if (!updatePayload.password) delete updatePayload.password;
 
       const url = `${Config.address}api/Employee/Edit`;
-      this.http.put(url, updatePayload).subscribe({
+      this.http.put(url, updatePayload, { responseType: 'text' }).subscribe({
         next: () => {
           this.toaster.success('Success', 'Employee updated successfully.');
           this.event.emit();
