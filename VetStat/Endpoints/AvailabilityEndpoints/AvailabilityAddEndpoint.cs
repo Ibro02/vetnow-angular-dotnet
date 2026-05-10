@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Auth;
+using VetStat.Helpers.Services.Appointment;
 using VetStat.Models;
 using VetStat.Validators;
 using static VetStat.Endpoints.AvailabilityEndpoints.AvailabilityAddEndpoint;
@@ -14,10 +15,12 @@ namespace VetStat.Endpoints.AvailabilityEndpoints;
 public class AvailabilityAddEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
+    private readonly TimeSlotGeneratorService _slotGenerator;
 
-    public AvailabilityAddEndpoint(DataContext db)
+    public AvailabilityAddEndpoint(DataContext db, TimeSlotGeneratorService slotGenerator)
     {
         _db = db;
+        _slotGenerator = slotGenerator;
     }
 
     [HttpPost("Add")]
@@ -47,37 +50,11 @@ public class AvailabilityAddEndpoint : MyEndpointBase
             _db.Availability.Add(newAvailability);
             _db.SaveChanges();
 
-            // Generate time slots for the next 30 days based on the availability
-            var duration = TimeSpan.FromMinutes(newAvailability.AppointmentDuration);
-            var slots = new List<TimeSlot>();
+            // Generate time slots for the next 30 days using the shared generator
+            var dates = Enumerable.Range(0, 30)
+                .Select(offset => DateTime.Today.AddDays(offset));
 
-            for (int dayOffset = 0; dayOffset < 30; dayOffset++)
-            {
-                var slotDate = DateTime.Today.AddDays(dayOffset);
-                var current = newAvailability.AvailableFrom;
-
-                while (current + duration <= newAvailability.AvailableTo)
-                {
-                    // Skip slots that overlap with the break window
-                    if (current < newAvailability.BreakTo && current + duration > newAvailability.BreakFrom)
-                    {
-                        current = newAvailability.BreakTo;
-                        continue;
-                    }
-
-                    slots.Add(new TimeSlot
-                    {
-                        AvailabilityId = newAvailability.Id,
-                        SlotEmployeeId = newAvailability.EmployeeId,
-                        SlotDateTime = slotDate + current,
-                        AppointmentTime = current,
-                        IsAvailable = true
-                    });
-
-                    current += duration;
-                }
-            }
-
+            var slots = _slotGenerator.GenerateSlots(newAvailability, dates);
             _db.TimeSlot.AddRange(slots);
             _db.SaveChanges();
         }

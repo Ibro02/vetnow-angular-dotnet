@@ -23,14 +23,23 @@ public class AvailabilityDeleteEndpoint : MyEndpointBase
         try
         {
             var availabilityToDelete = _db.Availability.SingleOrDefault(x => x.Id == id);
-            if (availabilityToDelete != null)
-            {
-                _db.Availability.Remove(availabilityToDelete);
-                _db.SaveChanges();
-                return Ok("Object deleted!");
-            }
-            else
+            if (availabilityToDelete == null)
                 return NotFound($"Availability with ID {id} not found.");
+
+            // Clean up future unbooked time slots before deleting the availability.
+            // Booked slots (IsAvailable = false) are preserved — they reference
+            // existing appointments that must not be silently removed.
+            var today = DateTime.Today;
+            var futureUnbookedSlots = _db.TimeSlot
+                .Where(ts => ts.AvailabilityId == id && ts.SlotDateTime >= today && ts.IsAvailable)
+                .ToList();
+
+            _db.TimeSlot.RemoveRange(futureUnbookedSlots);
+
+            _db.Availability.Remove(availabilityToDelete);
+            _db.SaveChanges();
+
+            return Ok($"Availability deleted and {futureUnbookedSlots.Count} future slots cleaned up.");
         }
         catch (Exception err)
         {

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using VetStat.Endpoints.VetStationSearchEndpoints;
 using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
+using VetStat.Helpers.Services.Appointment;
 using VetStat.Helpers.Services.Email;
 using VetStat.Helpers.Validators;
 using VetStat.Extensions;
@@ -22,6 +23,7 @@ builder.Services.AddHostedService<TokenCleanupService>();
 // DEV ENVIRONMENT: Generates time slots on startup and every 24h.
 // For production, replace with a proper scheduler (Hangfire, Quartz.NET, Azure Timer Trigger, etc.)
 builder.Services.AddHostedService<AppointmentGeneratorService>();
+builder.Services.AddScoped<TimeSlotGeneratorService>();
 
 // --- Authentication ---
 builder.Services.AddAuthentication(TokenAuthenticationDefaults.AuthenticationScheme)

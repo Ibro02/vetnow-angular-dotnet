@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers.Services.Appointment;
 using VetStat.Models;
 
 namespace VetStat.Helpers.Services
@@ -43,9 +44,10 @@ namespace VetStat.Helpers.Services
             {
                 using var scope = _serviceProvider.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var slotGenerator = scope.ServiceProvider.GetRequiredService<TimeSlotGeneratorService>();
 
                 await CleanupOldTimeSlots(db);
-                await GenerateTimeSlotsForAllEmployees(db);
+                await GenerateTimeSlotsForAllEmployees(db, slotGenerator);
             }
             catch (Exception ex)
             {
@@ -94,13 +96,13 @@ namespace VetStat.Helpers.Services
 
         /// <summary>
         /// Generates time slots 30 days in advance for all active employees that have availability set.
-        /// Skips non-working days, holidays, break times, and days that already have slots generated.
+        /// Skips non-working days, holidays, and days that already have slots generated.
         ///
         /// NOTE: We loop over Availability records instead of Employee records because
         /// Employee.Id (which hides Person.Id) is not reliably populated by EF due to
         /// the TPT inheritance setup. Availability.EmployeeId is a proper FK and always correct.
         /// </summary>
-        private async Task GenerateTimeSlotsForAllEmployees(DataContext db)
+        private async Task GenerateTimeSlotsForAllEmployees(DataContext db, TimeSlotGeneratorService slotGenerator)
         {
             // Get all availabilities for active (non-deleted) employees
             var availabilities = await db.Availability
@@ -112,7 +114,7 @@ namespace VetStat.Helpers.Services
             {
                 try
                 {
-                    await GenerateTimeSlotsForEmployee(db, availability);
+                    await GenerateTimeSlotsForEmployee(db, availability, slotGenerator);
                 }
                 catch (Exception ex)
                 {
@@ -121,7 +123,7 @@ namespace VetStat.Helpers.Services
             }
         }
 
-        private async Task GenerateTimeSlotsForEmployee(DataContext db, Availability availability)
+        private async Task GenerateTimeSlotsForEmployee(DataContext db, Availability availability, TimeSlotGeneratorService slotGenerator)
         {
             var employeeId = availability.EmployeeId!.Value;
 
@@ -151,10 +153,8 @@ namespace VetStat.Helpers.Services
                 .Distinct()
                 .ToListAsync();
 
-            // Calculate the time slot times (skip break period)
-            var slotTimes = CalculateSlotTimes(availability);
-
-            int totalSlotsGenerated = 0;
+            // Build list of dates that need slots generated
+            var datesToGenerate = new List<DateTime>();
 
             for (var date = today; date <= endDate; date = date.AddDays(1))
             {
@@ -163,68 +163,27 @@ namespace VetStat.Helpers.Services
                     continue;
 
                 // Skip if it's not a working day
-                //var dayName = date.DayOfWeek.ToString();
-                //if (!workingDayNames.Any(wd => wd.Equals(dayName, StringComparison.OrdinalIgnoreCase)))
-                //    continue;
+                var dayName = date.DayOfWeek.ToString();
+                if (workingDayNames.Any() && !workingDayNames.Any(wd => wd.Equals(dayName, StringComparison.OrdinalIgnoreCase)))
+                    continue;
 
                 // Skip if employee is on holiday
                 if (holidays.Any(h => date >= h.StartDate.Date && date <= h.EndDate.Date))
                     continue;
 
-                // Generate time slots for this date
-                foreach (var slotTime in slotTimes)
-                {
-                    db.TimeSlot.Add(new TimeSlot
-                    {
-                        IsAvailable = true,
-                        AvailabilityId = availability.Id,
-                        SlotDateTime = date,
-                        SlotEmployeeId = employeeId,
-                        AppointmentTime = slotTime
-                    });
-                }
-
-                totalSlotsGenerated += slotTimes.Count;
+                datesToGenerate.Add(date);
             }
 
-            if (totalSlotsGenerated > 0)
-            {
-                await db.SaveChangesAsync();
-                _logger.LogInformation("Generated {Count} time slots for employee {EmployeeId}.",
-                    totalSlotsGenerated, employeeId);
-            }
-        }
+            if (!datesToGenerate.Any())
+                return;
 
-        /// <summary>
-        /// Calculates all appointment time slots for a day based on availability,
-        /// skipping the break period.
-        /// </summary>
-        private List<TimeSpan> CalculateSlotTimes(Availability availability)
-        {
-            var slots = new List<TimeSpan>();
+            // Use the shared generator — produces consistent SlotDateTime = date + time
+            var slots = slotGenerator.GenerateSlots(availability, datesToGenerate);
+            db.TimeSlot.AddRange(slots);
+            await db.SaveChangesAsync();
 
-            var current = availability.AvailableFrom;
-            var end = availability.AvailableTo;
-            var breakFrom = availability.BreakFrom;
-            var breakTo = availability.BreakTo;
-            int duration = availability.AppointmentDuration;
-
-            while (current.Add(TimeSpan.FromMinutes(duration)) <= end)
-            {
-                // Skip slots that overlap with break time
-                var slotEnd = current.Add(TimeSpan.FromMinutes(duration));
-
-                bool overlapWithBreak = current < breakTo && slotEnd > breakFrom;
-
-                if (!overlapWithBreak)
-                {
-                    slots.Add(current);
-                }
-
-                current = current.Add(TimeSpan.FromMinutes(duration));
-            }
-
-            return slots;
+            _logger.LogInformation("Generated {Count} time slots for employee {EmployeeId}.",
+                slots.Count, employeeId);
         }
     }
 }
