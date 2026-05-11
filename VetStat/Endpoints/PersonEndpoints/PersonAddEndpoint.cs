@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
 using VetStat.Models;
 using VetStat.Helpers.Services;
@@ -13,7 +14,7 @@ namespace VetStat.Endpoints.PersonEndpoints;
 [Route("api/Person")]
 public class PersonAddEndpoint : MyEndpointBaseAsync
     .WithRequest<Person>
-    .WithActionResult<Person>
+    .WithActionResult<PersonResponse>
 {
     private readonly DataContext _db;
 
@@ -23,7 +24,7 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
     }
 
     [HttpPost("Add")]
-    public override async Task<ActionResult<Person>> HandleAsync(
+    public override async Task<ActionResult<PersonResponse>> HandleAsync(
         [FromBody] Person person, CancellationToken cancellationToken = default)
     {
         try
@@ -44,8 +45,7 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
             _db.Person.Add(person);
             _db.SaveChanges();
 
-            person.Password = null!; // never return hash to client
-            return Ok(person);
+            return Ok(person.ToDto());
         }
         catch (Exception ex)
         {

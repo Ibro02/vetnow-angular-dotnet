@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Auth;
 using VetStat.Helpers.Services;
@@ -112,8 +113,7 @@ public class AdminPanelEndpoints : MyEndpointBase
         }
 
         _db.SaveChanges();
-        person.Password = null!; // never return hash to client
-        return Ok(person);
+        return Ok(person.ToDto());
     }
 
     [HttpDelete("Users/Delete")]
@@ -250,8 +250,7 @@ public class AdminPanelEndpoints : MyEndpointBase
 
         _db.Person.Add(person);
         _db.SaveChanges();
-        person.Password = null!; // never return hash to client
-        return Ok(person);
+        return Ok(person.ToDto());
     }
 
     // ─── Vet Station Details ───
@@ -465,8 +464,7 @@ public class AdminPanelEndpoints : MyEndpointBase
 
         _db.Employee.Add(employee);
         _db.SaveChanges();
-        employee.Password = null!; // never return hash to client
-        return Ok(employee);
+        return Ok(employee.ToDto());
     }
 
     // ─── Roles ───

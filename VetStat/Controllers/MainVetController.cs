@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
 using VetStat.Helpers.Validators;
 using VetStat.Models;
@@ -22,25 +23,26 @@ namespace VetStat.Controllers
 
         //api/MainVet/GetAll
         [HttpGet]
-        public ActionResult<List<MainVet>> GetAll()
+        public ActionResult<List<MainVetResponse>> GetAll()
         {
             if (!_db.MainVet.IsNullOrEmpty())
-                return Ok(_db.MainVet.ToList());
+                return Ok(_db.MainVet.ToList().Select(m => m.ToDto()).ToList());
             return NoContent();
         }
 
         //api/MainVet/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<MainVet> Get(int id)
+        public ActionResult<MainVetResponse> Get(int id)
         {
-            if (!_db.MainVet.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.MainVet.Where(x => x.Id == id));
-            else return NoContent();
+            var mainvet = _db.MainVet.SingleOrDefault(x => x.Id == id);
+            if (mainvet != null)
+                return Ok(mainvet.ToDto());
+            return NoContent();
         }
 
         //api/MainVet/Add
         [HttpPost]
-        public ActionResult<MainVet> Add([FromBody] MainVet mainvet)
+        public ActionResult<MainVetResponse> Add([FromBody] MainVet mainvet)
         {
             try
             {
@@ -48,7 +50,7 @@ namespace VetStat.Controllers
                 _db.Vet.Add(mainvet);
                 _db.SaveChanges();
 
-                return Ok(mainvet);
+                return Ok(mainvet.ToDto());
             }
             catch (Exception err)
             {
@@ -67,7 +69,7 @@ namespace VetStat.Controllers
 
                 mainvet.Id = _mainvet.Id;
                 _db.SaveChanges();
-                return Ok(mainvet);
+                return Ok(_mainvet.ToDto());
             }
 
             catch (Exception err)

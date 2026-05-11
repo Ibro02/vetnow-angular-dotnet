@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
 using VetStat.Helpers.Validators;
 using VetStat.Models;
@@ -22,25 +23,26 @@ namespace VetStat.Controllers
 
         //api/Vet/GetAll
         [HttpGet]
-        public ActionResult<List<Vet>> GetAll()
+        public ActionResult<List<VetResponse>> GetAll()
         {
             if (!_db.Vet.IsNullOrEmpty())
-                return Ok(_db.Vet.ToList());
+                return Ok(_db.Vet.ToList().Select(v => v.ToDto()).ToList());
             return NoContent();
         }
 
         //api/Vet/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<Vet> Get(int id)
+        public ActionResult<VetResponse> Get(int id)
         {
-            if (!_db.Vet.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Vet.Where(x => x.Id == id));
-            else return NoContent();
+            var vet = _db.Vet.SingleOrDefault(x => x.Id == id);
+            if (vet != null)
+                return Ok(vet.ToDto());
+            return NoContent();
         }
 
         //api/Vet/Add
         [HttpPost]
-        public ActionResult<Vet> Add([FromBody] Vet vet)
+        public ActionResult<VetResponse> Add([FromBody] Vet vet)
         {
             try
             {
@@ -48,7 +50,7 @@ namespace VetStat.Controllers
                 _db.Vet.Add(vet);
                 _db.SaveChanges();
 
-                return Ok(vet);
+                return Ok(vet.ToDto());
             }
             catch (Exception ex)
             {
@@ -67,7 +69,7 @@ namespace VetStat.Controllers
                 Services.UpdateEntity(_vet, vet);
 
                 _db.SaveChanges();
-                return Ok(vet);
+                return Ok(_vet.ToDto());
             }
 
             catch (Exception err)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
 using VetStat.Models;
 using VetStat.Helpers;
@@ -23,25 +24,25 @@ namespace VetStat.Controllers
 
         //api/Admin/GetAll
         [HttpGet]
-        public ActionResult<List<Admin>> GetAll()
+        public ActionResult<List<AdminResponse>> GetAll()
         {
             if (!_db.Admin.IsNullOrEmpty())
-                return Ok(_db.Admin.ToList());
+                return Ok(_db.Admin.ToList().Select(a => a.ToDto()).ToList());
 
             return NoContent();
         }
         //api/Admin/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<Admin> Get(int id)
+        public ActionResult<AdminResponse> Get(int id)
         {
-            if (!_db.Admin.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Admin.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var admin = _db.Admin.SingleOrDefault(x => x.Id == id);
+            if (admin != null)
+                return Ok(admin.ToDto());
+            return NoContent();
         }
         //api/Admin/Add
         [HttpPost]
-        public ActionResult<Admin> Add([FromBody] Admin admin)
+        public ActionResult<AdminResponse> Add([FromBody] Admin admin)
         {
             try
             {
@@ -49,7 +50,7 @@ namespace VetStat.Controllers
 
                 _db.Admin.Add(admin);
                 _db.SaveChanges();
-                return Ok(admin);
+                return Ok(admin.ToDto());
             }
             catch (Exception ex)
             {
@@ -69,7 +70,7 @@ namespace VetStat.Controllers
                     _admin.Password = admin.Password;
 
                 _db.SaveChanges();
-                return Ok(admin);
+                return Ok(_admin.ToDto());
             }
             catch (Exception err)
             {

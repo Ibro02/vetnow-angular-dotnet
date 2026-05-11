@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
 using VetStat.Helpers.Validators;
 using VetStat.Models;
@@ -22,27 +23,27 @@ namespace VetStat.Controllers
 
         //api/Barber/GetAll
         [HttpGet]
-        public ActionResult<List<Barber>> GetAll()
+        public ActionResult<List<BarberResponse>> GetAll()
         {
             if (!_db.Barber.IsNullOrEmpty())
-                return Ok(_db.Barber.ToList());
-            
+                return Ok(_db.Barber.ToList().Select(b => b.ToDto()).ToList());
+
             return NoContent();
         }
 
         //api/Barber/Get/:id
         [HttpGet("{id}")]
-        public ActionResult<Barber> Get(int id)
+        public ActionResult<BarberResponse> Get(int id)
         {
-            if (!_db.Barber.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Barber.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var barber = _db.Barber.SingleOrDefault(x => x.Id == id);
+            if (barber != null)
+                return Ok(barber.ToDto());
+            return NoContent();
         }
 
         //api/Barber/Add
         [HttpPost]
-        public ActionResult<Barber> Add([FromBody] Barber barber)
+        public ActionResult<BarberResponse> Add([FromBody] Barber barber)
         {
             try
             {
@@ -50,7 +51,7 @@ namespace VetStat.Controllers
 
                 _db.Barber.Add(barber);
                 _db.SaveChanges();
-                return Ok(barber);
+                return Ok(barber.ToDto());
 
             }
             catch (Exception ex)
@@ -69,7 +70,7 @@ namespace VetStat.Controllers
             {
                 Services.UpdateEntity(_barber, barber);
                 _db.SaveChanges();
-                return Ok(barber);
+                return Ok(_barber.ToDto());
             }
 
             catch (Exception err)

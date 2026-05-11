@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
 using VetStat.Models;
 using static VetStat.Endpoints.EmployeeEndpoints.EmployeeGetNursesByVetStationIdEndpoint;
@@ -11,7 +12,7 @@ namespace VetStat.Endpoints.EmployeeEndpoints;
 [Route("api/Employee")]
 public class EmployeeGetNursesByVetStationIdEndpoint : MyEndpointBaseAsync
     .WithRequest<EmployeeGetByVetStationIdRequest>
-    .WithActionResult<List<Employee>>
+    .WithActionResult<List<NurseResponse>>
 {
     private readonly DataContext _db;
 
@@ -21,14 +22,17 @@ public class EmployeeGetNursesByVetStationIdEndpoint : MyEndpointBaseAsync
     }
 
     [HttpGet("GetNursesByVetStationId")]
-    public override async Task<ActionResult<List<Employee>>> HandleAsync(
+    public override async Task<ActionResult<List<NurseResponse>>> HandleAsync(
         [FromQuery] EmployeeGetByVetStationIdRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
-
-            return Ok(_db.Nurse.Where(x => x.VetStationId == request.Id).ToList());
-
+            var nurses = _db.Nurse
+                .Where(x => x.VetStationId == request.Id)
+                .ToList()
+                .Select(n => n.ToDto())
+                .ToList();
+            return Ok(nurses);
         }
         catch (Exception ex)
         {

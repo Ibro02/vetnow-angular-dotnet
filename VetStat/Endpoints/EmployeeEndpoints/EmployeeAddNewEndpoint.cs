@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Auth;
 using VetStat.Models;
@@ -23,7 +24,7 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
     }
 
     [HttpPost("AddNewEmployee")]
-    public ActionResult<EmployeeAddNewResponse> HandleAsync([FromBody] EmployeeAddNewRequest newEmployee)
+    public ActionResult<EmployeeResponse> HandleAsync([FromBody] EmployeeAddNewRequest newEmployee)
     {
         try
         {
@@ -56,8 +57,7 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
                 _db.Employee.Add(_newEmployee);
                 _db.SaveChanges();
 
-                _newEmployee.Password = null!; // never return hash to client
-                return Ok(_newEmployee);
+                return Ok(_newEmployee.ToDto());
             }
             return BadRequest("Employee already exists!");
         }
@@ -84,7 +84,4 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
         public int VetStationId { get; set; }
     }
 
-    public class EmployeeAddNewResponse : Person
-    {
-    }
 }
