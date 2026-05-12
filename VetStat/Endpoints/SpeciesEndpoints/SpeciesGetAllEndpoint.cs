@@ -22,11 +22,18 @@ public class SpeciesGetAllEndpoint : MyEndpointBase
     }
 
     [HttpGet("Get")]
-    public ActionResult<List<Species>> HandleAsync()
+    public ActionResult HandleAsync(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 100)
     {
-        if (_db.Species.IsNullOrEmpty())
-            return NoContent();
+        var query = _db.Species.AsQueryable();
+        var totalCount = query.Count();
+        var dataItems = query
+            .OrderBy(s => s.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
 
-        return Ok(_db.Species.ToList());
+        return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
     }
 }

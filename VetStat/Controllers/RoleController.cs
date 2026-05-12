@@ -22,15 +22,21 @@ namespace VetStat.Controllers
 
         //api/Role/GetAll
         [HttpGet]
-        public ActionResult<List<Role>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 100)
         {
             try
             {
-                var roles = _db.Role.ToList();
-                if (roles.Count > 0)
-                    return Ok(roles);
-                
-                return NoContent();
+                var query = _db.Role.AsQueryable();
+                var totalCount = query.Count();
+                var dataItems = query
+                    .OrderBy(r => r.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
             }
             catch (Exception ex)
             {

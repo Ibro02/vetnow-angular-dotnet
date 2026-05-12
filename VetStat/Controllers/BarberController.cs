@@ -23,12 +23,21 @@ namespace VetStat.Controllers
 
         //api/Barber/GetAll
         [HttpGet]
-        public ActionResult<List<BarberResponse>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            if (!_db.Barber.IsNullOrEmpty())
-                return Ok(_db.Barber.ToList().Select(b => b.ToDto()).ToList());
+            var query = _db.Barber.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(b => b.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()
+                .Select(b => b.ToDto())
+                .ToList();
 
-            return NoContent();
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
 
         //api/Barber/Get/:id

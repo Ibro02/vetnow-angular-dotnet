@@ -4,15 +4,12 @@ using VetStat.Data;
 using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
 using VetStat.Models;
-using static VetStat.Endpoints.EmployeeEndpoints.EmployeeGetByVetStationIdEndpoint;
 
 namespace VetStat.Endpoints.EmployeeEndpoints;
 
 [Authorize]
 [Route("api/Employee")]
-public class EmployeeGetByVetStationIdEndpoint : MyEndpointBaseAsync
-    .WithRequest<EmployeeGetByVetStationIdRequest>
-    .WithActionResult<List<EmployeeResponse>>
+public class EmployeeGetByVetStationIdEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
 
@@ -22,26 +19,35 @@ public class EmployeeGetByVetStationIdEndpoint : MyEndpointBaseAsync
     }
 
     [HttpGet("GetByVetStationId")]
-    public override async Task<ActionResult<List<EmployeeResponse>>> HandleAsync(
-        [FromQuery] EmployeeGetByVetStationIdRequest request, CancellationToken cancellationToken = default)
+    public ActionResult HandleAsync(
+        [FromQuery] int id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 100)
     {
         try
         {
-            var employees = _db.Employee
-                .Where(x => x.VetStationId == request.Id)
+            var query = _db.Employee.Where(x => x.VetStationId == id);
+
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(e => e.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList()
                 .Select(e => e.ToDto())
                 .ToList();
-            return Ok(employees);
+
+            return Ok(new
+            {
+                totalCount,
+                dataItems,
+                currentPage = page,
+                pageSize,
+            });
         }
         catch (Exception ex)
         {
             return BadRequest($"Could not retrieve employees: {ex.Message}");
         }
-    }
-
-    public class EmployeeGetByVetStationIdRequest
-    {
-        public int Id { get; set; }
     }
 }

@@ -23,11 +23,21 @@ namespace VetStat.Controllers
         }
         //api/Nurse/GetAll
         [HttpGet]
-        public ActionResult<List<NurseResponse>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            if (!_db.Nurse.IsNullOrEmpty())
-                return Ok(_db.Nurse.ToList().Select(n => n.ToDto()).ToList());
-            return NoContent();
+            var query = _db.Nurse.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(n => n.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()
+                .Select(n => n.ToDto())
+                .ToList();
+
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
 
         //api/Nurse/Get/:id

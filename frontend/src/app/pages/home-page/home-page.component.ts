@@ -70,8 +70,8 @@ export class HomePageComponent implements OnInit {
 
   getAll() {
     let url = Config.address + "api/VetStation/GetAll";
-    this.httpClient.get<VetStation[]>(url).subscribe(async x => {
-      let vetStationsArr: VetStation[] = x;
+    this.httpClient.get<any>(url).subscribe(async x => {
+      let vetStationsArr: VetStation[] = x.dataItems;
       this.vetStationService.vetStations = {vetStations: [...vetStationsArr]};
     });
   }

@@ -24,12 +24,21 @@ namespace VetStat.Controllers
 
         //api/Admin/GetAll
         [HttpGet]
-        public ActionResult<List<AdminResponse>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            if (!_db.Admin.IsNullOrEmpty())
-                return Ok(_db.Admin.ToList().Select(a => a.ToDto()).ToList());
+            var query = _db.Admin.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(a => a.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()
+                .Select(a => a.ToDto())
+                .ToList();
 
-            return NoContent();
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/Admin/Get/:id
         [HttpGet("{id:int}")]

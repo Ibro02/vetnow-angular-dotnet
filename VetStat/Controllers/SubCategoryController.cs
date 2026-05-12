@@ -22,12 +22,19 @@ namespace VetStat.Controllers
 
         //api/SubCategory/GetAll
         [HttpGet]
-        public ActionResult<List<SubCategory>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 100)
         {
-            if (!_db.SubCategory.IsNullOrEmpty())
-                return Ok(_db.SubCategory.ToList());
+            var query = _db.SubCategory.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(s => s.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            return NoContent();
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/SubCategory/Get/:id
         [HttpGet("{id:int}")]

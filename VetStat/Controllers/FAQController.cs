@@ -23,12 +23,19 @@ namespace VetStat.Controllers
         //api/FAQ/GetAll
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<List<FAQ>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            if (!_db.FAQ.IsNullOrEmpty())
-                return Ok(_db.FAQ.ToList());
+            var query = _db.FAQ.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(f => f.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            return NoContent();
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/FAQ/Get/:id
         [AllowAnonymous]

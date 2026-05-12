@@ -152,10 +152,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           type:     'dropdown',
           required: true,
           loadOptions: async () => {
-            const data = await firstValueFrom(
-              this.http.get<any[]>(Config.address + 'api/SpeciesGetAll/Get')
+            const res: any = await firstValueFrom(
+              this.http.get(Config.address + 'api/SpeciesGetAll/Get')
             );
-            return data.map((s: any) => ({
+            return res.dataItems.map((s: any) => ({
               id:   s.id,
               name: s.speciesName || s.SpeciesName || '',
             }));

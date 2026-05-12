@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
@@ -9,9 +8,7 @@ namespace VetStat.Endpoints.VetStationEndpoints;
 
 [AllowAnonymous]
 [Route("api/VetStation")]
-public class VetStationGetAllEndpoint : MyEndpointBaseAsync
-    .WithoutRequest
-    .WithActionResult<List<VetStation>>
+public class VetStationGetAllEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
 
@@ -21,10 +18,18 @@ public class VetStationGetAllEndpoint : MyEndpointBaseAsync
     }
 
     [HttpGet("GetAll")]
-    public override async Task<ActionResult<List<VetStation>>> HandleAsync(CancellationToken cancellationToken = default)
+    public ActionResult HandleAsync(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 100)
     {
-        if (!_db.VetStation.IsNullOrEmpty())
-            return Ok(_db.VetStation.ToList());
-        return NoContent();
+        var query = _db.VetStation.AsQueryable();
+        var totalCount = query.Count();
+        var dataItems = query
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
     }
 }

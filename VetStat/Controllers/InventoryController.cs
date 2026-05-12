@@ -22,12 +22,19 @@ namespace VetStat.Controllers
 
         //api/Inventory/GetAll
         [HttpGet]
-        public ActionResult<List<Inventory>> GetAll()
+        public ActionResult GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            if (!_db.Inventory.IsNullOrEmpty())
-                return Ok(_db.Inventory.ToList());
+            var query = _db.Inventory.AsQueryable();
+            var totalCount = query.Count();
+            var dataItems = query
+                .OrderBy(i => i.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            return NoContent();
+            return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/Inventory/Get/:id
         [HttpGet("{id:int}")]

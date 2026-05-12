@@ -119,10 +119,10 @@ export class VetStationHomePageComponent implements OnInit {
   async selectService(service: any) {
     this.selectedServiceId = service.id;
     this.selectedEmployee = undefined;
-    const data = await firstValueFrom(
-      this.http.get<Employee[]>(Config.address + service.api, { params: { id: this.vetStationId } })
+    const data: any = await firstValueFrom(
+      this.http.get(Config.address + service.api, { params: { id: this.vetStationId } })
     );
-    this.employeeList = data;
+    this.employeeList = data.dataItems;
   }
   toggleGallery(state: boolean) {
     this.showGallery = state;

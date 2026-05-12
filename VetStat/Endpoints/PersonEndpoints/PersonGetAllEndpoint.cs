@@ -10,9 +10,7 @@ namespace VetStat.Endpoints.PersonEndpoints;
 
 [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
 [Route("api/Person")]
-public class PersonGetAllEndpoint : MyEndpointBaseAsync
-    .WithoutRequest
-    .WithActionResult<List<PersonResponse>>
+public class PersonGetAllEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
 
@@ -22,10 +20,38 @@ public class PersonGetAllEndpoint : MyEndpointBaseAsync
     }
 
     [HttpGet("GetAll")]
-    public override async Task<ActionResult<List<PersonResponse>>> HandleAsync(CancellationToken cancellationToken = default)
+    public ActionResult HandleAsync(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
     {
-        if (_db.Person != null)
-            return Ok(_db.Person.ToList().Select(p => p.ToDto()).ToList());
-        return NoContent();
+        var query = _db.Person.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.ToLower();
+            query = query.Where(p =>
+                (p.FirstName != null && p.FirstName.ToLower().Contains(s)) ||
+                (p.LastName != null && p.LastName.ToLower().Contains(s)) ||
+                p.Email.ToLower().Contains(s) ||
+                p.Username.ToLower().Contains(s));
+        }
+
+        var totalCount = query.Count();
+        var dataItems = query
+            .OrderBy(p => p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList()
+            .Select(p => p.ToDto())
+            .ToList();
+
+        return Ok(new
+        {
+            totalCount,
+            dataItems,
+            currentPage = page,
+            pageSize,
+        });
     }
 }
