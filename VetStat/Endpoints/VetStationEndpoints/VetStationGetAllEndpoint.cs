@@ -18,7 +18,7 @@ public class VetStationGetAllEndpoint : MyEndpointBase
     }
 
     [HttpGet("GetAll")]
-    public ActionResult HandleAsync(
+    public async Task<ActionResult> HandleAsync(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {
@@ -30,6 +30,6 @@ public class VetStationGetAllEndpoint : MyEndpointBase
             .Take(pageSize)
             .ToList();
 
-        return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
+        return await Task.Run(() => Ok(new { totalCount, dataItems, currentPage = page, pageSize }));
     }
 }

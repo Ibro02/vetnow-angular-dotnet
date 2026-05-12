@@ -30,7 +30,7 @@ public class VetStationGetAllEndpointTests
         var endpoint = new VetStationGetAllEndpoint(db);
         var result = await endpoint.HandleAsync();
 
-        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        var ok = Assert.IsType<OkObjectResult>(result);
         var list = Assert.IsType<List<VetStation>>(ok.Value);
         Assert.Equal(2, list.Count);
     }
@@ -43,6 +43,6 @@ public class VetStationGetAllEndpointTests
 
         var result = await endpoint.HandleAsync();
 
-        Assert.IsType<NoContentResult>(result.Result);
+        Assert.IsType<NoContentResult>(result);
     }
 }
