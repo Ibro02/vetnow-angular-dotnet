@@ -61,13 +61,16 @@ namespace VetStat.Controllers
 
         //api/Role/Add
         [HttpPost]
-        public void Add([FromBody] Role value)
+        public ActionResult Add([FromBody] Role value)
         {
             if (value != null)
             {
                 _db.Role.Add(value);
                 _db.SaveChanges();
+                return Ok(value);
             }
+            return BadRequest("Invalid role data provided.");
+
         }
 
         //// PUT api/Role/:id
@@ -78,10 +81,14 @@ namespace VetStat.Controllers
 
         //api/Role/Delete/:id
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult Delete(int id)
         {
-            _db.Role.Where(x => x.Id == id).ExecuteDelete();
+            var result = _db.Role.Where(x => x.Id == id).ExecuteDelete();
             _db.SaveChanges();
+
+            if (result != 0)
+                return Ok($"Role with has been deleted.");
+            return NotFound($"Role not found.");
         }
 
     }
