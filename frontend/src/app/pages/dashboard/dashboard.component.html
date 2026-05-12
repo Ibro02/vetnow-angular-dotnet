@@ -1,0 +1,184 @@
+<app-header-title title="Dashboard" description="Overview of your vet station activity"></app-header-title>
+
+<div class="dashboard-container" @fadeIn>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadDashboard()">
+      <fa-icon [icon]="faRefresh" class="mr-2"></fa-icon> Retry
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && !error">
+
+    <!-- ═══ KPI Cards ═══ -->
+    <div class="kpi-grid" [@listStagger]="kpiCards.length">
+      <div *ngFor="let card of kpiCards" class="kpi-card" @fadeIn>
+        <div class="kpi-icon" [style.background]="card.bgColor">
+          <fa-icon [icon]="card.icon" [style.color]="card.color"></fa-icon>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ card.value | number }}</span>
+          <span class="kpi-label">{{ card.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Charts Row ═══ -->
+    <div class="charts-row">
+
+      <!-- Appointments (last 7 days) bar chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>
+            <fa-icon [icon]="faChartLine" class="mr-2"></fa-icon>
+            Appointments (last 7 days)
+          </h3>
+        </div>
+        <div class="bar-chart">
+          <div *ngFor="let day of appointmentsByDay" class="bar-col">
+            <span class="bar-value">{{ day.count }}</span>
+            <div class="bar" [style.height]="getBarHeight(day.count)"></div>
+            <span class="bar-label">{{ getDayLabel(day.date) }}</span>
+          </div>
+          <div *ngIf="appointmentsByDay.length === 0" class="empty-chart">
+            No appointment data for the last 7 days
+          </div>
+        </div>
+      </div>
+
+      <!-- Species Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Species Distribution</h3>
+        </div>
+        <div class="species-list">
+          <div *ngFor="let sp of speciesChart; let i = index" class="species-row">
+            <div class="species-info">
+              <span class="species-dot" [style.background]="speciesColors[i % speciesColors.length]"></span>
+              <span class="species-name">{{ sp.name }}</span>
+            </div>
+            <div class="species-bar-track">
+              <div class="species-bar-fill"
+                   [style.width]="getSpeciesBarWidth(sp.count)"
+                   [style.background]="speciesColors[i % speciesColors.length]"></div>
+            </div>
+            <span class="species-count">{{ sp.count }} ({{ getSpeciesPercent(sp.count) }})</span>
+          </div>
+          <div *ngIf="speciesChart.length === 0" class="empty-chart">
+            No pet species data available
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Bottom Row: Appointments Table + Employee Breakdown + Quick Actions ═══ -->
+    <div class="bottom-row">
+
+      <!-- Recent Appointments Table -->
+      <div class="table-card">
+        <div class="chart-header">
+          <h3>Recent Appointments</h3>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Pet</th>
+                <th>Employee</th>
+                <th>Station</th>
+                <th>Date</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of recentAppointments">
+                <td>{{ a.customerName }}</td>
+                <td>{{ a.petName }}</td>
+                <td>{{ a.employeeName }}</td>
+                <td>{{ a.vetStationName }}</td>
+                <td>{{ a.date | date:'mediumDate' }}</td>
+                <td>{{ a.time ?? '—' }}</td>
+              </tr>
+              <tr *ngIf="recentAppointments.length === 0">
+                <td colspan="6" class="empty-table">No appointments found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sidebar: Employee Breakdown + Quick Actions -->
+      <div class="sidebar-col">
+        <!-- Employee Breakdown -->
+        <div class="chart-card compact">
+          <div class="chart-header">
+            <h3>Staff Breakdown</h3>
+          </div>
+          <div class="breakdown-list">
+            <div class="breakdown-row">
+              <div class="breakdown-icon vet">
+                <fa-icon [icon]="faStethoscope"></fa-icon>
+              </div>
+              <div class="breakdown-info">
+                <span class="breakdown-label">Veterinarians</span>
+                <span class="breakdown-val">{{ employeeBreakdown.vets }}</span>
+              </div>
+              <span class="breakdown-pct">{{ getBreakdownPercent(employeeBreakdown.vets) }}</span>
+            </div>
+            <div class="breakdown-row">
+              <div class="breakdown-icon nurse">
+                <fa-icon [icon]="faSyringe"></fa-icon>
+              </div>
+              <div class="breakdown-info">
+                <span class="breakdown-label">Nurses</span>
+                <span class="breakdown-val">{{ employeeBreakdown.nurses }}</span>
+              </div>
+              <span class="breakdown-pct">{{ getBreakdownPercent(employeeBreakdown.nurses) }}</span>
+            </div>
+            <div class="breakdown-row">
+              <div class="breakdown-icon barber">
+                <fa-icon [icon]="faCut"></fa-icon>
+              </div>
+              <div class="breakdown-info">
+                <span class="breakdown-label">Groomers</span>
+                <span class="breakdown-val">{{ employeeBreakdown.barbers }}</span>
+              </div>
+              <span class="breakdown-pct">{{ getBreakdownPercent(employeeBreakdown.barbers) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="chart-card compact">
+          <div class="chart-header">
+            <h3>Quick Actions</h3>
+          </div>
+          <div class="quick-actions">
+            <a routerLink="/admin-panel" class="action-btn">
+              Admin Panel <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+            </a>
+            <a routerLink="/settings/employees" class="action-btn">
+              Manage Employees <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+            </a>
+            <a routerLink="/settings/availability" class="action-btn">
+              Availability Settings <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+            </a>
+            <a routerLink="/settings/vet-station" class="action-btn">
+              Workspace Settings <fa-icon [icon]="faArrowRight" class="ml-2"></fa-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

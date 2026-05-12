@@ -16,7 +16,8 @@ import {
   faUsers,
   faNewspaper,
   faClock,
-  faShieldHalved
+  faShieldHalved,
+  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -60,8 +61,9 @@ export class SettingsComponent implements OnInit{
     { link: '/settings/employees',   text: 'Employees', icon: faUsers     },
   ];
 
-  // Employee+ sees: Posts and Availability
+  // Employee+ sees: Dashboard, Posts and Availability
   public employeeExtrasArr: SettingsCardContent[] = [
+    { link: '/dashboard',             text: 'Dashboard',    icon: faChartLine },
     { link: '/settings/posts',        text: 'Posts',        icon: faNewspaper },
     { link: '/settings/availability', text: 'Availability', icon: faClock     },
   ];

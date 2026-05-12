@@ -15,6 +15,7 @@ import {PetsSettingsComponent} from "./pages/pets-settings/pets-settings.compone
 import {MyAppointmentsComponent} from "./pages/my-appointments/my-appointments.component";
 import {AdminPanelComponent} from "./pages/admin-panel/admin-panel.component";
 import {AvailabilitySettingsComponent} from "./pages/availability-settings/availability-settings.component";
+import {DashboardComponent} from "./pages/dashboard/dashboard.component";
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -31,6 +32,7 @@ export const routes: Routes = [
   { path: 'my-appointments', component: MyAppointmentsComponent, canActivate: [AuthorizationGuard] },
 
   // Employee+ (permission level >= 2)
+  { path: 'dashboard', component: DashboardComponent, canActivate: [roleGuard(2)] },
   { path: 'settings/vet-station', component: VetStationComponent, canActivate: [roleGuard(2)] },
   { path: 'settings/employees', component: EmployeeListComponent, canActivate: [roleGuard(2)] },
   { path: 'settings/availability', component: AvailabilitySettingsComponent, canActivate: [roleGuard(2)] },
