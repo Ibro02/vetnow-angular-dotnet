@@ -21,7 +21,7 @@ namespace VetStat.Models
         public Person? Owner { get; set; }
 
         // public Person Id {get;set;}
-        public DateTime BirthDate {get;set; }
+        public DateTime? BirthDate {get;set; }
         [ForeignKey("Species")]
 
         public int? AnimalSpeciesId { get; set; }

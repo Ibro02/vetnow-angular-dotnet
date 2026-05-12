@@ -11,7 +11,7 @@ public class NurseResponse
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public int? RoleId { get; set; }
-    public DateTime BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
     public string Username { get; set; } = string.Empty;
     public string? City { get; set; }
     public string? Country { get; set; }

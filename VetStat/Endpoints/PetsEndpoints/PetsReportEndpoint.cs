@@ -94,7 +94,7 @@ public class PetsReportEndpoint : MyEndpointBase
                                 table.Cell().Element(ContentStyle).Text(pet.Name);
                                 table.Cell().Element(ContentStyle).Text(pet.Species?.SpeciesName ?? "/");
                                 table.Cell().Element(ContentStyle).Text(pet.Breed?.Name ?? "/");
-                                table.Cell().Element(ContentStyle).Text(pet.BirthDate.ToString("dd.MM.yyyy"));
+                                table.Cell().Element(ContentStyle).Text(pet.BirthDate?.ToString("dd.MM.yyyy") ?? DateTime.UtcNow.ToString());
 
                                 static IContainer ContentStyle(IContainer container) =>
                                     container.PaddingVertical(5).BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2);

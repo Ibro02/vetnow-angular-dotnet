@@ -126,7 +126,7 @@ public class PetsGetByIdEndpoint : MyEndpointBase
         public int Id { get; set; }
         public string? Name { get; set; }
         public int? OwnerId { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public int? AnimalSpeciesId { get; set; }
         public string? SpeciesName { get; set; }
         public string? Diet { get; set; }

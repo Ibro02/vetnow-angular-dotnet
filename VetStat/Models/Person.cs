@@ -27,8 +27,7 @@ namespace VetStat.Models
         [JsonIgnore]
   
         public byte[]? Picture { get; set; } //Pictures are saved as memory stream
-
-        public DateTime BirthDate { get; set; } = DateTime.UtcNow;
+        public DateTime? BirthDate { get; set; }
         [Required]
         public string Username { get; set; }
         [Required]
