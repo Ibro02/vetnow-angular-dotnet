@@ -57,7 +57,7 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
         public bool isAdmin { get; set; } = false;
         public bool isVisitor { get; set; } = false;
         public bool verified { get; set; }
-        public DateTime BirthDate { get; set; } = DateTime.Now;
+        public DateTime BirthDate { get; set; } = DateTime.UtcNow;
         public string? Username { get; set; }
         public int? CityId { get; set; }
         public int? RoleId { get; set; }

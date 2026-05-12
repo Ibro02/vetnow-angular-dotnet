@@ -63,7 +63,7 @@ public class PetsReportEndpoint : MyEndpointBase
                             col.Item().Text("VetStat - Medicinski karton ljubimaca").FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
                             col.Item().Text($"Vlasnik ID: {request.OwnerId}").FontSize(12);
                         });
-                        row.ConstantItem(100).Text($"{DateTime.Now:dd.MM.yyyy}").AlignRight();
+                        row.ConstantItem(100).Text($"{DateTime.UtcNow:dd.MM.yyyy}").AlignRight();
                     });
 
                     page.Content().PaddingVertical(10).Column(col =>

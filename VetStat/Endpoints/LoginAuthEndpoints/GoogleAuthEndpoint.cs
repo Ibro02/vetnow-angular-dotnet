@@ -65,8 +65,8 @@ public class GoogleAuthEndpoint : MyEndpointBase
                 LastName = payload.FamilyName,
                 GoogleProviderId = googleSubject,
                 verified = true, // Google already verified the email
-                ProfileCreationDate = DateTime.Now,
-                BirthDate = DateTime.Now
+                ProfileCreationDate = DateTime.UtcNow,
+                BirthDate = DateTime.UtcNow
             };
             _db.Person.Add(userProfile);
             _db.SaveChanges();
@@ -89,7 +89,7 @@ public class GoogleAuthEndpoint : MyEndpointBase
             UserProfile = userProfile,
             Token = newToken,
             UserProfileId = userProfile.Id,
-            LoggTime = DateTime.Now
+            LoggTime = DateTime.UtcNow
         };
 
         _db.AuthentificationToken.Add(authToken);

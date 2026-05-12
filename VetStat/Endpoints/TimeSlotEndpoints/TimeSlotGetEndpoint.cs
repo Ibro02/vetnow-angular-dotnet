@@ -21,7 +21,7 @@ public class TimeSlotGetEndpoint : MyEndpointBase
     public ActionResult HandleAsync([FromQuery] int employeeid, string? date)
     {
         DateTime _date = date != null ? new DateTime(int.Parse(date.Split("-")[0]),
-            int.Parse(date.Split("-")[1]), int.Parse(date.Split("-")[2])) : DateTime.Now;
+            int.Parse(date.Split("-")[1]), int.Parse(date.Split("-")[2])) : DateTime.UtcNow;
 
         if (!_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid).IsNullOrEmpty())
             return Ok(_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid)

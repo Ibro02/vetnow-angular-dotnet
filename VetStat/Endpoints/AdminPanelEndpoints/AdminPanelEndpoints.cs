@@ -97,7 +97,7 @@ public class AdminPanelEndpoints : MyEndpointBase
                 // Promote to employee: insert a row in the Employee table (TPT)
                 _db.Database.ExecuteSqlRaw(
                     "INSERT INTO Employee (Id, DateOfEmployment, IsDeleted) VALUES ({0}, {1}, {2})",
-                    person.Id, DateTime.Now, false);
+                    person.Id, DateTime.UtcNow, false);
             }
             else if (!isNowEmployeeRole && existingEmployee != null)
             {
@@ -243,8 +243,8 @@ public class AdminPanelEndpoints : MyEndpointBase
             City = request.City,
             Country = request.Country,
             RoleId = request.RoleId ?? 1,
-            BirthDate = DateTime.Now,
-            ProfileCreationDate = DateTime.Now,
+            BirthDate = DateTime.UtcNow,
+            ProfileCreationDate = DateTime.UtcNow,
             verified = true,
         };
 
@@ -456,9 +456,9 @@ public class AdminPanelEndpoints : MyEndpointBase
             Country = request.Country,
             RoleId = request.RoleId,
             VetStationId = request.VetStationId,
-            BirthDate = DateTime.Now,
-            ProfileCreationDate = DateTime.Now,
-            DateOfEmployment = DateTime.Now,
+            BirthDate = DateTime.UtcNow,
+            ProfileCreationDate = DateTime.UtcNow,
+            DateOfEmployment = DateTime.UtcNow,
             verified = true,
         };
 

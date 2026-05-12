@@ -62,7 +62,7 @@ namespace VetStat.Helpers.Services
         /// </summary>
         private async Task CleanupOldTimeSlots(DataContext db)
         {
-            var today = DateTime.Now.Date;
+            var today = DateTime.UtcNow.Date;
 
             var expiredSlotIds = await db.TimeSlot
                 .Where(t => t.SlotDateTime.Date < today)
@@ -142,7 +142,7 @@ namespace VetStat.Helpers.Services
                 .ToListAsync();
 
             // Get dates that already have time slots generated
-            var today = DateTime.Now.Date;
+            var today = DateTime.UtcNow.Date;
             var endDate = today.AddDays(DaysInAdvance);
 
             var existingSlotDates = await db.TimeSlot

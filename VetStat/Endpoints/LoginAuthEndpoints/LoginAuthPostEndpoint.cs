@@ -76,7 +76,7 @@ public class LoginAuthPostEndpoint : MyEndpointBase
                 UserProfile = userProfile,
                 Token = newToken,
                 UserProfileId = userProfile.Id,
-                LoggTime = DateTime.Now
+                LoggTime = DateTime.UtcNow
             };
 
             _db.AuthentificationToken.Add(log);

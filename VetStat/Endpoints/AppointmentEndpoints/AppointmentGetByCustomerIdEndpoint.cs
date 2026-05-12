@@ -63,7 +63,7 @@ public class AppointmentGetByCustomerIdEndpoint : MyEndpointBase
                         .Where(vs => vs.Id == a.VetStationId)
                         .Select(vs => vs.Name).FirstOrDefault()
                 })
-                .Where(a => a.SlotDateTime >= DateTime.Now.Date)
+                .Where(a => a.SlotDateTime >= DateTime.UtcNow.Date)
                 .OrderBy(a => a.SlotDateTime)
                 .ThenBy(a => a.AppointmentTime)
                 .ToList()
