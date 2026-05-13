@@ -64,7 +64,7 @@ public class AppointmentRescheduleEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not process the appointment. Please try again.");
         }
     }
 

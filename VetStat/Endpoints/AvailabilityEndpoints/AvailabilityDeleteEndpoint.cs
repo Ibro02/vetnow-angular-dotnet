@@ -43,7 +43,7 @@ public class AvailabilityDeleteEndpoint : MyEndpointBase
         }
         catch (Exception err)
         {
-            return BadRequest($"Could not delete: {err.Message}");
+            return BadRequest("Could not delete the record. Please try again.");
         }
     }
 }

@@ -51,15 +51,15 @@ namespace VetStat.Controllers
         {
             try
             {
-                if (_db.VetStation.Where(x => x.Id == inventory.VetStationId).IsNullOrEmpty())
-                    throw new Exception("samir");
+                if (!_db.VetStation.Any(x => x.Id == inventory.VetStationId))
+                    return BadRequest("The specified vet station does not exist.");
                 _db.Inventory.Add(inventory);
                 _db.SaveChanges();
                 return Ok(inventory);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Could not create the record. Please check your input and try again.");
             }
         }
         //api/Inventory/Edit/:id
@@ -87,7 +87,7 @@ namespace VetStat.Controllers
             }
             catch (Exception err)
             {
-                return BadRequest(err.Message);
+                return BadRequest("Could not update the record. Please check your input and try again.");
             }
         }
 
@@ -110,7 +110,7 @@ namespace VetStat.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Could not delete: {ex.Message}");
+                return BadRequest("Could not delete the record. Please try again.");
             }
         }
     }

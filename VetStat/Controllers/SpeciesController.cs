@@ -63,7 +63,7 @@ namespace VetStat.Controllers
             catch (Exception err)
             {
 
-                return BadRequest(err.Message); 
+                return BadRequest("Could not create the record. Please check your input and try again.");
             }
         }
 
@@ -89,7 +89,7 @@ namespace VetStat.Controllers
             catch (Exception err)
             {
 
-                return BadRequest(err.Message);
+                return BadRequest("Could not update the record. Please check your input and try again.");
             }
 
         }
@@ -117,7 +117,7 @@ namespace VetStat.Controllers
             catch (Exception err)
             {
 
-                return BadRequest($"Could not delete: {err.Message}");
+                return BadRequest("Could not delete the record. Please try again.");
             }
         }
     }

@@ -78,7 +78,7 @@ public class AppointmentAddEndpoint : MyEndpointBaseAsync
         }
         catch (Exception err)
         {
-            return BadRequest(err.Message);
+            return BadRequest("Could not process the appointment. Please try again.");
         }
     }
 }

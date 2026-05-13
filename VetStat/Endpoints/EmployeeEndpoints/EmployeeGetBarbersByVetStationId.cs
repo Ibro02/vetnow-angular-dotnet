@@ -47,7 +47,7 @@ public class EmployeeGetBarbersByVetStationIdEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest($"Could not retrieve barbers: {ex.Message}");
+            return BadRequest("Could not retrieve the data. Please try again.");
         }
     }
 }

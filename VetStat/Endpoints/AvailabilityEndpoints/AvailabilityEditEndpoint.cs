@@ -77,7 +77,7 @@ public class AvailabilityEditEndpoint : MyEndpointBase
         }
         catch (Exception err)
         {
-            return BadRequest(err.Message);
+            return BadRequest("Could not save availability. Please try again.");
         }
     }
 }

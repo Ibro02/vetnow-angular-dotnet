@@ -33,7 +33,7 @@ public class EmployeeGetByIdEndpoint : MyEndpointBaseAsync
         }
         catch (Exception ex)
         {
-            return BadRequest($"Could not find: {ex.Message}");
+            return BadRequest("Could not retrieve the data. Please try again.");
         }
     }
 

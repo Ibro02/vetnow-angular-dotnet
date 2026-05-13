@@ -9,6 +9,7 @@ using VetStat.Helpers.Services.Appointment;
 using VetStat.Helpers.Services.Email;
 using VetStat.Helpers.Validators;
 using VetStat.Extensions;
+using VetStat.Helpers.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,8 @@ if (app.Environment.IsDevelopment())
     }
 
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors(
     options => options

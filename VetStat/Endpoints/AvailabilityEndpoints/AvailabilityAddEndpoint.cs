@@ -60,7 +60,7 @@ public class AvailabilityAddEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not save availability. Please try again.");
         }
         return Ok(newAvailability);
     }

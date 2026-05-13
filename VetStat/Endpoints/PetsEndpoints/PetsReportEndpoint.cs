@@ -115,7 +115,7 @@ public class PetsReportEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not retrieve the data. Please try again.");
         }
     }
 

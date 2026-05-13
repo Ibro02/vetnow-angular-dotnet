@@ -65,7 +65,7 @@ public class EmployeeEditEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not update the record. Please check your input and try again.");
         }
     }
 

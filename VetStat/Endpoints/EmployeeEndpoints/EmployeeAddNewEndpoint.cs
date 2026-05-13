@@ -63,7 +63,7 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.InnerException.Message);
+            return BadRequest("Could not create the record. Please check your input and try again.");
         }
     }
 

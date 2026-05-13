@@ -120,7 +120,7 @@ public class DashboardGetStatsEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest($"Failed to load dashboard stats: {ex.Message}");
+            return BadRequest("Could not retrieve the data. Please try again.");
         }
     }
 }

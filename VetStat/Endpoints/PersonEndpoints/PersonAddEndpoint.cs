@@ -49,7 +49,7 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not create the record. Please check your input and try again.");
         }
     }
 }

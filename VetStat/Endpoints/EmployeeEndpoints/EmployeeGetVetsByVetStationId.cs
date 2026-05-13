@@ -47,7 +47,7 @@ public class EmployeeGetVetsByVetStationIdEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest($"Could not retrieve vets: {ex.Message}");
+            return BadRequest("Could not retrieve the data. Please try again.");
         }
     }
 }

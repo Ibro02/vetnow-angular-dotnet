@@ -81,7 +81,7 @@ public class ProfileSettingsEditEndpoint : MyEndpointBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest("Could not update profile settings. Please try again.");
         }
     }
 

@@ -70,7 +70,7 @@ public class VetStationEditEndpoint : MyEndpointBase
         }
         catch (Exception err)
         {
-            return BadRequest(err.Message);
+            return BadRequest("Could not update the record. Please check your input and try again.");
         }
     }
 }
