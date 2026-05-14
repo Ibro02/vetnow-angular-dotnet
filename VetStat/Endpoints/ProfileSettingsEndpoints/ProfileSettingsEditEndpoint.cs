@@ -41,6 +41,19 @@ public class ProfileSettingsEditEndpoint : MyEndpointBase
 
         try
         {
+            // Uniqueness checks (exclude the current user)
+            if (!string.IsNullOrEmpty(request.Email) && request.Email != person.Email)
+            {
+                if (_db.Person.Any(x => x.Email == request.Email && x.Id != person.Id))
+                    return BadRequest("Email is already in use by another account.");
+            }
+
+            if (!string.IsNullOrEmpty(request.Username) && request.Username != person.Username)
+            {
+                if (_db.Person.Any(x => x.Username == request.Username && x.Id != person.Id))
+                    return BadRequest("Username is already in use by another account.");
+            }
+
             if (!string.IsNullOrEmpty(request.FirstName))
                 person.FirstName = request.FirstName;
 
