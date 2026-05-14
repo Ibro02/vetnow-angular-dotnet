@@ -15,6 +15,7 @@ import {
   DynamicFormCardComponent,
   DynamicFormConfig,
 } from '../../components/group/pet-add-card/pet-add-card.component';
+import { ConfirmModalComponent } from '../../components/common/confirm-modal/confirm-modal.component';
 
 
 interface PetResponse {
@@ -54,6 +55,7 @@ interface PagedResponse<T> {
     HeaderTitleComponent,
     TableComponent,
     DynamicFormCardComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './pets-settings.component.html',
   styleUrl: './pets-settings.component.css'
@@ -116,6 +118,12 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       type: 'text',
     },
   ];
+
+  // Confirm modal state
+  showDeleteConfirm = false;
+  showRestoreConfirm = false;
+  confirmTargetPetId: number | null = null;
+  confirmTargetPetName = '';
 
   // Pet add/edit popup state
   showPetForm: boolean = false;
@@ -305,32 +313,62 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
   onTableAction(event: { action: string; row: any }): void {
     if (event.action === 'delete') {
-      this.deletePet(event.row.id);
+      this.requestDeletePet(event.row.id);
     } else if (event.action === 'edit') {
       this.editPet(event.row.id);
     }
   }
 
-  async deletePet(petId: number): Promise<void> {
+  /** Show delete confirmation modal */
+  requestDeletePet(petId: number): void {
+    const pet = this.pets.find(p => p.id === petId);
+    this.confirmTargetPetId = petId;
+    this.confirmTargetPetName = pet?.name ?? 'this pet';
+    this.showDeleteConfirm = true;
+  }
+
+  /** Show restore confirmation modal */
+  requestRestorePet(petId: number): void {
+    const pet = this.pets.find(p => p.id === petId);
+    this.confirmTargetPetId = petId;
+    this.confirmTargetPetName = pet?.name ?? 'this pet';
+    this.showRestoreConfirm = true;
+  }
+
+  /** Actually perform delete after user confirms */
+  async confirmDeletePet(): Promise<void> {
+    if (this.confirmTargetPetId == null) return;
+    this.showDeleteConfirm = false;
     try {
       await firstValueFrom(
-        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + petId, { responseType: 'text' })
+        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + this.confirmTargetPetId, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
       // failed to delete pet
     }
+    this.confirmTargetPetId = null;
   }
 
-  async restorePet(petId: number): Promise<void> {
+  /** Actually perform restore after user confirms */
+  async confirmRestorePet(): Promise<void> {
+    if (this.confirmTargetPetId == null) return;
+    this.showRestoreConfirm = false;
     try {
       await firstValueFrom(
-        this.http.put(Config.address + 'api/Pets/Restore?id=' + petId, {}, { responseType: 'text' })
+        this.http.put(Config.address + 'api/Pets/Restore?id=' + this.confirmTargetPetId, {}, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
       // failed to restore pet
     }
+    this.confirmTargetPetId = null;
+  }
+
+  cancelConfirm(): void {
+    this.showDeleteConfirm = false;
+    this.showRestoreConfirm = false;
+    this.confirmTargetPetId = null;
   }
 
   editPet(petId: number): void {

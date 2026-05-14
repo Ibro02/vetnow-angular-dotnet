@@ -11,3 +11,15 @@
   (addClick)="editingEmployee = null; showAddEmployee = true"
   (actionClick)="onAction($event)"
 />
+
+<!-- Delete confirmation modal -->
+<app-confirm-modal
+  [visible]="showDeleteConfirm"
+  title="Delete Employee"
+  [message]="'Are you sure you want to delete ' + (deleteTargetEmployee?.firstName ?? '') + ' ' + (deleteTargetEmployee?.lastName ?? '') + '? This action cannot be undone.'"
+  confirmText="Delete"
+  cancelText="Cancel"
+  [isDanger]="true"
+  (onConfirm)="confirmDeleteEmployee()"
+  (onCancel)="cancelDeleteEmployee()"
+/>

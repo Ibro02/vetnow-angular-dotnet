@@ -328,3 +328,15 @@
     </div>
   </div>
 </div>
+
+<!-- Confirm Modal (delete user / delete station / remove employee) -->
+<app-confirm-modal
+  [visible]="showConfirmModal"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  [confirmText]="confirmText"
+  cancelText="Cancel"
+  [isDanger]="confirmIsDanger"
+  (onConfirm)="onConfirmAccept()"
+  (onCancel)="onConfirmCancel()"
+/>

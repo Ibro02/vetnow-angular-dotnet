@@ -3,6 +3,7 @@ import { NgIf } from '@angular/common';
 import { TableComponent, TableColumn, TableAction } from '../../components/common/table/table.component';
 import { AddEmployeeComponent } from '../../components/group/add-employee/add-employee.component';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
+import { ConfirmModalComponent } from '../../components/common/confirm-modal/confirm-modal.component';
 import { MyAuthService } from '../../services/MyAuth';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -12,7 +13,7 @@ import {ToasterService} from "../../services/toaster.service";
 @Component({
   selector: 'app-employee-list',
   standalone: true,
-  imports: [NgIf, TableComponent, AddEmployeeComponent, HeaderTitleComponent],
+  imports: [NgIf, TableComponent, AddEmployeeComponent, HeaderTitleComponent, ConfirmModalComponent],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css',
 })
@@ -20,6 +21,10 @@ export class EmployeeListComponent implements OnInit {
   employees: any[] = [];
   showAddEmployee = false;
   editingEmployee: any = null;
+
+  // Confirm modal state
+  showDeleteConfirm = false;
+  deleteTargetEmployee: any = null;
 
   columns: TableColumn[] = [
     {
@@ -70,15 +75,28 @@ export class EmployeeListComponent implements OnInit {
       this.editingEmployee = event.row;
       this.showAddEmployee = true;
     } else if (event.action === 'delete') {
-      const url = `${environment.apiUrl}/api/Employee/Delete?id=${event.row.id}`;
-      this.http.delete(url, { responseType: 'text' }).subscribe({
-        next: () => {
-          this.toaster.success('Success', 'Employee deleted successfully!');
-          this.ngOnInit();
-        },
-        error: (er) => this.toaster.error('Whops!', `Something went wrong!\n ${er.message}`),
-      });
+      this.deleteTargetEmployee = event.row;
+      this.showDeleteConfirm = true;
     }
+  }
+
+  async confirmDeleteEmployee(): Promise<void> {
+    if (!this.deleteTargetEmployee) return;
+    this.showDeleteConfirm = false;
+    const url = `${environment.apiUrl}/api/Employee/Delete?id=${this.deleteTargetEmployee.id}`;
+    this.http.delete(url, { responseType: 'text' }).subscribe({
+      next: () => {
+        this.toaster.success('Success', 'Employee deleted successfully!');
+        this.ngOnInit();
+      },
+      error: (er) => this.toaster.error('Error', 'Failed to delete employee.'),
+    });
+    this.deleteTargetEmployee = null;
+  }
+
+  cancelDeleteEmployee(): void {
+    this.showDeleteConfirm = false;
+    this.deleteTargetEmployee = null;
   }
 }
 

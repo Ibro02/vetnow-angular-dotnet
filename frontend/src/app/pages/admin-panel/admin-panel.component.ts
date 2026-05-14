@@ -7,11 +7,12 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../enviroment';
 import { ToasterService } from '../../services/toaster.service';
+import { ConfirmModalComponent } from '../../components/common/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, FormsModule, TableComponent, HeaderTitleComponent],
+  imports: [NgIf, NgFor, NgClass, FormsModule, TableComponent, HeaderTitleComponent, ConfirmModalComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.css',
 })
@@ -113,6 +114,14 @@ export class AdminPanelComponent implements OnInit {
 
   detailTab: 'employees' | 'info' = 'employees';
 
+  // ─── Confirm Modal ───
+  showConfirmModal = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmText = 'Confirm';
+  confirmIsDanger = true;
+  private confirmCallback: (() => void) | null = null;
+
   constructor(private toaster: ToasterService, private http: HttpClient) {}
 
   async ngOnInit() {
@@ -167,16 +176,23 @@ export class AdminPanelComponent implements OnInit {
       this.selectedRoleId = event.row.roleId ?? 1;
       this.showRoleModal = true;
     } else if (event.action === 'delete') {
-      if (!confirm(`Delete user "${event.row.username}"?`)) return;
-      try {
-        await firstValueFrom(
-          this.http.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, { params: { id: event.row.id }, responseType: 'text' })
-        );
-        this.toaster.success('Success', 'User deleted');
-        await this.loadUsers();
-      } catch (err: any) {
-        this.toaster.error('Error', err.error ?? 'Failed to delete user');
-      }
+      this.openConfirm(
+        'Delete User',
+        `Are you sure you want to delete user "${event.row.username}"? This action cannot be undone.`,
+        'Delete',
+        true,
+        async () => {
+          try {
+            await firstValueFrom(
+              this.http.delete(`${environment.apiUrl}/api/AdminPanel/Users/Delete`, { params: { id: event.row.id }, responseType: 'text' })
+            );
+            this.toaster.success('Success', 'User deleted');
+            await this.loadUsers();
+          } catch (err: any) {
+            this.toaster.error('Error', err.error ?? 'Failed to delete user');
+          }
+        }
+      );
     }
   }
 
@@ -351,17 +367,24 @@ export class AdminPanelComponent implements OnInit {
   }
 
   async deleteStation(row: any) {
-    if (!confirm(`Delete station "${row.name}"?`)) return;
-    try {
-      await firstValueFrom(
-        this.http.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, { params: { id: row.id }, responseType: 'text' })
-      );
-      this.toaster.success('Success', 'Vet station deleted');
-      this.showStationDetail = false;
-      await this.loadStations();
-    } catch (err: any) {
-      this.toaster.error('Error', err.error ?? 'Failed to delete station');
-    }
+    this.openConfirm(
+      'Delete Vet Station',
+      `Are you sure you want to delete station "${row.name}"? This action cannot be undone.`,
+      'Delete',
+      true,
+      async () => {
+        try {
+          await firstValueFrom(
+            this.http.delete(`${environment.apiUrl}/api/AdminPanel/VetStations/Delete`, { params: { id: row.id }, responseType: 'text' })
+          );
+          this.toaster.success('Success', 'Vet station deleted');
+          this.showStationDetail = false;
+          await this.loadStations();
+        } catch (err: any) {
+          this.toaster.error('Error', err.error ?? 'Failed to delete station');
+        }
+      }
+    );
   }
 
   // ═══════════════════════════════
@@ -403,18 +426,25 @@ export class AdminPanelComponent implements OnInit {
         this.toaster.error('Error', err.error ?? 'Failed to assign main vet');
       }
     } else if (event.action === 'remove') {
-      if (!confirm(`Remove ${event.row.firstName} ${event.row.lastName} from this station?`)) return;
-      try {
-        await firstValueFrom(
-          this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/RemoveEmployee`, {
-            employeeId: event.row.id, vetStationId: this.stationDetail.id,
-          }, { responseType: 'text' })
-        );
-        this.toaster.success('Success', 'Employee removed from station');
-        await this.openStationDetail(this.stationDetail.id);
-      } catch (err: any) {
-        this.toaster.error('Error', err.message ?? 'Failed to remove employee');
-      }
+      this.openConfirm(
+        'Remove Employee',
+        `Are you sure you want to remove ${event.row.firstName} ${event.row.lastName} from this station?`,
+        'Remove',
+        true,
+        async () => {
+          try {
+            await firstValueFrom(
+              this.http.put(`${environment.apiUrl}/api/AdminPanel/VetStations/RemoveEmployee`, {
+                employeeId: event.row.id, vetStationId: this.stationDetail.id,
+              }, { responseType: 'text' })
+            );
+            this.toaster.success('Success', 'Employee removed from station');
+            await this.openStationDetail(this.stationDetail.id);
+          } catch (err: any) {
+            this.toaster.error('Error', err.message ?? 'Failed to remove employee');
+          }
+        }
+      );
     }
   }
 
@@ -502,5 +532,27 @@ export class AdminPanelComponent implements OnInit {
         this.http.get<any[]>(`${environment.apiUrl}/api/AdminPanel/Roles`)
       );
     } catch {}
+  }
+
+  // ─── Confirm Modal helpers ───
+
+  private openConfirm(title: string, message: string, confirmText: string, isDanger: boolean, callback: () => void) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmText = confirmText;
+    this.confirmIsDanger = isDanger;
+    this.confirmCallback = callback;
+    this.showConfirmModal = true;
+  }
+
+  onConfirmAccept() {
+    this.showConfirmModal = false;
+    this.confirmCallback?.();
+    this.confirmCallback = null;
+  }
+
+  onConfirmCancel() {
+    this.showConfirmModal = false;
+    this.confirmCallback = null;
   }
 }

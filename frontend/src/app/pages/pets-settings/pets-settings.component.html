@@ -107,8 +107,8 @@
         [picture]="getPetPictureUrl(pet)"
         [petId]="pet.id"
         [isDeleted]="pet.isDeleted === true"
-        (onDelete)="deletePet($event)"
-        (onRestore)="restorePet($event)"
+        (onDelete)="requestDeletePet($event)"
+        (onRestore)="requestRestorePet($event)"
         (onDownloadPdf)="downloadPdf($event)"
         (onEdit)="editPet($event)"
       />
@@ -198,5 +198,29 @@
     [editData]="editingPetData"
     (onSave)="onPetSave($event)"
     (onCancel)="onPetCancel()"
+  />
+
+  <!-- Delete confirmation modal -->
+  <app-confirm-modal
+    [visible]="showDeleteConfirm"
+    title="Delete Pet"
+    [message]="'Are you sure you want to delete \'' + confirmTargetPetName + '\'? You can restore the pet later from the Deleted filter.'"
+    confirmText="Delete"
+    cancelText="Cancel"
+    [isDanger]="true"
+    (onConfirm)="confirmDeletePet()"
+    (onCancel)="cancelConfirm()"
+  />
+
+  <!-- Restore confirmation modal -->
+  <app-confirm-modal
+    [visible]="showRestoreConfirm"
+    title="Restore Pet"
+    [message]="'Are you sure you want to restore \'' + confirmTargetPetName + '\'?'"
+    confirmText="Restore"
+    cancelText="Cancel"
+    [isDanger]="false"
+    (onConfirm)="confirmRestorePet()"
+    (onCancel)="cancelConfirm()"
   />
 </div>
