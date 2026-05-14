@@ -47,7 +47,7 @@ public class SpeciesUpdateOrInsertEndpointTests
 
     private static void SeedToken(DataContext db)
     {
-        db.AuthentificationToken.Add(new AuthentificationToken
+        db.AuthenticationToken.Add(new AuthenticationToken
         {
             Token = ValidToken,
             UserProfileId = 1

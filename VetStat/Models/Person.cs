@@ -43,7 +43,7 @@ namespace VetStat.Models
 
         public float? MembershipLoyalty { get; set; }  //Discount
 
-        public bool verified { get; set; }
+        public bool Verified { get; set; }
 
         /// <summary>
         /// Google OAuth subject ID. When set, this user registered/logged in via Google.

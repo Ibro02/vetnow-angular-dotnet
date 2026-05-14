@@ -29,7 +29,7 @@ namespace VetStat.Helpers.Services
             string authToken = _httpContext.HttpContext?.Request.Headers["my-auth-token"];
             if (string.IsNullOrEmpty(authToken)) return false;
 
-            return _db.AuthentificationToken.Any(x => x.Token == authToken);
+            return _db.AuthenticationToken.Any(x => x.Token == authToken);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace VetStat.Helpers.Services
             string authToken = _httpContext.HttpContext?.Request.Headers["my-auth-token"];
             if (string.IsNullOrEmpty(authToken)) return null;
 
-            var token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == authToken);
+            var token = _db.AuthenticationToken.SingleOrDefault(x => x.Token == authToken);
             if (token == null) return null;
 
             return _db.Person.SingleOrDefault(x => x.Id == token.UserProfileId);

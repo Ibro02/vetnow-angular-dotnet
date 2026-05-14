@@ -17,7 +17,7 @@ public class TokenAuthenticationOptions : AuthenticationSchemeOptions { }
 
 /// <summary>
 /// Custom authentication handler that validates the existing "my-auth-token" header
-/// against the AuthentificationToken table in the database.
+/// against the AuthenticationToken table in the database.
 /// On success, creates a ClaimsPrincipal with UserId, Username, Email, and Role claims.
 /// </summary>
 public class TokenAuthenticationHandler : AuthenticationHandler<TokenAuthenticationOptions>
@@ -48,7 +48,7 @@ public class TokenAuthenticationHandler : AuthenticationHandler<TokenAuthenticat
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-        var authToken = await db.AuthentificationToken
+        var authToken = await db.AuthenticationToken
             .Include(t => t.UserProfile)
             .ThenInclude(p => p.Role)
             .FirstOrDefaultAsync(t => t.Token == token);

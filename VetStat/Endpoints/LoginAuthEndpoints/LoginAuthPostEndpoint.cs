@@ -39,7 +39,7 @@ public class LoginAuthPostEndpoint : MyEndpointBase
             if (userProfile == null || !PasswordHasher.Verify(loginValue.password, userProfile.Password))
                 return NotFound("User does not exist!");
 
-            if (!userProfile.verified)
+            if (!userProfile.Verified)
             {
                 string newVerificationToken = Helpers.Validators.Services.GenerateToken(10);
 
@@ -75,16 +75,16 @@ public class LoginAuthPostEndpoint : MyEndpointBase
 
             string newToken = Helpers.Validators.Services.GenerateToken(10);
 
-            AuthentificationToken log = new AuthentificationToken()
+            AuthenticationToken log = new AuthenticationToken()
             {
-                IpAdress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
+                IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 UserProfile = userProfile,
                 Token = newToken,
                 UserProfileId = userProfile.Id,
-                LoggTime = DateTime.UtcNow
+                LoggedTime = DateTime.UtcNow
             };
 
-            _db.AuthentificationToken.Add(log);
+            _db.AuthenticationToken.Add(log);
             _db.SaveChanges();
 
             return Ok(newToken);

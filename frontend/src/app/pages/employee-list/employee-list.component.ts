@@ -7,7 +7,7 @@ import { ConfirmModalComponent } from '../../components/common/confirm-modal/con
 import { MyAuthService } from '../../services/MyAuth';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import {environment} from "../../../enviroment";
+import {environment} from "../../../environment";
 import {ToasterService} from "../../services/toaster.service";
 
 @Component({

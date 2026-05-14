@@ -27,6 +27,18 @@ namespace VetStat.Data
             modelBuilder.Entity<Barber>().ToTable("Barber");
             modelBuilder.Entity<MainVet>().ToTable("MainVet");
 
+            // ─── Column/Table name mappings (preserve existing DB names after code renames) ───
+
+            modelBuilder.Entity<AuthenticationToken>()
+                .ToTable("AuthentificationToken");
+            modelBuilder.Entity<AuthenticationToken>()
+                .Property(t => t.IpAddress).HasColumnName("IpAdress");
+            modelBuilder.Entity<AuthenticationToken>()
+                .Property(t => t.LoggedTime).HasColumnName("LoggTime");
+
+            modelBuilder.Entity<Person>()
+                .Property(p => p.Verified).HasColumnName("verified");
+
             // ─── Indexes ───────────────────────────────────────────────
 
             // Person — login, registration, and profile uniqueness checks
@@ -35,10 +47,10 @@ namespace VetStat.Data
             modelBuilder.Entity<Person>()
                 .HasIndex(p => p.Username).IsUnique();
 
-            // AuthentificationToken — looked up on every authenticated request
-            modelBuilder.Entity<AuthentificationToken>()
+            // AuthenticationToken — looked up on every authenticated request
+            modelBuilder.Entity<AuthenticationToken>()
                 .HasIndex(t => t.Token).IsUnique();
-            modelBuilder.Entity<AuthentificationToken>()
+            modelBuilder.Entity<AuthenticationToken>()
                 .HasIndex(t => t.UserProfileId);
 
             // Employee — frequently filtered by station and soft-delete status
@@ -130,7 +142,7 @@ namespace VetStat.Data
         public DbSet<Species> Species => Set<Species>();
         public DbSet<TimeSlot> TimeSlot => Set<TimeSlot>();
         public DbSet<Breed> Breed => Set<Breed>();
-        public DbSet<AuthentificationToken> AuthentificationToken => Set<AuthentificationToken>();
+        public DbSet<AuthenticationToken> AuthenticationToken => Set<AuthenticationToken>();
 
         public DbSet<EmployeeWorkingDay> EmployeeWorkingDays => Set<EmployeeWorkingDay>();
 

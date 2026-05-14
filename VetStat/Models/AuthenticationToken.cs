@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VetStat.Models
 {
-    public class AuthentificationToken
+    public class AuthenticationToken
     {
         [Key]
         public int Id { get; set; }
@@ -14,8 +14,8 @@ namespace VetStat.Models
         public int UserProfileId { get; set; }
         public Person UserProfile { get; set; }
 
-        public string? IpAdress { get; set; }
+        public string? IpAddress { get; set; }
 
-        public DateTime? LoggTime { get; set; }
+        public DateTime? LoggedTime { get; set; }
     }
 }

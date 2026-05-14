@@ -72,7 +72,7 @@ public class AvailabilityAddValidator : AbstractValidator<AvailabilityAddRequest
             .WithMessage("Break to must fall within working hours.");
 
         // Appointment duration: required, integer, 5-120 minutes
-        RuleFor(x => x.AppointmentDuaration)
+        RuleFor(x => x.AppointmentDuration)
             .NotEmpty().WithMessage("Appointment duration is required.")
             .Must(d => int.TryParse(d, out _))
             .WithMessage("Appointment duration must be a whole number.")

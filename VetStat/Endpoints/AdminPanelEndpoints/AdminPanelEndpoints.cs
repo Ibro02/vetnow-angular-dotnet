@@ -59,7 +59,7 @@ public class AdminPanelEndpoints : MyEndpointBase
                 Role = p.RoleId.HasValue ? _db.Role.Where(r => r.Id == p.RoleId).Select(r => r.Name).FirstOrDefault() : "User",
                 p.City,
                 p.Country,
-                p.verified,
+                p.Verified,
                 p.ProfileCreationDate
             })
             .ToList();
@@ -136,8 +136,8 @@ public class AdminPanelEndpoints : MyEndpointBase
         if (person == null) return NotFound("User not found.");
 
         // Clean up related data
-        var tokens = _db.AuthentificationToken.Where(t => t.UserProfileId == id);
-        _db.AuthentificationToken.RemoveRange(tokens);
+        var tokens = _db.AuthenticationToken.Where(t => t.UserProfileId == id);
+        _db.AuthenticationToken.RemoveRange(tokens);
 
         var employee = _db.Employee.SingleOrDefault(e => e.Id == id);
         if (employee != null)
@@ -257,7 +257,7 @@ public class AdminPanelEndpoints : MyEndpointBase
             RoleId = request.RoleId ?? 1,
             BirthDate = DateTime.UtcNow,
             ProfileCreationDate = DateTime.UtcNow,
-            verified = true,
+            Verified = true,
         };
 
         _db.Person.Add(person);
@@ -471,7 +471,7 @@ public class AdminPanelEndpoints : MyEndpointBase
             BirthDate = DateTime.UtcNow,
             ProfileCreationDate = DateTime.UtcNow,
             DateOfEmployment = DateTime.UtcNow,
-            verified = true,
+            Verified = true,
         };
 
         _db.Employee.Add(employee);

@@ -3,7 +3,7 @@ import { NgIf, NgFor, NgClass, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../enviroment';
+import { environment } from '../../../environment';
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
 import { fadeIn, listStagger } from '../../animations/shared.animations';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';

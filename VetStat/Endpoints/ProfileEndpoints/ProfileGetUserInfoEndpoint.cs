@@ -25,7 +25,7 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
     public ActionResult<Person> HandleAsync()
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
-        var _token = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
+        var _token = _db.AuthenticationToken.SingleOrDefault(x => x.Token == token);
         if (_token == null)
             return Unauthorized("Invalid token.");
 
@@ -96,7 +96,7 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
             BirthDate = person.BirthDate;
             Username = person.Username;
             // Password is intentionally excluded — never send hashes to the client.
-            verified = person.verified;
+            verified = person.Verified;
         }
     }
 }

@@ -43,7 +43,7 @@ public class AvailabilityAddEndpoint : MyEndpointBase
             AvailableTo = new TimeSpan(int.Parse(availableTo[0]), int.Parse(availableTo[1]), 0),
             BreakFrom = new TimeSpan(int.Parse(breakFrom[0]), int.Parse(breakFrom[1]), 0),
             BreakTo = new TimeSpan(int.Parse(breakTo[0]), int.Parse(breakTo[1]), 0),
-            AppointmentDuration = int.Parse(availability.AppointmentDuaration),
+            AppointmentDuration = int.Parse(availability.AppointmentDuration),
         };
         try
         {
@@ -72,6 +72,6 @@ public class AvailabilityAddEndpoint : MyEndpointBase
         public string? BreakTo { get; set; }
         public string? AvailableFrom { get; set; }
         public string? AvailableTo { get; set; }
-        public string AppointmentDuaration { get; set; }
+        public string AppointmentDuration { get; set; }
     }
 }

@@ -44,7 +44,7 @@ public class VerificationPostEndpoint : MyEndpointBase
 
         if (tokenObj.Token == loginValue.token)
         {
-            user.verified = true;
+            user.Verified = true;
             _db.TwoFaVerificationTokens.Remove(tokenObj);
             _db.SaveChanges();
             return Ok("Verified successfully!");

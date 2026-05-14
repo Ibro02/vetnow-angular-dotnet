@@ -5,7 +5,7 @@ import { TableComponent, TableColumn, TableAction } from '../../components/commo
 import { HeaderTitleComponent } from '../../components/common/header-title/header-title.component';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../enviroment';
+import { environment } from '../../../environment';
 import { ToasterService } from '../../services/toaster.service';
 import { ConfirmModalComponent } from '../../components/common/confirm-modal/confirm-modal.component';
 

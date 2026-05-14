@@ -20,12 +20,12 @@ public class LoginAuthDeleteEndpoint : MyEndpointBase
     public ActionResult HandleAsync()
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
-        var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
+        var authToken = _db.AuthenticationToken.SingleOrDefault(x => x.Token == token);
 
         if (authToken == null)
             return NotFound("Token not found.");
 
-        _db.AuthentificationToken.Remove(authToken);
+        _db.AuthenticationToken.Remove(authToken);
         _db.SaveChanges();
         return Ok("Logged out successfully.");
     }

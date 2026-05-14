@@ -40,7 +40,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admin");
+                    b.ToTable("Admin", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Animal", b =>
@@ -87,7 +87,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Animal");
+                    b.ToTable("Animal", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Appointment", b =>
@@ -125,7 +125,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("VetStationId");
 
-                    b.ToTable("Appointment");
+                    b.ToTable("Appointment", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.AuthentificationToken", b =>
@@ -156,7 +156,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("AuthentificationToken");
+                    b.ToTable("AuthentificationToken", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Availability", b =>
@@ -189,7 +189,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Availability");
+                    b.ToTable("Availability", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Breed", b =>
@@ -211,7 +211,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("SpeciesId");
 
-                    b.ToTable("Breed");
+                    b.ToTable("Breed", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Category", b =>
@@ -228,7 +228,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.EmployeeWorkingDay", b =>
@@ -243,7 +243,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("WorkingDayId");
 
-                    b.ToTable("EmployeeWorkingDays");
+                    b.ToTable("EmployeeWorkingDays", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.FAQ", b =>
@@ -269,7 +269,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("VetStationId");
 
-                    b.ToTable("FAQ");
+                    b.ToTable("FAQ", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Holiday", b =>
@@ -293,7 +293,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Holidays");
+                    b.ToTable("Holidays", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Inventory", b =>
@@ -335,7 +335,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("VetStationId");
 
-                    b.ToTable("Inventory");
+                    b.ToTable("Inventory", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Person", b =>
@@ -440,7 +440,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Role", b =>
@@ -457,7 +457,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Species", b =>
@@ -479,7 +479,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Species");
+                    b.ToTable("Species", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.SubCategory", b =>
@@ -506,7 +506,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("SubCategory");
+                    b.ToTable("SubCategory", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.TimeSlot", b =>
@@ -538,7 +538,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("SlotEmployeeId");
 
-                    b.ToTable("TimeSlot");
+                    b.ToTable("TimeSlot", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.TwoFaVerificationToken", b =>
@@ -566,7 +566,7 @@ namespace VetStat.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TwoFaVerificationTokens");
+                    b.ToTable("TwoFaVerificationTokens", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.VetStation", b =>
@@ -621,7 +621,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VetStation");
+                    b.ToTable("VetStation", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.WorkingDay", b =>
@@ -638,7 +638,7 @@ namespace VetStat.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("WorkingDays");
+                    b.ToTable("WorkingDays", (string)null);
                 });
 
             modelBuilder.Entity("VetStat.Models.Employee", b =>

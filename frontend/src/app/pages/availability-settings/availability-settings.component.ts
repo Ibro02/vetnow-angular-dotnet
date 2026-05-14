@@ -6,7 +6,7 @@ import { MyAuthService } from '../../services/MyAuth';
 import { ToasterService } from '../../services/toaster.service';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../enviroment';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-availability-settings',
@@ -65,7 +65,7 @@ export class AvailabilitySettingsComponent implements OnInit {
           availableTo: '17:00',
           breakFrom: '10:30',
           breakTo: '11:00',
-          appointmentDuaration: '35',
+          appointmentDuration: '35',
         })
       );
 

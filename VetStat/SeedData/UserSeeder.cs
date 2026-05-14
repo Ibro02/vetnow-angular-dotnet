@@ -47,7 +47,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1985, 1, 1),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.0f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -64,7 +64,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1993, 6, 15),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.0f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -81,7 +81,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1990, 5, 15),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.05f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -98,7 +98,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1988, 3, 22),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.10f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -115,7 +115,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1995, 8, 10),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.0f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -132,7 +132,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1992, 11, 28),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.15f,
-                verified = true
+                Verified = true
             },
             new Person
             {
@@ -149,7 +149,7 @@ public class UserSeeder
                 BirthDate = new DateTime(1993, 7, 4),
                 ProfileCreationDate = DateTime.UtcNow,
                 MembershipLoyalty = 0.0f,
-                verified = true
+                Verified = true
             }
         };
 

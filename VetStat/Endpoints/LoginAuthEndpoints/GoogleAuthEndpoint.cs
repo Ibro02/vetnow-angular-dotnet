@@ -64,7 +64,7 @@ public class GoogleAuthEndpoint : MyEndpointBase
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
                 GoogleProviderId = googleSubject,
-                verified = true, // Google already verified the email
+                Verified = true, // Google already verified the email
                 ProfileCreationDate = DateTime.UtcNow,
                 BirthDate = DateTime.UtcNow
             };
@@ -76,23 +76,23 @@ public class GoogleAuthEndpoint : MyEndpointBase
             // 3b. Existing user (registered by email/password) logging in with Google
             //     for the first time — link the Google account.
             userProfile.GoogleProviderId = googleSubject;
-            userProfile.verified = true; // email is confirmed via Google
+            userProfile.Verified = true; // email is confirmed via Google
             _db.SaveChanges();
         }
 
         // 4. Create a session token (same logic as normal login)
         string newToken = Helpers.Validators.Services.GenerateToken(10);
 
-        var authToken = new AuthentificationToken
+        var authToken = new AuthenticationToken
         {
-            IpAdress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
+            IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
             UserProfile = userProfile,
             Token = newToken,
             UserProfileId = userProfile.Id,
-            LoggTime = DateTime.UtcNow
+            LoggedTime = DateTime.UtcNow
         };
 
-        _db.AuthentificationToken.Add(authToken);
+        _db.AuthenticationToken.Add(authToken);
         _db.SaveChanges();
 
         return Ok(newToken);

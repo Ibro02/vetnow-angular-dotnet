@@ -26,7 +26,7 @@ public class ProfileSettingsGetEndpoint : MyEndpointBase
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
 
-        var authToken = _db.AuthentificationToken.SingleOrDefault(x => x.Token == token);
+        var authToken = _db.AuthenticationToken.SingleOrDefault(x => x.Token == token);
         if (authToken == null)
             return Unauthorized("Invalid token.");
 
