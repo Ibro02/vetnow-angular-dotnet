@@ -62,7 +62,23 @@ isError:boolean = false;
             else
               this.router.navigate(['verification']);
           },
-          error: () => { this.isError = true; }
+          error: (err) => {
+            let body = err.error;
+            if (typeof body === 'string') {
+              try { body = JSON.parse(body); } catch { /* leave as string */ }
+            }
+
+            if (err.status === 401 && body?.needsVerification) {
+              this.toaster.info('Verification Required', body.message);
+              this.router.navigate(['verification'], { queryParams: { userId: body.userId } });
+            } else if (err.status === 404) {
+              this.isError = true;
+              this.toaster.error('Error', 'Invalid username/email or password.');
+            } else {
+              this.isError = true;
+              this.toaster.error('Error', 'Login failed. Please try again.');
+            }
+          }
         });
 
       this.isError = false;

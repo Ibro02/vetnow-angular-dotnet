@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
@@ -34,16 +34,16 @@ public class PersonAddEndpoint : MyEndpointBaseAsync
             if (!validation.IsValid)
                 return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
-            if (!_db.Person.ToList<Person>().Where(x => x.Username == person.Username).IsNullOrEmpty())
-                throw new Exception("Username already in use");
+            if (await _db.Person.AnyAsync(x => x.Username == person.Username, cancellationToken))
+                return BadRequest("Username already in use.");
 
-            if (!_db.Person.ToList<Person>().Where(x => x.Email == person.Email).IsNullOrEmpty())
-                throw new Exception("Email already in use");
+            if (await _db.Person.AnyAsync(x => x.Email == person.Email, cancellationToken))
+                return BadRequest("Email already in use.");
 
             person.Password = PasswordHasher.Hash(person.Password);
 
             _db.Person.Add(person);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync(cancellationToken);
 
             return Ok(person.ToDto());
         }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
@@ -24,7 +24,7 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
     }
 
     [HttpPost("AddNewEmployee")]
-    public ActionResult<EmployeeResponse> HandleAsync([FromBody] EmployeeAddNewRequest newEmployee)
+    public async Task<ActionResult<EmployeeResponse>> HandleAsync([FromBody] EmployeeAddNewRequest newEmployee)
     {
         try
         {
@@ -36,30 +36,29 @@ public class EmployeeAddNewEndpoint : MyEndpointBase
             if (!validation.IsValid)
                 return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
-            if (_db.Employee.ToList().Where(x => x.Email == newEmployee.Email).IsNullOrEmpty())
-            {
-                var _newEmployee = new Employee()
-                {
-                    FirstName = newEmployee.FirstName,
-                    LastName = newEmployee.LastName,
-                    Email = newEmployee.Email,
-                    BirthDate = DateTime.Parse(newEmployee.BirthDate),
-                    ProfileCreationDate = DateTime.Parse(newEmployee.ProfileCreationDate),
-                    DateOfEmployment = DateTime.Parse(newEmployee.DateOfEmployment),
-                    City = newEmployee.City,
-                    Country = newEmployee.Country,
-                    Phone = newEmployee.Phone,
-                    RoleId = newEmployee.RoleId,
-                    VetStationId = newEmployee.VetStationId,
-                    Password = PasswordHasher.Hash(newEmployee.Password),
-                    Username = newEmployee.Username,
-                };
-                _db.Employee.Add(_newEmployee);
-                _db.SaveChanges();
+            if (await _db.Employee.AnyAsync(x => x.Email == newEmployee.Email))
+                return BadRequest("Employee with this email already exists.");
 
-                return Ok(_newEmployee.ToDto());
-            }
-            return BadRequest("Employee already exists!");
+            var _newEmployee = new Employee()
+            {
+                FirstName = newEmployee.FirstName,
+                LastName = newEmployee.LastName,
+                Email = newEmployee.Email,
+                BirthDate = DateTime.Parse(newEmployee.BirthDate),
+                ProfileCreationDate = DateTime.Parse(newEmployee.ProfileCreationDate),
+                DateOfEmployment = DateTime.Parse(newEmployee.DateOfEmployment),
+                City = newEmployee.City,
+                Country = newEmployee.Country,
+                Phone = newEmployee.Phone,
+                RoleId = newEmployee.RoleId,
+                VetStationId = newEmployee.VetStationId,
+                Password = PasswordHasher.Hash(newEmployee.Password),
+                Username = newEmployee.Username,
+            };
+            _db.Employee.Add(_newEmployee);
+            await _db.SaveChangesAsync();
+
+            return Ok(_newEmployee.ToDto());
         }
         catch (Exception ex)
         {
