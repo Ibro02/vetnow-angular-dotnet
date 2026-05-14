@@ -27,6 +27,48 @@ namespace VetStat.Data
             modelBuilder.Entity<Barber>().ToTable("Barber");
             modelBuilder.Entity<MainVet>().ToTable("MainVet");
 
+            // ─── Indexes ───────────────────────────────────────────────
+
+            // Person — login, registration, and profile uniqueness checks
+            modelBuilder.Entity<Person>()
+                .HasIndex(p => p.Email).IsUnique();
+            modelBuilder.Entity<Person>()
+                .HasIndex(p => p.Username).IsUnique();
+
+            // AuthentificationToken — looked up on every authenticated request
+            modelBuilder.Entity<AuthentificationToken>()
+                .HasIndex(t => t.Token).IsUnique();
+            modelBuilder.Entity<AuthentificationToken>()
+                .HasIndex(t => t.UserProfileId);
+
+            // Employee — frequently filtered by station and soft-delete status
+            modelBuilder.Entity<Employee>()
+                .HasIndex(e => e.VetStationId);
+
+            // Animal — list-by-owner queries
+            modelBuilder.Entity<Animal>()
+                .HasIndex(a => a.OwnerId);
+
+            // Appointment — filtered by animal, employee, and time slot
+            modelBuilder.Entity<Appointment>()
+                .HasIndex(a => a.AnimalId);
+            modelBuilder.Entity<Appointment>()
+                .HasIndex(a => a.EmployeeId);
+
+            // TimeSlot — queried by employee for availability/scheduling
+            modelBuilder.Entity<TimeSlot>()
+                .HasIndex(t => t.SlotEmployeeId);
+
+            // Availability — queried by employee
+            modelBuilder.Entity<Availability>()
+                .HasIndex(a => a.EmployeeId);
+
+            // TwoFaVerificationToken — looked up by userId during 2FA flow
+            modelBuilder.Entity<TwoFaVerificationToken>()
+                .HasIndex(t => t.UserId);
+
+            // ─── Relationships ────────────────────────────────────────
+
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Employee)
                 .WithMany()

@@ -77,6 +77,18 @@ public class AdminPanelEndpoints : MyEndpointBase
         var person = _db.Person.SingleOrDefault(p => p.Id == request.Id);
         if (person == null) return NotFound("User not found.");
 
+        // Uniqueness checks (exclude the current user)
+        if (request.Email != null && request.Email != person.Email)
+        {
+            if (_db.Person.Any(p => p.Email == request.Email && p.Id != person.Id))
+                return BadRequest("Email is already in use by another account.");
+        }
+        if (request.Username != null && request.Username != person.Username)
+        {
+            if (_db.Person.Any(p => p.Username == request.Username && p.Id != person.Id))
+                return BadRequest("Username is already in use by another account.");
+        }
+
         if (request.FirstName != null) person.FirstName = request.FirstName;
         if (request.LastName != null) person.LastName = request.LastName;
         if (request.Email != null) person.Email = request.Email;
