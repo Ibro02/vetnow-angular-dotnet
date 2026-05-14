@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.DTOs.Responses;
 using VetStat.Helpers.Api;
@@ -27,7 +28,7 @@ public class EmployeeGetByIdEndpoint : MyEndpointBaseAsync
     {
         try
         {
-            var employee = _db.Employee.Where(x => x.Id == request.Id).FirstOrDefault();
+            var employee = await _db.Employee.Where(x => x.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
             if (employee == null) return NotFound();
             return Ok(employee.ToDto());
         }

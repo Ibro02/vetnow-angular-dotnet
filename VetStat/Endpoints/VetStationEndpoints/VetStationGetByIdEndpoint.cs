@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
@@ -25,9 +25,12 @@ public class VetStationGetByIdEndpoint : MyEndpointBaseAsync
     public override async Task<ActionResult<VetStation>> HandleAsync(
         [FromQuery] VetStationGetByIdRequest request, CancellationToken cancellationToken = default)
     {
-        if (!_db.VetStation.Where(x => x.Id == request.Id).IsNullOrEmpty())
-            return Ok(_db.VetStation.Where(x => x.Id == request.Id));
-        return NoContent();
+        var stations = await _db.VetStation
+            .Where(x => x.Id == request.Id)
+            .ToListAsync(cancellationToken);
+        if (stations.Count == 0)
+            return NoContent();
+        return Ok(stations);
     }
 
     public class VetStationGetByIdRequest

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
@@ -37,7 +38,10 @@ public class AnimalGetByOwnerIdEndpoint : MyEndpointBaseAsync
 
         try
         {
-            return Ok(_db.Animal.Where(x => x.OwnerId == request.Id));
+            var animals = await _db.Animal
+                .Where(x => x.OwnerId == request.Id)
+                .ToListAsync(cancellationToken);
+            return Ok(animals);
         }
         catch
         {

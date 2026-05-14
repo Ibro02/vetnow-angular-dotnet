@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Models;
@@ -23,13 +24,13 @@ public class VetStationGetAllEndpoint : MyEndpointBase
         [FromQuery] int pageSize = 100)
     {
         var query = _db.VetStation.AsQueryable();
-        var totalCount = query.Count();
-        var dataItems = query
+        var totalCount = await query.CountAsync();
+        var dataItems = await query
             .OrderBy(v => v.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
 
-        return await Task.Run(() => Ok(new { totalCount, dataItems, currentPage = page, pageSize }));
+        return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
     }
 }
