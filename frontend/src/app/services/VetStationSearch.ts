@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { VetStationList } from '../pages/home-page/VetStation';
-import { Config } from '../config';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'root',
@@ -72,7 +72,7 @@ export class VetStationService {
 
   async setValues(value?: string) {
     const arr = this.dropdown;
-    const requestLink = Config.address + 'api/VetStationSearch';
+    const requestLink = `${environment.apiUrl}/api/VetStationSearch`;
     let url = requestLink + (value ? '?name=' + value : '?');
 
     arr.map((x) => {

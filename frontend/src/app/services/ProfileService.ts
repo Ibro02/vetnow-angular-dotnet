@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { UserProfile } from './interfaces/UserProfile';
-import { Config } from '../config';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ export class ProfileService {
   constructor(private http: HttpClient) {}
 
   async getUserContent(): Promise<void> {
-    const link = Config.address + 'api/ProfileEndpoint/GetUserInfo';
+    const link = `${environment.apiUrl}/api/ProfileEndpoint/GetUserInfo`;
     try {
       this.userProfile = await firstValueFrom(
         this.http.get<UserProfile>(link)

@@ -7,7 +7,7 @@ import {OtherSignUpMethodsComponent} from "../../components/other-sign-up-method
 import { HttpClient } from "@angular/common/http";
 import {Router, RouterLink} from "@angular/router";
 import {MyAuthService} from "../../services/MyAuth";
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import {ToasterService} from "../../services/toaster.service";
 import { shake, fadeIn } from '../../animations/shared.animations';
 @Component({
@@ -45,7 +45,7 @@ isError:boolean = false;
     this.myAuthService.loginValue!.usernameOrEmail = this.usernameOrEmail;
     this.myAuthService.loginValue!.password = this.password;
     if (this.usernameOrEmail.trim() && this.password.trim()) {
-      const link = Config.address + 'api/LoginAuth/Post';
+      const link = `${environment.apiUrl}/api/LoginAuth/Post`;
 
       this.http.post(link, this.myAuthService.loginValue, { responseType: 'text' })
         .subscribe({

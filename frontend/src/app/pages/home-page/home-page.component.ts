@@ -11,7 +11,7 @@ import {HttpClient} from "@angular/common/http";
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
 import {VetStationService} from "../../services/VetStationSearch";
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import { RouterLink } from '@angular/router';
 import { listStagger, fadeIn } from '../../animations/shared.animations';
 
@@ -69,7 +69,7 @@ export class HomePageComponent implements OnInit {
   }
 
   getAll() {
-    let url = Config.address + "api/VetStation/GetAll";
+    let url = `${environment.apiUrl}/api/VetStation/GetAll`;
     this.httpClient.get<any>(url).subscribe(async x => {
       let vetStationsArr: VetStation[] = x.dataItems;
       this.vetStationService.vetStations = {vetStations: [...vetStationsArr]};

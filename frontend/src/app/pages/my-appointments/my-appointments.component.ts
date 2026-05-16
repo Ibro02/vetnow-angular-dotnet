@@ -11,7 +11,7 @@ import { HeaderTitleComponent } from '../../components/common/header-title/heade
 import { CalendarComponent } from '../../components/common/calendar/calendar.component';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import { listStagger, fadeIn, scaleIn } from '../../animations/shared.animations';
 
 @Component({
@@ -160,7 +160,7 @@ export class MyAppointmentsComponent implements OnInit {
       const dateStr = appt.slotDateTime.split('T')[0];
       const data = await firstValueFrom(
         this.http.get<any[]>(
-          Config.address + `api/TimeSlot/Get?employeeid=${appt.employeeId}&date=${dateStr}`
+          `${environment.apiUrl}/api/TimeSlot/Get?employeeid=${appt.employeeId}&date=${dateStr}`
         )
       );
       this.availableSlots = Array.isArray(data) ? data : [];

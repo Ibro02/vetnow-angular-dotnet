@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { LoginRequest } from '../pages/login/LoginRequest';
-import { Config } from '../config';
+import { environment } from '../../environment';
 import { UserProfile } from './interfaces/UserProfile';
 
 @Injectable({ providedIn: 'root' })
@@ -55,7 +55,7 @@ export class MyAuthService {
     // Re-read the token from storage so we use the freshly stored one after login
     this.token = this.getToken();
 
-    const link = Config.address + 'api/ProfileEndpoint/GetUserInfo';
+    const link = `${environment.apiUrl}/api/ProfileEndpoint/GetUserInfo`;
     try {
       this.userProfile = await firstValueFrom(
         this.http.get<UserProfile>(link)
@@ -76,7 +76,7 @@ export class MyAuthService {
     this.token = null;
 
     if (token) {
-      const link = Config.address + 'api/LoginAuth/Delete';
+      const link = `${environment.apiUrl}/api/LoginAuth/Delete`;
       // Send the DELETE with explicit header since we just cleared storage
       // (the interceptor would read null from storage at this point)
       this.http
@@ -92,7 +92,7 @@ export class MyAuthService {
    * Stores the returned token and returns it.
    */
   async getAuthorizationToken(): Promise<string> {
-    const link = Config.address + 'api/LoginAuth/Post';
+    const link = `${environment.apiUrl}/api/LoginAuth/Post`;
     try {
       const newToken = await firstValueFrom(
         this.http.post(link, this.loginValue, { responseType: 'text' })
@@ -109,7 +109,7 @@ export class MyAuthService {
    * and returns the app's own session token (login or auto-register).
    */
   async loginWithGoogle(googleIdToken: string): Promise<boolean> {
-    const link = Config.address + 'api/GoogleAuth/Login';
+    const link = `${environment.apiUrl}/api/GoogleAuth/Login`;
     try {
       const newToken = await firstValueFrom(
         this.http.post(link, { idToken: googleIdToken }, { responseType: 'text' })

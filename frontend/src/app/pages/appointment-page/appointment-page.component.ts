@@ -9,7 +9,7 @@ import { firstValueFrom } from "rxjs";
 import {NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {TimeSlot} from "./TimeSlot";
-import {Config} from "../../config";
+import { environment } from '../../../environment';
 import {Animal} from "./Animal";
 import {ToasterService} from "../../services/toaster.service";
 import { fadeIn, scaleIn } from '../../animations/shared.animations';
@@ -85,7 +85,7 @@ export class AppointmentPageComponent {
     this.isLoadingPets = true;
     try {
       const data = await firstValueFrom(
-        this.http.get<Animal[]>(Config.address + `api/Animal/GetByOwnerId?id=${this.user?.id}`)
+        this.http.get<Animal[]>(`${environment.apiUrl}/api/Animal/GetByOwnerId?id=${this.user?.id}`)
       );
       this.pets = Array.isArray(data) ? data : [];
     } catch {
@@ -101,7 +101,7 @@ export class AppointmentPageComponent {
     try {
       const data = await firstValueFrom(
         this.http.get<TimeSlot[]>(
-          Config.address + `api/TimeSlot/Get?employeeid=${this.employeeid}&date=${date.split("T")[0]}`
+          `${environment.apiUrl}/api/TimeSlot/Get?employeeid=${this.employeeid}&date=${date.split("T")[0]}`
         )
       );
       // API returns 204 NoContent (empty body) when no slots exist
@@ -116,7 +116,7 @@ export class AppointmentPageComponent {
   async fetchEmployee() {
     try {
       this.employee = await firstValueFrom(
-        this.http.get(Config.address + `api/Employee/Get?id=${this.employeeid}`)
+        this.http.get(`${environment.apiUrl}/api/Employee/Get?id=${this.employeeid}`)
       );
     } catch {
       this.employee = null;
@@ -160,7 +160,7 @@ export class AppointmentPageComponent {
 
     try {
       await firstValueFrom(
-        this.http.post(Config.address + 'api/Appointment/Add', this.newAppointment)
+        this.http.post(`${environment.apiUrl}/api/Appointment/Add`, this.newAppointment)
       );
       this.toaster.success('Appointment booked!', `See you on ${this.appointmentTime}!`);
       this.router.navigate(['/home-page']);

@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
 import {ToasterService} from "../../services/toaster.service";
 import {MyAuthService} from "../../services/MyAuth";
-import {Config} from "../../config";
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-vet-station',
@@ -161,7 +161,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const apiUrl = Config.address + `api/VetStation/Edit/${this.id}`;
+    const apiUrl = `${environment.apiUrl}/api/VetStation/Edit/${this.id}`;
 
     try {
       await firstValueFrom(
@@ -174,7 +174,7 @@ export class VetStationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchVetStationInfo = async () => {
-    const apiUrl = Config.address + `api/VetStation/Get?id=${this.id}`;
+    const apiUrl = `${environment.apiUrl}/api/VetStation/Get?id=${this.id}`;
 
     try {
       const response = await firstValueFrom(

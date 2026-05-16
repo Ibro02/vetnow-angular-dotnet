@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, firstValueFrom } from 'rxjs';
-import { Config } from '../config';
+import { environment } from '../../environment';
 
 export interface AppointmentDto {
   id: number;
@@ -33,7 +33,7 @@ export class AppointmentService {
   async getByCustomerId(customerId: number): Promise<AppointmentDto[]> {
     const data = await firstValueFrom(
       this.http.get<AppointmentDto[]>(
-        Config.address + `api/Appointment/GetByCustomerId?customerId=${customerId}`
+        `${environment.apiUrl}/api/Appointment/GetByCustomerId?customerId=${customerId}`
       )
     );
     return Array.isArray(data) ? data : [];
@@ -42,7 +42,7 @@ export class AppointmentService {
   async getByEmployeeId(employeeId: number): Promise<AppointmentDto[]> {
     const data = await firstValueFrom(
       this.http.get<AppointmentDto[]>(
-        Config.address + `api/Appointment/GetByEmployeeId?employeeId=${employeeId}`
+        `${environment.apiUrl}/api/Appointment/GetByEmployeeId?employeeId=${employeeId}`
       )
     );
     return Array.isArray(data) ? data : [];
@@ -51,7 +51,7 @@ export class AppointmentService {
   async cancel(appointmentId: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(
-        Config.address + `api/Appointment/Cancel?appointmentId=${appointmentId}`,
+        `${environment.apiUrl}/api/Appointment/Cancel?appointmentId=${appointmentId}`,
         { responseType: 'text' }
       )
     );
@@ -61,7 +61,7 @@ export class AppointmentService {
   async reschedule(appointmentId: number, newTimeSlotId: number): Promise<void> {
     await firstValueFrom(
       this.http.put(
-        Config.address + `api/Appointment/Reschedule`,
+        `${environment.apiUrl}/api/Appointment/Reschedule`,
         { appointmentId, newTimeSlotId },
         { responseType: 'text' }
       )

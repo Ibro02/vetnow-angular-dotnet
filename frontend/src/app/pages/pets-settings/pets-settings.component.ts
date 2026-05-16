@@ -8,7 +8,7 @@ import { HeaderTitleComponent } from '../../components/common/header-title/heade
 import { TableComponent, TableColumn } from '../../components/common/table/table.component';
 import { ProfileService } from '../../services/ProfileService';
 import { MyAuthService } from '../../services/MyAuth';
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -161,7 +161,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           required: true,
           loadOptions: async () => {
             const res: any = await firstValueFrom(
-              this.http.get(Config.address + 'api/SpeciesGetAll/Get')
+              this.http.get(`${environment.apiUrl}/api/SpeciesGetAll/Get`)
             );
             return res.dataItems.map((s: any) => ({
               id:   s.id,
@@ -177,7 +177,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
           loadOptions: async (speciesId: any) => {
             const data = await firstValueFrom(
               this.http.get<any[]>(
-                Config.address + 'api/BreedGetBySpecies/Get?speciesId=' + speciesId
+                `${environment.apiUrl}/api/BreedGetBySpecies/Get?speciesId=${speciesId}`
               )
             );
             return data.map((b: any) => ({
@@ -245,7 +245,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
       const data = await firstValueFrom(
         this.http.get<PagedResponse<PetResponse>>(
-          Config.address + url + '?' + queryString
+          `${environment.apiUrl}/${url}?${queryString}`
         )
       );
 
@@ -341,7 +341,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     this.showDeleteConfirm = false;
     try {
       await firstValueFrom(
-        this.http.delete(Config.address + 'api/Pets/SoftDelete?id=' + this.confirmTargetPetId, { responseType: 'text' })
+        this.http.delete(`${environment.apiUrl}/api/Pets/SoftDelete?id=${this.confirmTargetPetId}`, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
@@ -356,7 +356,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     this.showRestoreConfirm = false;
     try {
       await firstValueFrom(
-        this.http.put(Config.address + 'api/Pets/Restore?id=' + this.confirmTargetPetId, {}, { responseType: 'text' })
+        this.http.put(`${environment.apiUrl}/api/Pets/Restore?id=${this.confirmTargetPetId}`, {}, { responseType: 'text' })
       );
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
     } catch (error) {
@@ -428,7 +428,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       }
 
       await firstValueFrom(
-        this.http.post(Config.address + 'api/PetsUpdateOrInsert/Save', requestBody)
+        this.http.post(`${environment.apiUrl}/api/PetsUpdateOrInsert/Save`, requestBody)
       );
 
       this.showPetForm = false;
@@ -453,7 +453,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     }
 
     try {
-      const url = `${Config.address}api/PetsReport/Generate?OwnerId=${ownerId}`;
+      const url = `${environment.apiUrl}/api/PetsReport/Generate?OwnerId=${ownerId}`;
 
       const blob = await firstValueFrom(
         this.http.get(url, { responseType: 'blob' })

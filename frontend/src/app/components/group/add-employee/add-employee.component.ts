@@ -12,7 +12,7 @@ import {
 import { ButtonComponent } from "../../common/button/button.component";
 import { ToasterService } from '../../../services/toaster.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Config } from '../../../config';
+import { environment } from '../../../../environment';
 
 /** Birth date must be in the past and the employee must be at least 18 years old. */
 function birthDateValidator(): ValidatorFn {
@@ -138,7 +138,7 @@ export class AddEmployeeComponent implements OnInit {
       // Remove password if empty (not changed)
       if (!updatePayload.password) delete updatePayload.password;
 
-      const url = `${Config.address}api/Employee/Edit`;
+      const url = `${environment.apiUrl}/api/Employee/Edit`;
       this.http.put(url, updatePayload, { responseType: 'text' }).subscribe({
         next: () => {
           this.toaster.success('Success', 'Employee updated successfully.');
@@ -154,7 +154,7 @@ export class AddEmployeeComponent implements OnInit {
         },
       });
     } else {
-      const url = `${Config.address}api/EmployeeEndpoint/AddNewEmployee`;
+      const url = `${environment.apiUrl}/api/EmployeeEndpoint/AddNewEmployee`;
       this.http.post(url, newEmployee).subscribe({
         next: () => {
           this.toaster.success('Success', 'Employee added successfully.');

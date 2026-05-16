@@ -5,7 +5,7 @@ import { NgForOf, NgIf, NgClass, DatePipe } from "@angular/common";
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import { Employee } from "./Employee";
 import { Animal } from "../../pages/appointment-page/Animal";
 import { TimeSlot } from "../../pages/appointment-page/TimeSlot";
@@ -88,7 +88,7 @@ export class VetStationHomePageComponent implements OnInit {
   async fetchVetStats() {
     try {
       const data: any[] = await firstValueFrom(
-        this.http.get<any[]>(Config.address + 'api/VetStation/Get/', { params: { id: this.vetStationId } })
+        this.http.get<any[]>(`${environment.apiUrl}/api/VetStation/Get/`, { params: { id: this.vetStationId } })
       );
       this.vetStation = data[0];
       this.vetStationFullAddress = `${this.vetStation.address}, ${this.vetStation.city},\n${this.vetStation.country}`;
@@ -98,7 +98,7 @@ export class VetStationHomePageComponent implements OnInit {
   async fetchPets() {
     try {
       const data = await firstValueFrom(
-        this.http.get<Animal[]>(Config.address + `api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`)
+        this.http.get<Animal[]>(`${environment.apiUrl}/api/Animal/GetByOwnerId?id=${this.profileService.userProfile?.id}`)
       );
       this.pets = Array.isArray(data) ? data : [];
     } catch { this.pets = []; }
@@ -109,7 +109,7 @@ export class VetStationHomePageComponent implements OnInit {
     this.isLoadingSlots = true;
     try {
       const data = await firstValueFrom(
-        this.http.get<TimeSlot[]>(Config.address + `api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`)
+        this.http.get<TimeSlot[]>(`${environment.apiUrl}/api/TimeSlot/Get?employeeid=${this.selectedEmployee.id}&date=${date.split("T")[0]}`)
       );
       this.timeSlots = Array.isArray(data) ? data : [];
     } catch { this.timeSlots = []; }
@@ -120,7 +120,7 @@ export class VetStationHomePageComponent implements OnInit {
     this.selectedServiceId = service.id;
     this.selectedEmployee = undefined;
     const data: any = await firstValueFrom(
-      this.http.get(Config.address + service.api, { params: { id: this.vetStationId } })
+      this.http.get(`${environment.apiUrl}/${service.api}`, { params: { id: this.vetStationId } })
     );
     this.employeeList = data.dataItems;
   }
@@ -168,7 +168,7 @@ export class VetStationHomePageComponent implements OnInit {
     if (!this.selectedPet) return this.toaster.error("Selection Required", "Please select a pet.");
     try {
       await firstValueFrom(
-        this.http.post(Config.address + 'api/Appointment/Add', this.newAppointment)
+        this.http.post(`${environment.apiUrl}/api/Appointment/Add`, this.newAppointment)
       );
       this.toaster.success("Booked!", "See you soon.");
       this.router.navigate(['/home-page']);

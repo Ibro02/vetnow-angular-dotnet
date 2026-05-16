@@ -6,7 +6,7 @@ import { MyAuthService } from '../../services/MyAuth';
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Router, RouterLink } from "@angular/router";
 import { ToasterService } from '../../services/toaster.service';
-import { Config } from '../../config';
+import { environment } from '../../../environment';
 import { shake, fadeIn, slideStep } from '../../animations/shared.animations';
 
 @Component({
@@ -91,7 +91,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const link = Config.address + 'api/Person/Add';
+    const link = `${environment.apiUrl}/api/Person/Add`;
     this.http.post(link, this.newUser).subscribe({
       next: () => {
         this.router.navigate(['']);

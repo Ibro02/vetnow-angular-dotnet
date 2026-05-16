@@ -17,7 +17,7 @@ import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import * as L from 'leaflet';
 import {MyAuthService} from "../../services/MyAuth";
-import {Config} from "../../config";
+import { environment } from '../../../environment';
 import {Router} from "@angular/router";
 import {I18nService} from "../../services/i18n.service";
 
@@ -180,7 +180,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
 
     try {
       const data: any = await firstValueFrom(
-        this.http.get(Config.address + 'api/ProfileSettings/Get')
+        this.http.get(`${environment.apiUrl}/api/ProfileSettings/Get`)
       );
 
       this.profileSettingsFormGroup.patchValue({
@@ -216,7 +216,7 @@ export class ProfileSettingsComponent implements OnInit, AfterViewInit {
       this.toaster.error('Validation Error', 'Password must be 8–128 characters with uppercase, lowercase, digit, and special character.');
       return;
     }
-    const apiUrl = Config.address + 'api/ProfileSettings/Edit';
+    const apiUrl = `${environment.apiUrl}/api/ProfileSettings/Edit`;
     try {
       await firstValueFrom(
         this.http.put(apiUrl, this.profileSettingsFormGroup.value, { responseType: 'text' })

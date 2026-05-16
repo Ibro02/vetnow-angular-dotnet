@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {InputComponent} from "../../components/common/input/input.component";
 import { HttpClient } from "@angular/common/http";
-import {Config} from "../../config";
+import { environment } from '../../../environment';
 import {ActivatedRoute, Router} from "@angular/router";
 import {ButtonComponent} from "../../components/common/button/button.component";
 import {FormsModule} from "@angular/forms";
@@ -43,7 +43,7 @@ export class VerificationPageComponent implements OnInit {
 
   verifyUser() {
     if (!this.userId) return;
-    const url = Config.address + 'Verification';
+    const url = `${environment.apiUrl}/Verification`;
     this.http.post(url, { token: this.token, userId: this.userId }, { responseType: 'text' })
       .subscribe({
         next: () => {
