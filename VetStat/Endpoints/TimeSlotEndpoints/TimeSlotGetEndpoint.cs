@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -20,8 +21,16 @@ public class TimeSlotGetEndpoint : MyEndpointBase
     [HttpGet("Get")]
     public ActionResult Handle([FromQuery] int employeeid, string? date)
     {
-        DateTime _date = date != null ? new DateTime(int.Parse(date.Split("-")[0]),
-            int.Parse(date.Split("-")[1]), int.Parse(date.Split("-")[2])) : DateTime.UtcNow;
+        DateTime _date;
+        if (date != null)
+        {
+            if (!DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _date))
+                return BadRequest("Invalid date format. Expected yyyy-MM-dd.");
+        }
+        else
+        {
+            _date = DateTime.UtcNow.Date;
+        }
 
         if (!_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid).IsNullOrEmpty())
             return Ok(_db.TimeSlot.Where(x => x.SlotEmployeeId == employeeid)
