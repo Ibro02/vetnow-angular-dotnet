@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using VetStat.Data;
 using VetStat.Helpers.Api;
 using VetStat.Helpers.Services;
+using VetStat.Models;
 using static VetStat.Endpoints.VerificationEndpoints.VerificationPostEndpoint;
 
 namespace VetStat.Endpoints.VerificationEndpoints;
@@ -46,8 +47,20 @@ public class VerificationPostEndpoint : MyEndpointBase
         {
             user.Verified = true;
             _db.TwoFaVerificationTokens.Remove(tokenObj);
+
+            // Issue a session token so the user doesn't have to log in again after verifying.
+            string sessionToken = Helpers.Validators.Services.GenerateToken(10);
+            _db.AuthenticationToken.Add(new AuthenticationToken
+            {
+                Token = sessionToken,
+                UserProfileId = user.Id,
+                UserProfile = user,
+                IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
+                LoggedTime = DateTime.UtcNow,
+            });
+
             _db.SaveChanges();
-            return Ok("Verified successfully!");
+            return Ok(new { token = sessionToken });
         }
 
         return BadRequest("Wrong verification token!");

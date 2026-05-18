@@ -94,7 +94,7 @@ export class RegisterComponent implements OnInit {
     const link = `${environment.apiUrl}/api/Person/Add`;
     this.http.post(link, this.newUser).subscribe({
       next: () => {
-        this.router.navigate(['']);
+        this.router.navigate(['login']);
         this.toaster.success('Registration successful!', 'Please log in with your new account.');
       },
       error: (err: HttpErrorResponse) => {

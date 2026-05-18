@@ -44,11 +44,12 @@ export class VerificationPageComponent implements OnInit {
   verifyUser() {
     if (!this.userId) return;
     const url = `${environment.apiUrl}/Verification`;
-    this.http.post(url, { token: this.token, userId: this.userId }, { responseType: 'text' })
+    this.http.post<{ token: string }>(url, { token: this.token, userId: this.userId })
       .subscribe({
-        next: () => {
-          this.toaster.success('Verified!', 'Your account has been verified. Please log in.');
-          this.router.navigate(['']);
+        next: (response) => {
+          window.sessionStorage.setItem('my-auth-token', response.token);
+          this.toaster.success('Verified!', 'Your account has been verified.');
+          this.router.navigate(['home-page']);
         },
         error: (err) => {
           const msg = typeof err.error === 'string' ? err.error : 'Verification failed. Please try again.';
