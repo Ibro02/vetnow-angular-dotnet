@@ -29,7 +29,7 @@ public class LoginAuthPostEndpoint : MyEndpointBase
     }
 
     [HttpPost("Post")]
-    public ActionResult HandleAsync([FromBody] LoginAuthPostRequest loginValue)
+    public ActionResult Handle([FromBody] LoginAuthPostRequest loginValue)
     {
         if (!_authService.IsLogged())
         {

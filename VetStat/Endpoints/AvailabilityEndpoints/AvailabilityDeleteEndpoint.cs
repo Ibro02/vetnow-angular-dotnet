@@ -18,7 +18,7 @@ public class AvailabilityDeleteEndpoint : MyEndpointBase
     }
 
     [HttpDelete("Delete/{id:int}")]
-    public ActionResult HandleAsync(int id)
+    public ActionResult Handle(int id)
     {
         try
         {

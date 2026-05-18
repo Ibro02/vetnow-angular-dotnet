@@ -72,16 +72,64 @@ namespace VetStat.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] MainVet mainvet, int id)
         {
-            var _mainvet = _db.MainVet.Where(x => x.Id == id).FirstOrDefault();
+            var _mainvet = _db.MainVet.FirstOrDefault(x => x.Id == id);
+            if (_mainvet == null)
+                return NotFound($"MainVet with ID {id} not found.");
 
             try
             {
+                // Person properties
+                if (!string.IsNullOrEmpty(mainvet.FirstName))
+                    _mainvet.FirstName = mainvet.FirstName;
 
-                mainvet.Id = _mainvet.Id;
+                if (!string.IsNullOrEmpty(mainvet.LastName))
+                    _mainvet.LastName = mainvet.LastName;
+
+                if (!string.IsNullOrEmpty(mainvet.Email))
+                    _mainvet.Email = mainvet.Email;
+
+                if (!string.IsNullOrEmpty(mainvet.Phone))
+                    _mainvet.Phone = mainvet.Phone;
+
+                if (!string.IsNullOrEmpty(mainvet.Username))
+                    _mainvet.Username = mainvet.Username;
+
+                if (!string.IsNullOrEmpty(mainvet.City))
+                    _mainvet.City = mainvet.City;
+
+                if (!string.IsNullOrEmpty(mainvet.Country))
+                    _mainvet.Country = mainvet.Country;
+
+                if (!string.IsNullOrEmpty(mainvet.Address))
+                    _mainvet.Address = mainvet.Address;
+
+                if (mainvet.BirthDate.HasValue)
+                    _mainvet.BirthDate = mainvet.BirthDate;
+
+                // Employee properties
+                if (mainvet.VetStationId.HasValue)
+                    _mainvet.VetStationId = mainvet.VetStationId;
+
+                if (mainvet.DateOfEmployment != default)
+                    _mainvet.DateOfEmployment = mainvet.DateOfEmployment;
+
+                // Vet properties
+                if (!string.IsNullOrEmpty(mainvet.Speciality))
+                    _mainvet.Speciality = mainvet.Speciality;
+
+                if (!string.IsNullOrEmpty(mainvet.Education))
+                    _mainvet.Education = mainvet.Education;
+
+                if (!string.IsNullOrEmpty(mainvet.SpecialSkill))
+                    _mainvet.SpecialSkill = mainvet.SpecialSkill;
+
+                // MainVet properties
+                if (mainvet.ChiefVetStationId > 0)
+                    _mainvet.ChiefVetStationId = mainvet.ChiefVetStationId;
+
                 _db.SaveChanges();
                 return Ok(_mainvet.ToDto());
             }
-
             catch (Exception err)
             {
                 return BadRequest("Could not update the record. Please check your input and try again.");

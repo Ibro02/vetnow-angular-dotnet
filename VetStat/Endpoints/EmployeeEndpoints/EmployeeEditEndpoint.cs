@@ -22,7 +22,7 @@ public class EmployeeEditEndpoint : MyEndpointBase
     }
 
     [HttpPut("Edit")]
-    public ActionResult HandleAsync([FromBody] EmployeeEditRequest request)
+    public ActionResult Handle([FromBody] EmployeeEditRequest request)
     {
         var employee = _db.Employee.FirstOrDefault(x => x.Id == request.Id);
         if (employee == null)

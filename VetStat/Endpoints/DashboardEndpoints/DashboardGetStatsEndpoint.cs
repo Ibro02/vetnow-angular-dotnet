@@ -19,7 +19,7 @@ public class DashboardGetStatsEndpoint : MyEndpointBase
     }
 
     [HttpGet("GetStats")]
-    public ActionResult HandleAsync()
+    public ActionResult Handle()
     {
         try
         {

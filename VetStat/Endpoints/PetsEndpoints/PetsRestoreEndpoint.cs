@@ -20,7 +20,7 @@ public class PetsRestoreEndpoint : MyEndpointBase
     }
 
     [HttpPut("Restore")]
-    public ActionResult HandleAsync([FromQuery] int id)
+    public ActionResult Handle([FromQuery] int id)
     {
         var currentUserId = _authService.GetCurrentUserId();
         if (currentUserId == null)

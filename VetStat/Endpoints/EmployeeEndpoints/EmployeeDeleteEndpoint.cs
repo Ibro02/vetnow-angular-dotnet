@@ -21,7 +21,7 @@ public class EmployeeDeleteEndpoint : MyEndpointBase
     }
 
     [HttpDelete("Delete")]
-    public ActionResult HandleAsync([FromQuery] int id)
+    public ActionResult Handle([FromQuery] int id)
     {
         var employee = _db.Employee.FirstOrDefault(x => x.Id == id);
         if (employee == null)

@@ -17,7 +17,7 @@ public class LoginAuthDeleteEndpoint : MyEndpointBase
     }
 
     [HttpDelete("Delete")]
-    public ActionResult HandleAsync()
+    public ActionResult Handle()
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
         var authToken = _db.AuthenticationToken.SingleOrDefault(x => x.Token == token);

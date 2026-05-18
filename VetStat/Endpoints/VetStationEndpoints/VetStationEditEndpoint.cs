@@ -20,7 +20,7 @@ public class VetStationEditEndpoint : MyEndpointBase
     }
 
     [HttpPut("Edit/{id:int}")]
-    public ActionResult HandleAsync([FromBody] VetStation vetStation, int id)
+    public ActionResult Handle([FromBody] VetStation vetStation, int id)
     {
         var _vetStation = _db.VetStation.Where(x => x.Id == id).FirstOrDefault();
         if (_vetStation == null)

@@ -22,7 +22,7 @@ public class SpeciesGetAllEndpoint : MyEndpointBase
     }
 
     [HttpGet("Get")]
-    public ActionResult HandleAsync(
+    public ActionResult Handle(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)
     {

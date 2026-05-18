@@ -22,7 +22,7 @@ public class ProfileSettingsGetEndpoint : MyEndpointBase
     }
 
     [HttpGet("Get")]
-    public ActionResult HandleAsync()
+    public ActionResult Handle()
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
 

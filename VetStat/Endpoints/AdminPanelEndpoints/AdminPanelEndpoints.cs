@@ -351,18 +351,26 @@ public class AdminPanelEndpoints : MyEndpointBase
         var person = _db.Person.SingleOrDefault(p => p.Id == request.EmployeeId);
         if (person == null) return NotFound("Person not found.");
 
-        // Remove old main vet for this station if exists
+        // Demote old main vet for this station if exists.
+        // Use raw SQL to delete only the MainVet row — EF Core's Remove() would cascade
+        // through the TPT chain (MainVet→Vet→Employee→Person) and violate FK constraints
+        // on TimeSlot/Appointment for an employee who still has bookings.
         var oldMainVet = _db.MainVet.SingleOrDefault(m => m.ChiefVetStationId == request.VetStationId);
         if (oldMainVet != null)
         {
             var oldPerson = _db.Person.SingleOrDefault(p => p.Id == oldMainVet.Id);
-            if (oldPerson != null) oldPerson.RoleId = 4;
-            _db.MainVet.Remove(oldMainVet);
-            _db.SaveChanges(); // persist removal before raw SQL inserts
+            if (oldPerson != null)
+            {
+                var vetRoleId = _db.Role.Where(r => r.Name == "Vet").Select(r => r.Id).FirstOrDefault();
+                oldPerson.RoleId = vetRoleId > 0 ? vetRoleId : oldPerson.RoleId;
+            }
+            _db.SaveChanges(); // persist role demotion first
+            _db.Database.ExecuteSqlRaw("DELETE FROM MainVet WHERE Id = {0}", oldMainVet.Id);
         }
 
-        // Upgrade role to MainVet (5)
-        person.RoleId = 5;
+        // Upgrade role to MainVet
+        var mainVetRoleId = _db.Role.Where(r => r.Name == "MainVet").Select(r => r.Id).FirstOrDefault();
+        if (mainVetRoleId > 0) person.RoleId = mainVetRoleId;
         _db.SaveChanges();
 
         // Check if already in MainVet table

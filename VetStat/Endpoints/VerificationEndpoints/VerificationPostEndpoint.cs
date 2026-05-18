@@ -24,7 +24,7 @@ public class VerificationPostEndpoint : MyEndpointBase
     }
 
     [HttpPost]
-    public ActionResult HandleAsync([FromBody] VerificationPostRequest loginValue)
+    public ActionResult Handle([FromBody] VerificationPostRequest loginValue)
     {
         if (loginValue == null)
             return BadRequest();

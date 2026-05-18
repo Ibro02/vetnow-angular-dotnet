@@ -22,7 +22,7 @@ public class ProfileSettingsEditEndpoint : MyEndpointBase
     }
 
     [HttpPut("Edit")]
-    public ActionResult HandleAsync([FromBody] ProfileSettingsEditRequest request)
+    public ActionResult Handle([FromBody] ProfileSettingsEditRequest request)
     {
         string token = HttpContext.Request.Headers["my-auth-token"];
 

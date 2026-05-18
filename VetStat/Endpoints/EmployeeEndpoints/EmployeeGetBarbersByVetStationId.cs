@@ -19,7 +19,7 @@ public class EmployeeGetBarbersByVetStationIdEndpoint : MyEndpointBase
     }
 
     [HttpGet("GetBarbersByVetStationId")]
-    public ActionResult HandleAsync(
+    public ActionResult Handle(
         [FromQuery] int id,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 100)

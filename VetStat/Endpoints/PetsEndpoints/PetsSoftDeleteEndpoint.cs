@@ -20,7 +20,7 @@ public class PetsSoftDeleteEndpoint : MyEndpointBase
     }
 
     [HttpDelete("SoftDelete")]
-    public ActionResult HandleAsync([FromQuery] int id)
+    public ActionResult Handle([FromQuery] int id)
     {
         var currentUserId = _authService.GetCurrentUserId();
         if (currentUserId == null)

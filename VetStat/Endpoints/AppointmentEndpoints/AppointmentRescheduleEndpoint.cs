@@ -20,7 +20,7 @@ public class AppointmentRescheduleEndpoint : MyEndpointBase
     }
 
     [HttpPut("Reschedule")]
-    public ActionResult HandleAsync([FromBody] RescheduleRequest request)
+    public ActionResult Handle([FromBody] RescheduleRequest request)
     {
         try
         {

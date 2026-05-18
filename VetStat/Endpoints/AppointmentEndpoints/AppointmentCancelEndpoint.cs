@@ -20,7 +20,7 @@ public class AppointmentCancelEndpoint : MyEndpointBase
     }
 
     [HttpDelete("Cancel")]
-    public ActionResult HandleAsync([FromQuery] int appointmentId)
+    public ActionResult Handle([FromQuery] int appointmentId)
     {
         try
         {

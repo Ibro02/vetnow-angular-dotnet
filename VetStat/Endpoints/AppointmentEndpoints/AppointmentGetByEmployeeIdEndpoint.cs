@@ -18,7 +18,7 @@ public class AppointmentGetByEmployeeIdEndpoint : MyEndpointBase
     }
 
     [HttpGet("GetByEmployeeId")]
-    public ActionResult HandleAsync([FromQuery] int employeeId)
+    public ActionResult Handle([FromQuery] int employeeId)
     {
         try
         {

@@ -23,7 +23,7 @@ public class AvailabilityEditEndpoint : MyEndpointBase
     }
 
     [HttpPut("Edit/{id:int}")]
-    public ActionResult HandleAsync([FromBody] Availability availability, int id)
+    public ActionResult Handle([FromBody] Availability availability, int id)
     {
         var _availability = _db.Availability.Where(x => x.Id == id).FirstOrDefault();
         if (_availability == null)
