@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace VetStat.Models
@@ -9,18 +8,14 @@ namespace VetStat.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required]
         public string Name { get; set; }
 
         [ForeignKey("Owner")]
         public int? OwnerId { get; set; }
 
         [JsonIgnore]
-   
-
         public Person? Owner { get; set; }
 
-        // public Person Id {get;set;}
         public DateTime? BirthDate {get;set; }
         [ForeignKey("Species")]
 
