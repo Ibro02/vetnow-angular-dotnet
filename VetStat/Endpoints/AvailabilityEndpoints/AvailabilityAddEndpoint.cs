@@ -31,6 +31,9 @@ public class AvailabilityAddEndpoint : MyEndpointBase
         if (!validation.IsValid)
             return BadRequest(string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)));
 
+        if (_db.Availability.Any(a => a.EmployeeId == availability.EmployeeId))
+            return Conflict("An availability record already exists for this employee. Use the Edit endpoint to update it.");
+
         string[] availableFrom = availability.AvailableFrom.Split(':');
         string[] availableTo = availability.AvailableTo.Split(':');
         string[] breakFrom = availability.BreakFrom.Split(':');
