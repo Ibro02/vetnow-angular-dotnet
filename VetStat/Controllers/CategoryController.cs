@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -32,28 +31,30 @@ namespace VetStat.Controllers
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(c => c.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/Category/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<Category> Get(int id)
+        public ActionResult<CategoryResponse> Get(int id)
         {
-            if (!_db.Category.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Category.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var category = _db.Category.FirstOrDefault(x => x.Id == id);
+            if (category != null)
+                return Ok(category.ToDto());
+            return NoContent();
         }
         //api/Category/Add
         [HttpPost]
-        public ActionResult<Category> Add([FromBody] Category category)
+        public ActionResult<CategoryResponse> Add([FromBody] Category category)
         {
             try
             {
                 _db.Category.Add(category);
                 _db.SaveChanges();
-                return Ok(category);
+                return Ok(category.ToDto());
             }
             catch (Exception ex)
             {
@@ -64,14 +65,16 @@ namespace VetStat.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] Category category, int id)
         {
-            var _category = _db.Category.Where(x => x.Id == id).FirstOrDefault();
+            var _category = _db.Category.FirstOrDefault(x => x.Id == id);
+            if (_category == null)
+                return NotFound($"Category with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(category.Name))
                     _category.Name = category.Name;
 
                 _db.SaveChanges();
-                return Ok(category);
+                return Ok(_category.ToDto());
             }
             catch (Exception err)
             {

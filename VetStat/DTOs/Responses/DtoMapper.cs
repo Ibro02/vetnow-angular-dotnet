@@ -2,6 +2,8 @@ using VetStat.Models;
 
 namespace VetStat.DTOs.Responses;
 
+// ── Controller-level simple entities ─────────────────────────────────────────
+
 /// <summary>
 /// Static helper to map EF entities → response DTOs.
 /// Keeps the mapping in one place so endpoints stay clean.
@@ -159,5 +161,58 @@ public static class DtoMapper
     {
         Id = a.Id,
         Username = a.Username,
+    };
+
+    public static CategoryResponse ToDto(this Category c) => new()
+    {
+        Id = c.Id,
+        Name = c.Name,
+    };
+
+    public static FAQResponse ToDto(this FAQ f) => new()
+    {
+        Id = f.Id,
+        Question = f.Question,
+        Answer = f.Answer,
+        VetStationId = f.VetStationId,
+    };
+
+    public static InventoryResponse ToDto(this Inventory i) => new()
+    {
+        Id = i.Id,
+        VetStationId = i.VetStationId,
+        ProductId = i.ProductId,
+        Quantity = i.Quantity,
+        DateOfEntry = i.DateOfEntry,
+        ProductionDate = i.ProductionDate,
+        ExpireDate = i.ExpireDate,
+        Status = i.Status,
+        SellingPrice = i.SellingPrice,
+    };
+
+    public static ProductResponse ToDto(this Product p) => new()
+    {
+        Id = p.Id,
+        ProductName = p.ProductName,
+        Manufacturer = p.Manufacturer,
+        Description = p.Description,
+        SubCategoryId = p.SubCategoryId,
+        SideEffects = p.SideEffects,
+        Image = p.Image,
+    };
+
+    public static SpeciesResponse ToDto(this Species s) => new()
+    {
+        Id = s.Id,
+        SpeciesName = s.SpeciesName,
+        Behavior = s.Behavior,
+        Diet = s.Diet,
+    };
+
+    public static SubCategoryResponse ToDto(this SubCategory s) => new()
+    {
+        Id = s.Id,
+        Name = s.Name,
+        CategoryId = s.CategoryId,
     };
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -32,28 +31,30 @@ namespace VetStat.Controllers
                 .OrderBy(s => s.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(s => s.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/SubCategory/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<SubCategory> Get(int id)
+        public ActionResult<SubCategoryResponse> Get(int id)
         {
-            if (!_db.SubCategory.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.SubCategory.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var subCategory = _db.SubCategory.FirstOrDefault(x => x.Id == id);
+            if (subCategory != null)
+                return Ok(subCategory.ToDto());
+            return NoContent();
         }
         //api/SubCategory/Add
         [HttpPost]
-        public ActionResult<SubCategory> Add([FromBody] SubCategory subCategory)
+        public ActionResult<SubCategoryResponse> Add([FromBody] SubCategory subCategory)
         {
             try
             {
                 _db.SubCategory.Add(subCategory);
                 _db.SaveChanges();
-                return Ok(subCategory);
+                return Ok(subCategory.ToDto());
             }
             catch (Exception ex)
             {
@@ -64,13 +65,15 @@ namespace VetStat.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] SubCategory subCategory, int id)
         {
-            var _subCategory = _db.SubCategory.Where(x => x.Id == id).FirstOrDefault();
+            var _subCategory = _db.SubCategory.FirstOrDefault(x => x.Id == id);
+            if (_subCategory == null)
+                return NotFound($"SubCategory with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(subCategory.Name))
                     _subCategory.Name = subCategory.Name;
                 _db.SaveChanges();
-                return Ok(subCategory);
+                return Ok(_subCategory.ToDto());
             }
             catch (Exception err)
             {

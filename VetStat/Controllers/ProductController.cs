@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -32,28 +31,30 @@ namespace VetStat.Controllers
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(p => p.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/Product/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<Product> Get(int id)
+        public ActionResult<ProductResponse> Get(int id)
         {
-            if (!_db.Product.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Product.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var product = _db.Product.FirstOrDefault(x => x.Id == id);
+            if (product != null)
+                return Ok(product.ToDto());
+            return NoContent();
         }
         //api/Product/Add
         [HttpPost]
-        public ActionResult<Product> Add([FromBody] Product product)
+        public ActionResult<ProductResponse> Add([FromBody] Product product)
         {
             try
             {
                 _db.Product.Add(product);
                 _db.SaveChanges();
-                return Ok(product);
+                return Ok(product.ToDto());
             }
             catch (Exception ex)
             {
@@ -64,7 +65,9 @@ namespace VetStat.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] Product product, int id)
         {
-            var _product = _db.Product.Where(x => x.Id == id).FirstOrDefault();
+            var _product = _db.Product.FirstOrDefault(x => x.Id == id);
+            if (_product == null)
+                return NotFound($"Product with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(product.ProductName))
@@ -78,9 +81,8 @@ namespace VetStat.Controllers
                 if (product.Image != null)
                     _product.Image = product.Image;
 
-
                 _db.SaveChanges();
-                return Ok(product);
+                return Ok(_product.ToDto());
             }
             catch (Exception err)
             {

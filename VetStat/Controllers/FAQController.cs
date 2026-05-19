@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -33,6 +32,8 @@ namespace VetStat.Controllers
                 .OrderBy(f => f.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(f => f.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
@@ -40,22 +41,22 @@ namespace VetStat.Controllers
         //api/FAQ/Get/:id
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public ActionResult<FAQ> Get(int id)
+        public ActionResult<FAQResponse> Get(int id)
         {
-            if (!_db.FAQ.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.FAQ.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var faq = _db.FAQ.FirstOrDefault(x => x.Id == id);
+            if (faq != null)
+                return Ok(faq.ToDto());
+            return NoContent();
         }
         //api/FAQ/Add
         [HttpPost]
-        public ActionResult<FAQ> Add([FromBody] FAQ faq)
+        public ActionResult<FAQResponse> Add([FromBody] FAQ faq)
         {
             try
             {
                 _db.FAQ.Add(faq);
                 _db.SaveChanges();
-                return Ok(faq);
+                return Ok(faq.ToDto());
             }
             catch (Exception ex)
             {
@@ -66,18 +67,18 @@ namespace VetStat.Controllers
         [HttpPut("{id}")]
         public ActionResult Edit([FromBody] FAQ faq, int id)
         {
-            var _faq = _db.FAQ.Where(x => x.Id == id).FirstOrDefault();
+            var _faq = _db.FAQ.FirstOrDefault(x => x.Id == id);
+            if (_faq == null)
+                return NotFound($"FAQ with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(faq.Question))
                     _faq.Question = faq.Question;
                 if (!string.IsNullOrEmpty(faq.Answer))
                     _faq.Answer = faq.Answer;
-                //if (!string.IsNullOrEmpty(faq.VetStationId.ToString()))
-                //    _faq.VetStationId = faq.VetStationId;
 
                 _db.SaveChanges();
-                return Ok(faq);
+                return Ok(_faq.ToDto());
             }
             catch (Exception err)
             {

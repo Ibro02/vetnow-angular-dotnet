@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -32,22 +31,24 @@ namespace VetStat.Controllers
                 .OrderBy(i => i.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(i => i.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
         }
         //api/Inventory/Get/:id
         [HttpGet("{id:int}")]
-        public ActionResult<Inventory> Get(int id)
+        public ActionResult<InventoryResponse> Get(int id)
         {
-            if (!_db.Inventory.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Inventory.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var inventory = _db.Inventory.FirstOrDefault(x => x.Id == id);
+            if (inventory != null)
+                return Ok(inventory.ToDto());
+            return NoContent();
         }
         //api/Inventory/Add
         [HttpPost]
-        public ActionResult<Inventory> Add([FromBody] Inventory inventory)
+        public ActionResult<InventoryResponse> Add([FromBody] Inventory inventory)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace VetStat.Controllers
                     return BadRequest("The specified vet station does not exist.");
                 _db.Inventory.Add(inventory);
                 _db.SaveChanges();
-                return Ok(inventory);
+                return Ok(inventory.ToDto());
             }
             catch (Exception ex)
             {
@@ -66,24 +67,26 @@ namespace VetStat.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Edit([FromBody] Inventory inventory, int id)
         {
-            var _inventory = _db.Inventory.Where(x => x.Id == id).FirstOrDefault();
+            var _inventory = _db.Inventory.FirstOrDefault(x => x.Id == id);
+            if (_inventory == null)
+                return NotFound($"Inventory with ID {id} not found.");
             try
             {
-                if (inventory.Quantity != null)
+                if (inventory.Quantity != default)
                     _inventory.Quantity = inventory.Quantity;
-                if (inventory.DateOfEntry != null)
+                if (inventory.DateOfEntry != default)
                     _inventory.DateOfEntry = inventory.DateOfEntry;
-                if (inventory.ProductionDate != null)
+                if (inventory.ProductionDate != default)
                     _inventory.ProductionDate = inventory.ProductionDate;
-                if (inventory.ExpireDate != null)
+                if (inventory.ExpireDate != default)
                     _inventory.ExpireDate = inventory.ExpireDate;
                 if (!string.IsNullOrEmpty(inventory.Status))
                     _inventory.Status = inventory.Status;
-                if (inventory.SellingPrice != null)
+                if (inventory.SellingPrice != default)
                     _inventory.SellingPrice = inventory.SellingPrice;
 
                 _db.SaveChanges();
-                return Ok(inventory);
+                return Ok(_inventory.ToDto());
             }
             catch (Exception err)
             {

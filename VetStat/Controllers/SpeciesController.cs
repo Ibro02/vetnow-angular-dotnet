@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text.RegularExpressions;
 using VetStat.Data;
+using VetStat.DTOs.Responses;
 using VetStat.Helpers.Auth;
-using VetStat.Helpers.Validators;
 using VetStat.Models;
 
 namespace VetStat.Controllers
@@ -33,6 +31,8 @@ namespace VetStat.Controllers
                 .OrderBy(s => s.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList()
+                .Select(s => s.ToDto())
                 .ToList();
 
             return Ok(new { totalCount, dataItems, currentPage = page, pageSize });
@@ -40,40 +40,37 @@ namespace VetStat.Controllers
 
         //api/Species/Get/:id
         [HttpGet("{id:int}")]
-    
-        public ActionResult<Animal> Get(int id)
+        public ActionResult<SpeciesResponse> Get(int id)
         {
-            if (!_db.Species.Where(x => x.Id == id).IsNullOrEmpty())
-                return Ok(_db.Species.Where(x => x.Id == id));
-            else
-                return NoContent();
+            var species = _db.Species.FirstOrDefault(x => x.Id == id);
+            if (species != null)
+                return Ok(species.ToDto());
+            return NoContent();
         }
 
         //api/Species/Add
         [HttpPost]
-
-        public ActionResult<Species> Add(Species species)
+        public ActionResult<SpeciesResponse> Add(Species species)
         {
             try
             {
                 _db.Add(species);
                 _db.SaveChanges();
-                return Ok(species);
+                return Ok(species.ToDto());
             }
             catch (Exception err)
             {
-
                 return BadRequest("Could not create the record. Please check your input and try again.");
             }
         }
 
         //api/Species/Edit/:id
         [HttpPut("{id:int}")]
-
         public ActionResult Edit([FromBody] Species species, int id)
         {
-            var _species = _db.Species.Where(x => x.Id == id).FirstOrDefault();
-
+            var _species = _db.Species.FirstOrDefault(x => x.Id == id);
+            if (_species == null)
+                return NotFound($"Species with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(species.SpeciesName))
@@ -82,16 +79,14 @@ namespace VetStat.Controllers
                     _species.Behavior = species.Behavior;
                 if (!string.IsNullOrEmpty(species.Diet))
                     _species.Diet = species.Diet;
-                
+
                 _db.SaveChanges();
-                return Ok(species);
+                return Ok(_species.ToDto());
             }
             catch (Exception err)
             {
-
                 return BadRequest("Could not update the record. Please check your input and try again.");
             }
-
         }
 
         //api/Species/Delete/:id
