@@ -23,7 +23,14 @@ export const myAuthInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
-        router.navigateByUrl('/');
+        // Purge stale token so IsLogged() returns false on the next tick.
+        // Without this, callers like NavbarComponent.loadSchedule() see a
+        // truthy token, re-issue GetUserInfo, get another 401, and loop.
+        window.localStorage.removeItem('my-auth-token');
+        window.sessionStorage.removeItem('my-auth-token');
+        if (router.url !== '/') {
+          router.navigateByUrl('/');
+        }
       }
       return throwError(() => err);
     })

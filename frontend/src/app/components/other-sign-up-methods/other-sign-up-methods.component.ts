@@ -8,6 +8,12 @@ import {Router} from "@angular/router";
 // Declare the global google namespace injected by the GSI script in index.html
 declare const google: any;
 
+// Module-level flag: google.accounts.id.initialize() must run exactly once per
+// page lifetime. Without this guard, every remount of this component (e.g.
+// navigating login ↔ register) re-initializes GIS and triggers the
+// "google.accounts.id.initialize() is called multiple times" console warning.
+let googleInitialized = false;
+
 @Component({
   selector: 'app-other-sign-up-methods',
   standalone: true,
@@ -53,12 +59,15 @@ export class OtherSignUpMethodsComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    google.accounts.id.initialize({
-      client_id: '1032558872733-v9evv1snk6l8es598b637nbo2bg1kqd0.apps.googleusercontent.com',
-      callback: (response: any) => this.handleGoogleCallback(response),
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
+    if (!googleInitialized) {
+      google.accounts.id.initialize({
+        client_id: '1032558872733-v9evv1snk6l8es598b637nbo2bg1kqd0.apps.googleusercontent.com',
+        callback: (response: any) => this.handleGoogleCallback(response),
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      googleInitialized = true;
+    }
 
     const buttonDiv = this.elementRef.nativeElement.querySelector('#google-signin-btn');
     if (buttonDiv) {
