@@ -31,6 +31,7 @@ namespace VetStat.Models
         [Required]
         public string Username { get; set; }
         [Required]
+        [JsonIgnore]
         public string Password { get; set; }
 
         public string? City { get; set; }
