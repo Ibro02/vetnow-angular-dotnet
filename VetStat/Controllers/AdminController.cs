@@ -8,6 +8,7 @@ using VetStat.Helpers.Auth;
 using VetStat.Models;
 using VetStat.Helpers;
 using VetStat.Helpers.Validators;
+using VetStat.Helpers.Services;
 
 namespace VetStat.Controllers
 {
@@ -71,12 +72,14 @@ namespace VetStat.Controllers
         public ActionResult Edit([FromBody] Admin admin, int id)
         {
             var _admin = _db.Admin.Where(x => x.Id == id).FirstOrDefault();
+            if (_admin == null)
+                return NotFound($"Admin with ID {id} not found.");
             try
             {
                 if (!string.IsNullOrEmpty(admin.Username))
                     _admin.Username = admin.Username;
                 if (!string.IsNullOrEmpty(admin.Password))
-                    _admin.Password = admin.Password;
+                    _admin.Password = PasswordHasher.Hash(admin.Password);
 
                 _db.SaveChanges();
                 return Ok(_admin.ToDto());
