@@ -8,6 +8,7 @@ import { HeaderTitleComponent } from '../../components/common/header-title/heade
 import { TableComponent, TableColumn } from '../../components/common/table/table.component';
 import { ProfileService } from '../../services/ProfileService';
 import { MyAuthService } from '../../services/MyAuth';
+import { ToasterService } from '../../services/toaster.service';
 import { environment } from '../../../environment';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -136,6 +137,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private authService: MyAuthService,
     private http: HttpClient,
+    private toaster: ToasterService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -343,9 +345,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       await firstValueFrom(
         this.http.delete(`${environment.apiUrl}/api/Pets/SoftDelete?id=${this.confirmTargetPetId}`, { responseType: 'text' })
       );
+      this.toaster.success('Success', `${this.confirmTargetPetName} has been deleted.`);
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
-    } catch (error) {
-      // failed to delete pet
+    } catch {
+      this.toaster.error('Error', 'Failed to delete pet. Please try again.');
     }
     this.confirmTargetPetId = null;
   }
@@ -358,9 +361,10 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
       await firstValueFrom(
         this.http.put(`${environment.apiUrl}/api/Pets/Restore?id=${this.confirmTargetPetId}`, {}, { responseType: 'text' })
       );
+      this.toaster.success('Success', `${this.confirmTargetPetName} has been restored.`);
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
-    } catch (error) {
-      // failed to restore pet
+    } catch {
+      this.toaster.error('Error', 'Failed to restore pet. Please try again.');
     }
     this.confirmTargetPetId = null;
   }
@@ -431,11 +435,12 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
         this.http.post(`${environment.apiUrl}/api/PetsUpdateOrInsert/Save`, requestBody)
       );
 
+      this.toaster.success('Success', this.editingPetData?.['id'] ? 'Pet updated successfully.' : 'Pet added successfully.');
       this.showPetForm = false;
       this.editingPetData = null;
       await this.fetchPets(this.activeSearchQuery, this.currentPage, this.pageSize, this.statusFilter);
-    } catch (error) {
-      // failed to save pet
+    } catch {
+      this.toaster.error('Error', 'Failed to save pet. Please try again.');
     }
   }
 
@@ -448,7 +453,7 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
     const ownerId = this.pets.length > 0 ? this.pets[0].ownerId : null;
 
     if (!ownerId) {
-      alert('No available pets to generate the pdf');
+      this.toaster.error('Error', 'No available pets to generate the PDF.');
       return;
     }
 
@@ -469,10 +474,9 @@ export class PetsSettingsComponent implements OnInit, OnDestroy {
 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
-
-    } catch (error) {
-      // failed to generate PDF
-      alert('Failed while generating PDF');
+      this.toaster.success('Success', 'Medical report downloaded successfully.');
+    } catch {
+      this.toaster.error('Error', 'Failed to generate PDF. Please try again.');
     }
   }
 }

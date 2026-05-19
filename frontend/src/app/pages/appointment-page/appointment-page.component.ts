@@ -1,4 +1,6 @@
-import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, ViewChild} from '@angular/core';
+import {Subject} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
 import {HeaderTitleComponent} from "../../components/common/header-title/header-title.component";
 import {CalendarComponent} from "../../components/common/calendar/calendar.component";
 import {ActivatedRoute, Params, Router} from "@angular/router";
@@ -14,6 +16,14 @@ import {Animal} from "./Animal";
 import {ToasterService} from "../../services/toaster.service";
 import { fadeIn, scaleIn } from '../../animations/shared.animations';
 
+// 2-second debounce window for date picks — see dateChange$ below.
+const DATE_DEBOUNCE_MS = 2000;
+
+// Minimum visible time for any loading state. Without this, sub-second
+// responses cause the spinner/skeleton to flicker (briefly appearing and
+// vanishing), which looks broken even when it isn't.
+const MIN_LOADER_MS = 1000;
+
 @Component({
   selector: 'app-appointment-page',
   standalone: true,
@@ -28,7 +38,7 @@ import { fadeIn, scaleIn } from '../../animations/shared.animations';
   styleUrl: './appointment-page.component.css',
   animations: [fadeIn, scaleIn],
 })
-export class AppointmentPageComponent {
+export class AppointmentPageComponent implements OnDestroy {
   user: UserProfile | null = null;
   pets: Animal[] = [];
   selectedPet?: Animal;
@@ -38,8 +48,20 @@ export class AppointmentPageComponent {
   appointmentTime?: string | null;
   newAppointment: any;
 
-  isLoadingSlots: boolean = false;
-  isLoadingPets: boolean = false;
+  // Initial-load defaults are `true` so the skeletons render on the very first
+  // paint instead of after getUserContent() resolves (otherwise the user sees a
+  // flash of "No slots available" while we're still fetching).
+  isLoadingSlots: boolean = true;
+  isLoadingPets: boolean = true;
+
+  // Page-level loading flag — covers the whole booking layout with a single
+  // spinner until the user profile + pets + slots + employee have all loaded.
+  isPageLoading: boolean = true;
+
+  // Debounced date-change pipeline. Emitting here flips the slot grid into its
+  // skeleton state immediately, but defers the actual HTTP call by 2s so rapid
+  // clicks through the calendar collapse into a single request.
+  private dateChange$ = new Subject<string>();
 
   // Searchable pet dropdown
   isPetDropdownOpen: boolean = false;
@@ -67,18 +89,40 @@ export class AppointmentPageComponent {
     private toaster: ToasterService,
     private elementRef: ElementRef,
     private http: HttpClient,
-  ) {}
+  ) {
+    this.dateChange$
+      .pipe(debounceTime(DATE_DEBOUNCE_MS))
+      .subscribe(date => this.fetchTimeSlots(date));
+  }
+
+  ngOnDestroy() {
+    this.dateChange$.complete();
+  }
 
   async ngOnInit() {
-    await this.profileService.getUserContent();
-    this.user = this.profileService.userProfile;
-    const date = this.route.snapshot.queryParamMap.get('date') ?? new Date().toJSON();
-
+    // Resolve employeeid from the route synchronously so the fetches below
+    // don't fire with an undefined id.
     this.route.params.subscribe((params: Params) => this.employeeid = params['id']);
 
-    this.fetchPets();
-    this.fetchTimeSlots(date);
-    this.fetchEmployee();
+    const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADER_MS));
+
+    try {
+      await this.profileService.getUserContent();
+      this.user = this.profileService.userProfile;
+      const date = this.route.snapshot.queryParamMap.get('date') ?? new Date().toJSON();
+
+      // Fire all three in parallel — the user is staring at the spinner, no
+      // reason to serialize them. minDelay enforces MIN_LOADER_MS so the
+      // spinner never flickers in/out faster than the eye can follow.
+      await Promise.all([
+        this.fetchPets(),
+        this.fetchTimeSlots(date),
+        this.fetchEmployee(),
+        minDelay,
+      ]);
+    } finally {
+      this.isPageLoading = false;
+    }
   }
 
   async fetchPets(): Promise<void> {
@@ -98,16 +142,24 @@ export class AppointmentPageComponent {
   async fetchTimeSlots(date: string = new Date().toJSON()) {
     this.isLoadingSlots = true;
     this.timeSlots = [];
+    const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADER_MS));
     try {
-      const data = await firstValueFrom(
-        this.http.get<TimeSlot[]>(
-          `${environment.apiUrl}/api/TimeSlot/Get?employeeid=${this.employeeid}&date=${date.split("T")[0]}`
-        )
-      );
-      // API returns 204 NoContent (empty body) when no slots exist
+      const [data] = await Promise.all([
+        firstValueFrom(
+          this.http.get<TimeSlot[]>(
+            `${environment.apiUrl}/api/TimeSlot/Get?employeeid=${this.employeeid}&date=${date.split("T")[0]}`
+          )
+        ),
+        minDelay,
+      ]);
+      // API returns 204 NoContent (empty body) when no slots exist.
+      // The empty-state container in the template renders the "no slots
+      // available" message when timeSlots.length === 0 — no toaster needed.
       this.timeSlots = Array.isArray(data) ? data : [];
     } catch {
+      // Keep timeSlots as [] so the empty-state container is shown.
       this.timeSlots = [];
+      await minDelay;
     } finally {
       this.isLoadingSlots = false;
     }
@@ -124,9 +176,13 @@ export class AppointmentPageComponent {
   }
 
   changeDate(value: Date) {
-    this.fetchTimeSlots(value.toJSON());
     this.appointmentTime = null;
     this.newAppointment = null;
+    // Give the user instant feedback (skeleton on, old slots cleared) but defer
+    // the real fetch by 2s so rapid date hopping collapses into one request.
+    this.isLoadingSlots = true;
+    this.timeSlots = [];
+    this.dateChange$.next(value.toJSON());
   }
 
   prepareAnAppointment(timeslot: TimeSlot) {

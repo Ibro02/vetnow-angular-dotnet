@@ -221,9 +221,43 @@ public class AdminPanelEndpoints : MyEndpointBase
     [HttpDelete("VetStations/Delete")]
     public ActionResult DeleteVetStation([FromQuery] int id)
     {
-
         var station = _db.VetStation.SingleOrDefault(v => v.Id == id);
         if (station == null) return NotFound("Vet station not found.");
+
+        // Detach employees — nullable FK, just null it out.
+        // This also loads the main vet as an Employee (same tracked instance).
+        _db.Employee.Where(e => e.VetStationId == id).ToList()
+            .ForEach(e => e.VetStationId = null);
+
+        // Null out appointments — nullable FK
+        _db.Appointment.Where(a => a.VetStationId == id).ToList()
+            .ForEach(a => a.VetStationId = null);
+
+        // FAQ and Inventory have non-nullable FKs — must delete rows
+        _db.FAQ.RemoveRange(_db.FAQ.Where(f => f.VetStationId == id));
+        _db.Inventory.RemoveRange(_db.Inventory.Where(i => i.VetStationId == id));
+
+        // Demote main vet role before the raw SQL delete.
+        // The mainVet entity may already be tracked (loaded above as Employee),
+        // so EF reuses the same instance — no duplicate tracking conflict.
+        var mainVet = _db.MainVet.SingleOrDefault(m => m.ChiefVetStationId == id);
+        if (mainVet != null)
+        {
+            var vetRoleId = _db.Role.Where(r => r.Name == "Vet").Select(r => r.Id).FirstOrDefault();
+            var mainVetPerson = _db.Person.SingleOrDefault(p => p.Id == mainVet.Id);
+            if (mainVetPerson != null && vetRoleId > 0)
+                mainVetPerson.RoleId = vetRoleId;
+        }
+
+        // Flush all EF-tracked changes first. The MainVet row still exists here,
+        // so EF can UPDATE the Employee/Person columns without a concurrency error.
+        _db.SaveChanges();
+
+        // Only now remove the MainVet row via raw SQL (TPT — same pattern as AssignMainVet).
+        // Doing this before SaveChanges would leave the mainVet entity in Modified state,
+        // causing EF to UPDATE a row that no longer exists → DbUpdateConcurrencyException.
+        if (mainVet != null)
+            _db.Database.ExecuteSqlRaw("DELETE FROM MainVet WHERE Id = {0}", mainVet.Id);
 
         _db.VetStation.Remove(station);
         _db.SaveChanges();

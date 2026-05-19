@@ -1,7 +1,25 @@
 <app-header-title description="Book your appointment in just a few steps" title="Make an Appointment"/>
 
 <div class="max-w-6xl mx-auto px-4 py-8">
-  <div class="grid md:grid-cols-2 gap-6 items-start">
+
+  <!-- ─── Initial-load spinner ─────────────────────────────────
+       Shown until user profile + pets + slots + employee resolve.
+       Replaces the booking grid so the user isn't staring at a
+       half-empty page during the long backend round-trip.
+  ──────────────────────────────────────────────────────────── -->
+  <div *ngIf="isPageLoading" @fadeIn
+       class="flex flex-col items-center justify-center gap-5 py-32">
+    <div class="relative w-16 h-16">
+      <div class="absolute inset-0 rounded-full border-4 border-emerald-100"></div>
+      <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-emerald-500 animate-spin"></div>
+    </div>
+    <div class="flex flex-col items-center gap-1">
+      <p class="text-base font-semibold text-gray-700">Preparing your booking…</p>
+      <p class="text-sm text-gray-400">Fetching available time slots and pets</p>
+    </div>
+  </div>
+
+  <div *ngIf="!isPageLoading" @fadeIn class="grid md:grid-cols-2 gap-6 items-start">
 
     <!-- ═══════════════════════════════════════
          LEFT — Employee card + Calendar

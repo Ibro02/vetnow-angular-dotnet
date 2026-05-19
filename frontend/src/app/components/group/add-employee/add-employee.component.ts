@@ -1,4 +1,4 @@
-import { NgClass, NgStyle } from '@angular/common';
+import { NgClass, NgFor, NgStyle } from '@angular/common';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {
   AbstractControl,
@@ -33,7 +33,7 @@ function birthDateValidator(): ValidatorFn {
 @Component({
   selector: 'app-add-employee',
   standalone: true,
-  imports: [NgClass, NgStyle, ReactiveFormsModule, ButtonComponent],
+  imports: [NgClass, NgFor, NgStyle, ReactiveFormsModule, ButtonComponent],
   templateUrl: './add-employee.component.html',
   styleUrls: ['./add-employee.component.css'],
 })
@@ -44,8 +44,14 @@ export class AddEmployeeComponent implements OnInit {
   employeeForm: FormGroup;
   showModal = false;
   isEditMode = false;
+  roles: { id: number; name: string }[] = [];
 
   ngOnInit(): void {
+    this.http.get<{ id: number; name: string }[]>(`${environment.apiUrl}/api/Role/List`).subscribe({
+      next: (roles) => { this.roles = roles; },
+      error: () => { this.toaster.error('Error', 'Could not load roles.'); },
+    });
+
     if (this.editEmployee) {
       this.isEditMode = true;
       this.employeeForm.patchValue({
@@ -179,7 +185,7 @@ export class AddEmployeeComponent implements OnInit {
       ['lastName',         'Last name is required and must contain only letters (max 50 chars).'],
       ['email',            'A valid email address is required (max 254 chars).'],
       ['phone',            'Phone must be 7–15 digits, e.g. +387 61 123 456.'],
-      ['roleId',           'A valid role ID (greater than 0) must be entered.'],
+      ['roleId',           'A role must be selected.'],
       ['birthDate',        'Birth date is required; the employee must be at least 18 years old.'],
       ['username',         'Username must be 5–30 characters: letters, digits, _ or -.'],
       ['password',         'Password must be 8–128 characters with at least one uppercase letter, one lowercase letter, one digit, and one special character.'],
