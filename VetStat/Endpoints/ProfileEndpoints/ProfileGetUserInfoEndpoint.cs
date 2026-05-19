@@ -36,9 +36,9 @@ public class ProfileGetUserInfoEndpoint : MyEndpointBase
             var userProfile = new ProfileGetUserInfoResponse(person, employee);
             return Ok(userProfile);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            return BadRequest(e.Message);
+            return BadRequest("Could not retrieve user profile. Please try again.");
         }
     }
 
