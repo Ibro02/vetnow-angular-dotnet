@@ -1,0 +1,517 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Serbian (`sr`).
+class AppLocalizationsSr extends AppLocalizations {
+  AppLocalizationsSr([String locale = 'sr']) : super(locale);
+
+  @override
+  String get appTitle => 'VetNow';
+
+  @override
+  String get navExplore => 'Istraži';
+
+  @override
+  String get navAppointments => 'Termini';
+
+  @override
+  String get navProfile => 'Profil';
+
+  @override
+  String get exploreHeroTitle => 'Pouzdana nega,\nzakazana za sekunde.';
+
+  @override
+  String get exploreHeroSubtitle =>
+      'Pregledaj proverene klinike blizu tebe — bez naloga za pregledanje.';
+
+  @override
+  String get searchHint => 'Pretraži klinike, usluge…';
+
+  @override
+  String get filterRecommended => 'Preporučeno';
+
+  @override
+  String get filterTopRated => 'Najbolje ocenjeno';
+
+  @override
+  String get filterNearest => 'Najbliže';
+
+  @override
+  String get filterOpenNow => 'Otvoreno sada';
+
+  @override
+  String clinicsInCity(int count, String city) {
+    return '$count klinika u $city';
+  }
+
+  @override
+  String get noClinicsMatch => 'Nijedna klinika ne odgovara tvojim filterima';
+
+  @override
+  String get chooseCity => 'Izaberi grad';
+
+  @override
+  String get loginTitle => 'Prijava';
+
+  @override
+  String get loginBookingGateTitle => 'Skoro gotovo';
+
+  @override
+  String get loginBookingGateSubtitle =>
+      'Prijavi se da potvrdiš termin — traje sekund.';
+
+  @override
+  String get usernameOrEmail => 'Korisničko ime / Email';
+
+  @override
+  String get password => 'Lozinka';
+
+  @override
+  String get keepSignedIn => 'Ostani prijavljen/a';
+
+  @override
+  String get forgotPassword => 'Zaboravljena lozinka?';
+
+  @override
+  String get signIn => 'Prijavi se';
+
+  @override
+  String get loginInvalidCredentials => 'Pogrešno korisničko ime ili lozinka.';
+
+  @override
+  String get loginNeedsVerification =>
+      'Nalog nije verifikovan. Poslali smo novi kod na tvoj email.';
+
+  @override
+  String get networkError =>
+      'Nešto nije uspelo. Proveri internet konekciju i pokušaj ponovo.';
+
+  @override
+  String get retry => 'Pokušaj ponovo';
+
+  @override
+  String get registerSuccessCheckEmail =>
+      'Nalog je kreiran! Proveri email da ga verifikuješ, pa se prijavi.';
+
+  @override
+  String get passwordRequirementsHint =>
+      'Najmanje 8 znakova: veliko i malo slovo, broj i specijalni znak.';
+
+  @override
+  String get noAccount => 'Nemaš nalog?';
+
+  @override
+  String get register => 'Registruj se';
+
+  @override
+  String get createAccount => 'Napravi nalog';
+
+  @override
+  String get registerSubtitle =>
+      'Napravi nalog da zakazuješ termine i upravljaš ljubimcima.';
+
+  @override
+  String get firstName => 'Ime';
+
+  @override
+  String get lastName => 'Prezime';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get username => 'Korisničko ime';
+
+  @override
+  String get createAccountButton => 'Napravi nalog';
+
+  @override
+  String get backToLogin => 'Nazad na prijavu';
+
+  @override
+  String get myAppointments => 'Moji termini';
+
+  @override
+  String get appointmentsSubtitle => 'Prati svoje buduće i prošle posete';
+
+  @override
+  String get upcoming => 'Budući';
+
+  @override
+  String get pastVisits => 'Prošle posete';
+
+  @override
+  String get statusCompleted => 'Završeno';
+
+  @override
+  String get statusCancelled => 'Otkazano';
+
+  @override
+  String get noUpcoming => 'Nema budućih termina.';
+
+  @override
+  String get noPast => 'Još nema prošlih termina.';
+
+  @override
+  String get noAppointmentsYet => 'Još nema termina';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get guestTitle => 'Pregledaš kao gost';
+
+  @override
+  String get guestMessage =>
+      'Napravi nalog da sačuvaš svoje ljubimce, pratiš istoriju poseta i brže zakažeš sledeći put.';
+
+  @override
+  String get guestBenefit1 =>
+      'Sačuvaj podatke o ljubimcima jednom, koristi za svaku rezervaciju';
+
+  @override
+  String get guestBenefit2 => 'Vodi evidenciju svake posete i vakcinacije';
+
+  @override
+  String get guestBenefit3 => 'Preskoči ponovno unošenje podataka sledeći put';
+
+  @override
+  String get logInRegister => 'Prijava / Registracija';
+
+  @override
+  String get takesLessThanMinute => 'Traje manje od minuta.';
+
+  @override
+  String get myPets => 'Moji ljubimci';
+
+  @override
+  String get viewAll => 'Pogledaj sve';
+
+  @override
+  String get addPet => 'Dodaj ljubimca';
+
+  @override
+  String get account => 'Nalog';
+
+  @override
+  String get personalInfo => 'Lični podaci';
+
+  @override
+  String get passwordSecurity => 'Lozinka i bezbednost';
+
+  @override
+  String get notifications => 'Obaveštenja';
+
+  @override
+  String get helpSupport => 'Pomoć i podrška';
+
+  @override
+  String get logOut => 'Odjavi se';
+
+  @override
+  String get member => 'Član';
+
+  @override
+  String get memberSince => 'Član od';
+
+  @override
+  String get pets => 'Ljubimci';
+
+  @override
+  String get logOutConfirmTitle => 'Odjava?';
+
+  @override
+  String get logOutConfirmMessage =>
+      'Uvek možeš ponovo da se prijaviš da vidiš svoje ljubimce i termine.';
+
+  @override
+  String get stayLoggedIn => 'Ostani prijavljen/a';
+
+  @override
+  String get cancelAppointmentTitle => 'Otkazati termin?';
+
+  @override
+  String get cancelAppointmentMessage =>
+      'Ovo ne može da se poništi. Moraćeš da zakažeš novi termin ako se predomisliš.';
+
+  @override
+  String get keepIt => 'Zadrži';
+
+  @override
+  String get cancelAppointmentAction => 'Otkaži termin';
+
+  @override
+  String get reschedule => 'Promeni termin';
+
+  @override
+  String get bookAgain => 'Zakaži ponovo';
+
+  @override
+  String get bookAppointment => 'Zakaži termin';
+
+  @override
+  String get chooseService => 'Izaberi uslugu';
+
+  @override
+  String get chooseStaffOptional => 'Izaberi osoblje (opciono)';
+
+  @override
+  String get pickTimeToday => 'Izaberi vreme — danas';
+
+  @override
+  String get pickTimeAbove => 'Izaberi vreme iznad';
+
+  @override
+  String get anyAvailable => 'Bilo ko dostupan';
+
+  @override
+  String get confirmBooking => 'Potvrdi rezervaciju';
+
+  @override
+  String get selectServiceAndTime => 'Izaberi uslugu i vreme';
+
+  @override
+  String get bookingSummary => 'Pregled rezervacije';
+
+  @override
+  String todayAtDuration(String slot, int duration) {
+    return 'Danas u $slot · $duration min';
+  }
+
+  @override
+  String get total => 'Ukupno';
+
+  @override
+  String get youAreBooked => 'Zakazano je!';
+
+  @override
+  String bookingConfirmedMessage(String clinicName) {
+    return 'Tvoj termin u $clinicName je potvrđen. Poslali smo detalje na tvoj email.';
+  }
+
+  @override
+  String get backToExplore => 'Nazad na Istraži';
+
+  @override
+  String get call => 'Pozovi';
+
+  @override
+  String get book => 'Zakaži';
+
+  @override
+  String get verifiedPartner => 'Verifikovani partner';
+
+  @override
+  String get whatIsVerifiedPartner => 'Šta znači Verifikovani partner?';
+
+  @override
+  String get verifiedPartnerExplanation =>
+      'Licenca ove klinike je proverena u registru Veterinarske komore, a njeno osoblje i usluge prikazane ovde pregledao je VetNow tim.';
+
+  @override
+  String get gotIt => 'Razumem';
+
+  @override
+  String get ourTeam => 'Naš tim';
+
+  @override
+  String get meetTheTeam => 'Upoznaj tim';
+
+  @override
+  String get openHoursToday => 'Otvoreno sada · Pon–Sub, 08:00–18:00';
+
+  @override
+  String get closedOpensTomorrow => 'Zatvoreno sada · Otvara se pon u 08:00';
+
+  @override
+  String get sortByRating => 'Sortiraj po oceni';
+
+  @override
+  String get allServices => 'Sve usluge';
+
+  @override
+  String get reviews => 'Recenzije';
+
+  @override
+  String get openNow => 'Otvoreno sada';
+
+  @override
+  String get closedNow => 'Zatvoreno sada';
+
+  @override
+  String get language => 'Jezik';
+
+  @override
+  String get chooseLanguage => 'Izaberi jezik';
+
+  @override
+  String get bosnian => 'Bosanski';
+
+  @override
+  String get croatian => 'Hrvatski';
+
+  @override
+  String get serbian => 'Srpski';
+
+  @override
+  String get savePet => 'Sačuvaj ljubimca';
+
+  @override
+  String get tellUsAboutFriend => 'Reci nam o svom prijatelju';
+
+  @override
+  String get weightOptional => 'Težina (kg) — opciono';
+
+  @override
+  String get breed => 'Rasa';
+
+  @override
+  String get species => 'Vrsta';
+
+  @override
+  String get petName => 'Ime';
+
+  @override
+  String get petInfoNote =>
+      'Vakcinacije i druge detalje možeš dodati kasnije sa profila ljubimca.';
+
+  @override
+  String get details => 'Detalji';
+
+  @override
+  String get vaccinationHistory => 'Istorija vakcinacije';
+
+  @override
+  String get noVaccinationRecords =>
+      'Još nema zapisa o vakcinaciji.\nTvoja veterinarska stanica ih može dodati posle posete.';
+
+  @override
+  String get weight => 'Težina';
+
+  @override
+  String get microchip => 'Mikročip';
+
+  @override
+  String get age => 'Starost';
+
+  @override
+  String get sectionAppointment => 'Termin';
+
+  @override
+  String get appointmentDetails => 'Detalji termina';
+
+  @override
+  String get sectionSpecialist => 'Specijalista';
+
+  @override
+  String get sectionClinic => 'Klinika';
+
+  @override
+  String get labelService => 'Usluga';
+
+  @override
+  String get labelDetails => 'Detalji';
+
+  @override
+  String get labelDuration => 'Trajanje';
+
+  @override
+  String get labelPet => 'Ljubimac';
+
+  @override
+  String get labelPrice => 'Cena';
+
+  @override
+  String get labelName => 'Naziv';
+
+  @override
+  String get labelAddress => 'Adresa';
+
+  @override
+  String get labelPhone => 'Telefon';
+
+  @override
+  String get servicesWithSpecialist => 'Usluge kod ovog specijaliste';
+
+  @override
+  String get noServicesListed => 'Još nema navedenih usluga.';
+
+  @override
+  String get reviewsForSpecialist => 'Recenzije za ovog specijalistu';
+
+  @override
+  String get amenityInOffice => 'Pregledi u ordinaciji';
+
+  @override
+  String get amenityInOfficeDesc =>
+      'Ova klinika prima ljubimce direktno u svojoj ordinaciji.';
+
+  @override
+  String get amenityOnField => 'Terenske posete';
+
+  @override
+  String get amenityOnFieldDesc => 'Veterinar može doći na vašu kućnu adresu.';
+
+  @override
+  String get amenityParking => 'Parking';
+
+  @override
+  String get amenityParkingDesc => 'Besplatan parking dostupan za posetioce.';
+
+  @override
+  String get amenityWheelchair => 'Pristup za invalidska kolica';
+
+  @override
+  String get amenityWheelchairDesc =>
+      'Objekat je prilagođen osobama sa invaliditetom.';
+
+  @override
+  String get amenityWifi => 'Besplatan WiFi';
+
+  @override
+  String get amenityWifiDesc =>
+      'Besplatan bežični internet dostupan u čekaonici.';
+
+  @override
+  String get roleVeterinarian => 'Veterinar';
+
+  @override
+  String get roleNurse => 'Medicinska sestra';
+
+  @override
+  String get roleGroomer => 'Negovatelj/ica';
+
+  @override
+  String get roleMainVet => 'Glavni veterinar';
+
+  @override
+  String get roleNoPreference => 'Bez preferencije';
+
+  @override
+  String get serviceVaccinationName => 'Vakcinacija';
+
+  @override
+  String get serviceVaccinationDesc =>
+      'Osnovne vakcine i vakcina protiv besnila';
+
+  @override
+  String get serviceCheckupName => 'Opšti pregled';
+
+  @override
+  String get serviceCheckupDesc => 'Kompletan fizički pregled';
+
+  @override
+  String get serviceDentalName => 'Čišćenje zuba';
+
+  @override
+  String get serviceDentalDesc => 'Skidanje kamenca i poliranje';
+
+  @override
+  String get serviceGroomingName => 'Šišanje i nega';
+
+  @override
+  String get serviceGroomingDesc => 'Pranje, šišanje i nega noktiju';
+}

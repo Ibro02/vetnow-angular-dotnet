@@ -1,0 +1,69 @@
+import '../config/api_config.dart';
+import 'api_client.dart';
+
+/// Flattened shape returned by GET /api/Appointment/GetByCustomerId —
+/// mirrors AppointmentGetByCustomerIdEndpoint's anonymous projection
+/// exactly (it's a joined view, not the raw Appointment entity).
+///
+/// Note: this endpoint only returns appointments with
+/// SlotDateTime >= today — the backend has no "past appointments"
+/// endpoint yet, so the Past tab stays empty for real accounts until
+/// one exists.
+class RemoteAppointment {
+  final int id;
+  final int employeeId;
+  final int vetStationId;
+  final int animalId;
+  final int timeSlotId;
+  final DateTime slotDateTime;
+  final String appointmentTime;
+  final String? animalName;
+  final String? speciesName;
+  final String? employeeFirstName;
+  final String? employeeLastName;
+  final String? vetStationName;
+
+  const RemoteAppointment({
+    required this.id,
+    required this.employeeId,
+    required this.vetStationId,
+    required this.animalId,
+    required this.timeSlotId,
+    required this.slotDateTime,
+    required this.appointmentTime,
+    this.animalName,
+    this.speciesName,
+    this.employeeFirstName,
+    this.employeeLastName,
+    this.vetStationName,
+  });
+
+  factory RemoteAppointment.fromJson(Map<String, dynamic> json) => RemoteAppointment(
+        id: json['id'] as int,
+        employeeId: json['employeeId'] as int,
+        vetStationId: json['vetStationId'] as int,
+        animalId: json['animalId'] as int,
+        timeSlotId: json['timeSlotId'] as int,
+        slotDateTime: DateTime.parse(json['slotDateTime'] as String),
+        appointmentTime: json['appointmentTime'] as String? ?? '',
+        animalName: json['animalName'] as String?,
+        speciesName: json['speciesName'] as String?,
+        employeeFirstName: json['employeeFirstName'] as String?,
+        employeeLastName: json['employeeLastName'] as String?,
+        vetStationName: json['vetStationName'] as String?,
+      );
+}
+
+class AppointmentApiService {
+  AppointmentApiService._();
+
+  static Future<List<RemoteAppointment>> getByCustomer({required int customerId, required String token}) async {
+    final result = await ApiClient.get(
+      ApiConfig.appointmentByCustomer,
+      query: {'customerId': customerId},
+      token: token,
+    );
+    final list = result as List<dynamic>? ?? [];
+    return list.map((e) => RemoteAppointment.fromJson(e as Map<String, dynamic>)).toList();
+  }
+}
