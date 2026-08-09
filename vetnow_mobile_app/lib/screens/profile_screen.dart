@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s6, AppSpacing.pagePadding, AppSpacing.s10),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s6, AppSpacing.pagePadding, 110),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -226,9 +226,12 @@ class _PetsRow extends StatelessWidget {
               padding: const EdgeInsets.only(right: AppSpacing.s3),
               child: HoverCard(
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => PetDetailScreen(pet: p)),
-                ),
+                onTap: () async {
+                  final deleted = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute(builder: (_) => PetDetailScreen(pet: p)),
+                  );
+                  if (deleted == true) onAdded();
+                },
                 child: Container(
                   width: 100,
                   padding: const EdgeInsets.all(AppSpacing.s3),

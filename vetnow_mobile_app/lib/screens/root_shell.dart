@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/luxury_nav_bar.dart';
 import 'explore_screen.dart';
 import 'my_appointments_screen.dart';
 import 'profile_screen.dart';
@@ -9,6 +10,11 @@ import 'profile_screen.dart';
 /// Explore is always fully usable as a guest; Appointments/Profile stay
 /// visible but show an AuthPrompt until the user logs in (see those
 /// screens) — nobody gets locked out of the tab bar itself.
+///
+/// The nav bar itself is a custom floating "pill" (see LuxuryNavBar)
+/// instead of the stock Material bottom bar every other app ships
+/// with — it's the one UI element present on every single screen, so
+/// it carries an outsized share of the app's premium feel.
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
 
@@ -31,28 +37,15 @@ class _RootShellState extends State<RootShell> {
 
     return Scaffold(
       backgroundColor: AppColors.bgSoft,
+      extendBody: true,
       body: SafeArea(bottom: false, child: _tabs[_tabIndex]),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: LuxuryNavBar(
         selectedIndex: _tabIndex,
-        onDestinationSelected: (i) => setState(() => _tabIndex = i),
-        backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.accent50,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.search_outlined),
-            selectedIcon: const Icon(Icons.search, color: AppColors.accent),
-            label: l10n.navExplore,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.event_outlined),
-            selectedIcon: const Icon(Icons.event, color: AppColors.accent),
-            label: l10n.navAppointments,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person, color: AppColors.accent),
-            label: l10n.navProfile,
-          ),
+        onSelect: (i) => setState(() => _tabIndex = i),
+        items: [
+          NavItem(icon: Icons.search_outlined, selectedIcon: Icons.search_rounded, label: l10n.navExplore),
+          NavItem(icon: Icons.event_outlined, selectedIcon: Icons.event_rounded, label: l10n.navAppointments),
+          NavItem(icon: Icons.person_outline, selectedIcon: Icons.person_rounded, label: l10n.navProfile),
         ],
       ),
     );

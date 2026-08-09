@@ -97,6 +97,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
     final staffName = [r.employeeFirstName, r.employeeLastName].where((s) => s != null && s.isNotEmpty).join(' ');
     return Appointment(
       id: r.id,
+      employeeId: r.employeeId,
+      vetStationId: r.vetStationId,
       clinicName: r.vetStationName ?? '',
       clinicAddress: '',
       clinicPhone: '',
@@ -181,8 +183,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
                     : TabBarView(
                         controller: _tabController,
                         children: [
-                          _AppointmentList(appointments: _upcoming, emptyText: _error ?? l10n.noUpcoming),
-                          _AppointmentList(appointments: _past, emptyText: l10n.noPast),
+                          _AppointmentList(appointments: _upcoming, emptyText: _error ?? l10n.noUpcoming, onChanged: _load),
+                          _AppointmentList(appointments: _past, emptyText: l10n.noPast, onChanged: _load),
                         ],
                       ),
               ),
@@ -202,7 +204,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
 class _AppointmentList extends StatelessWidget {
   final List<Appointment> appointments;
   final String emptyText;
-  const _AppointmentList({required this.appointments, required this.emptyText});
+  final VoidCallback onChanged;
+  const _AppointmentList({required this.appointments, required this.emptyText, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -210,23 +213,36 @@ class _AppointmentList extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.pagePadding),
-          child: Text(emptyText, style: const TextStyle(color: AppColors.textMuted)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 64,
+                width: 64,
+                decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                child: const Icon(Icons.event_busy_outlined, size: 28, color: AppColors.textMuted),
+              ),
+              const SizedBox(height: AppSpacing.s4),
+              Text(emptyText, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textMuted)),
+            ],
+          ),
         ),
       );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, AppSpacing.s8),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 110),
       itemCount: appointments.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
-      itemBuilder: (context, i) => _AppointmentCard(appointment: appointments[i]),
+      itemBuilder: (context, i) => _AppointmentCard(appointment: appointments[i], onChanged: onChanged),
     );
   }
 }
 
 class _AppointmentCard extends StatelessWidget {
   final Appointment appointment;
-  const _AppointmentCard({required this.appointment});
+  final VoidCallback onChanged;
+  const _AppointmentCard({required this.appointment, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -239,9 +255,12 @@ class _AppointmentCard extends StatelessWidget {
     };
 
     return HoverCard(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => AppointmentDetailScreen(appointment: a)),
-      ),
+      onTap: () async {
+        final changed = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(builder: (_) => AppointmentDetailScreen(appointment: a)),
+        );
+        if (changed == true) onChanged();
+      },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,

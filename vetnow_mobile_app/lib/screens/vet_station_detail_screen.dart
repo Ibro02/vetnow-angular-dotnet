@@ -6,7 +6,10 @@ import '../models/review.dart';
 import '../models/staff_member.dart';
 import '../models/vet_service.dart';
 import '../models/vet_station.dart';
+import '../services/employee_api_service.dart';
+import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
+import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/verified_badge.dart';
 import 'booking_screen.dart';
@@ -30,7 +33,51 @@ enum _StaffSort { featured, topRated }
 class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   _StaffSort _staffSort = _StaffSort.featured;
 
-  // TODO: replace with real data from Employee/Services/Reviews endpoints.
+  // Real staff for this station, fetched from the backend once the
+  // person is logged in (Employee/GetByVetStationId is [Authorize] —
+  // see chat notes on the guest-first conflict). Null means "not
+  // loaded yet" — guests and the pre-load moment fall back to the
+  // illustrative mock list below.
+  List<StaffMember>? _realStaff;
+  bool _loadingReal = false;
+  bool _attemptedLoad = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final auth = AuthScope.of(context);
+    if (auth.isLoggedIn && !_attemptedLoad && !_loadingReal) {
+      _attemptedLoad = true;
+      _loadRealStaff();
+    }
+  }
+
+  Future<void> _loadRealStaff() async {
+    final auth = AuthScope.of(context);
+    if (auth.token == null) return;
+    setState(() => _loadingReal = true);
+    try {
+      final staff = await EmployeeApiService.getByStation(
+        stationId: widget.station.id,
+        token: auth.token!,
+        context: context,
+      );
+      if (!mounted) return;
+      setState(() {
+        _realStaff = staff;
+        _loadingReal = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      // Keep showing the mock list rather than an empty/broken screen.
+      setState(() => _loadingReal = false);
+    }
+  }
+
+  // TODO: replace with real data from Services/Reviews endpoints —
+  // this mock list is also what powers "All services" below, since
+  // the backend has no per-employee service/price data at all yet
+  // (real staff, once loaded, simply won't have services attached).
   List<StaffMember> _staff(BuildContext context) => [
         StaffMember(
           id: 1,
@@ -76,7 +123,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   ];
 
   List<StaffMember> _sortedStaff(BuildContext context) {
-    final list = _staff(context);
+    final list = List<StaffMember>.from(_realStaff ?? _staff(context));
     if (_staffSort == _StaffSort.topRated) {
       list.sort((a, b) => b.rating.compareTo(a.rating));
     }
@@ -84,7 +131,10 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   }
 
   /// All services across every staff member, deduplicated by name, for
-  /// people who'd rather pick "what" before "who".
+  /// people who'd rather pick "what" before "who". Always sourced from
+  /// the mock catalog (see note above) regardless of whether real
+  /// staff loaded, since the backend has no service data to source
+  /// this from either way.
   List<VetService> _allServices(BuildContext context) {
     final seen = <String>{};
     final result = <VetService>[];
@@ -237,12 +287,18 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: AppSpacing.s3),
-                      ...staffList.map((s) => _StaffCard(
-                            staff: s,
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => StaffProfileScreen(staff: s, station: station)),
-                            ),
-                          )),
+                      if (_loadingReal)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: AppSpacing.s6),
+                          child: Center(child: PawLoader(size: 28, color: AppColors.primary)),
+                        )
+                      else
+                        ...staffList.map((s) => _StaffCard(
+                              staff: s,
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => StaffProfileScreen(staff: s, station: station)),
+                              ),
+                            )),
                       const SizedBox(height: AppSpacing.s8),
                       Text(l10n.allServices, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                       const SizedBox(height: AppSpacing.s3),
@@ -288,16 +344,11 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: OutlinedButton.icon(
+                    child: AppButton(
+                      label: l10n.call,
+                      icon: Icons.call,
+                      variant: AppButtonVariant.secondary,
                       onPressed: () {}, // TODO: launch tel: url with station.contactNumber
-                      icon: const Icon(Icons.call, size: 18, color: AppColors.ink),
-                      label: Text(l10n.call),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.ink,
-                        side: const BorderSide(color: AppColors.border, width: 1.5),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s3),

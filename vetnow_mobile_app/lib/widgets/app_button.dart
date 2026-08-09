@@ -4,8 +4,11 @@ import 'paw_loader.dart';
 
 enum AppButtonVariant { primary, secondary, danger, ghost }
 
-/// Mirrors the .btn-primary / .btn-secondary / .btn-danger / .btn-ghost
-/// classes from frontend/src/styles.css.
+/// The app's single button component — every screen routes through
+/// this so a style change here updates everywhere at once. Primary and
+/// danger use a soft gradient + glow shadow to match the premium
+/// pill-button language used in dialogs and booking; secondary/ghost
+/// stay flat and quiet since they're meant to recede.
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -24,6 +27,8 @@ class AppButton extends StatelessWidget {
     this.fullWidth = true,
   });
 
+  bool get _disabled => onPressed == null && !isLoading;
+
   @override
   Widget build(BuildContext context) {
     final Widget child = isLoading
@@ -40,23 +45,30 @@ class AppButton extends StatelessWidget {
                 Icon(icon, size: 18),
                 const SizedBox(width: 8),
               ],
-              Text(label),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
             ],
           );
 
-    final button = switch (variant) {
-      AppButtonVariant.primary => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            elevation: 0,
+    final Widget button = switch (variant) {
+      AppButtonVariant.primary => _GradientButton(
+          colors: const [AppColors.accent, AppColors.accentHover],
+          glowColor: AppColors.accent,
+          onTap: isLoading ? null : onPressed,
+          disabled: _disabled,
+          child: DefaultTextStyle(
+            style: const TextStyle(color: Colors.white),
+            child: IconTheme(data: const IconThemeData(color: Colors.white), child: child),
           ),
-          child: child,
+        ),
+      AppButtonVariant.danger => _GradientButton(
+          colors: const [AppColors.danger, AppColors.dangerHover],
+          glowColor: AppColors.danger,
+          onTap: isLoading ? null : onPressed,
+          disabled: _disabled,
+          child: DefaultTextStyle(
+            style: const TextStyle(color: Colors.white),
+            child: IconTheme(data: const IconThemeData(color: Colors.white), child: child),
+          ),
         ),
       AppButtonVariant.secondary => OutlinedButton(
           onPressed: isLoading ? null : onPressed,
@@ -71,19 +83,6 @@ class AppButton extends StatelessWidget {
           ),
           child: child,
         ),
-      AppButtonVariant.danger => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.danger,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            elevation: 0,
-          ),
-          child: child,
-        ),
       AppButtonVariant.ghost => TextButton(
           onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
@@ -95,5 +94,45 @@ class AppButton extends StatelessWidget {
     };
 
     return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
+  }
+}
+
+class _GradientButton extends StatelessWidget {
+  final List<Color> colors;
+  final Color glowColor;
+  final VoidCallback? onTap;
+  final bool disabled;
+  final Widget child;
+
+  const _GradientButton({
+    required this.colors,
+    required this.glowColor,
+    required this.onTap,
+    required this.disabled,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: disabled ? null : LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+            color: disabled ? AppColors.border : null,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            boxShadow: disabled ? null : [BoxShadow(color: glowColor.withValues(alpha: 0.32), blurRadius: 16, offset: const Offset(0, 7))],
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            alignment: Alignment.center,
+            child: child,
+          ),
+        ),
+      ),
+    );
   }
 }

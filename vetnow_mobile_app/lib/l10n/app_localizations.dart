@@ -202,6 +202,12 @@ abstract class AppLocalizations {
   /// **'Prijavi se da potvrdiš termin — traje sekundu.'**
   String get loginBookingGateSubtitle;
 
+  /// No description provided for @loginWelcomeSubtitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Drago nam je da si opet tu! 🐾'**
+  String get loginWelcomeSubtitle;
+
   /// No description provided for @usernameOrEmail.
   ///
   /// In bs, this message translates to:
@@ -586,6 +592,42 @@ abstract class AppLocalizations {
   /// **'Odaberi vrijeme iznad'**
   String get pickTimeAbove;
 
+  /// No description provided for @choosePet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi ljubimca'**
+  String get choosePet;
+
+  /// No description provided for @noPetsYet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nemaš dodanih ljubimaca.'**
+  String get noPetsYet;
+
+  /// No description provided for @addPetFirst.
+  ///
+  /// In bs, this message translates to:
+  /// **'Dodaj ljubimca da nastaviš'**
+  String get addPetFirst;
+
+  /// No description provided for @noSlotsToday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema slobodnih termina danas kod ovog zaposlenika.'**
+  String get noSlotsToday;
+
+  /// No description provided for @bookingFailed.
+  ///
+  /// In bs, this message translates to:
+  /// **'Rezervacija nije uspjela — termin je možda upravo zauzet. Pokušaj ponovo.'**
+  String get bookingFailed;
+
+  /// No description provided for @signInToSeeRealAvailability.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prijavljen/a si — sad biraš iz stvarno dostupnog osoblja i termina.'**
+  String get signInToSeeRealAvailability;
+
   /// No description provided for @anyAvailable.
   ///
   /// In bs, this message translates to:
@@ -801,6 +843,30 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Vakcinacije i druge detalje možeš dodati kasnije sa profila ljubimca.'**
   String get petInfoNote;
+
+  /// No description provided for @deletePet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ukloni ljubimca'**
+  String get deletePet;
+
+  /// No description provided for @deletePetConfirmTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ukloniti {name}?'**
+  String deletePetConfirmTitle(String name);
+
+  /// No description provided for @deletePetConfirmMessage.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ovo se ne može poništiti.'**
+  String get deletePetConfirmMessage;
+
+  /// No description provided for @deletePetAction.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ukloni'**
+  String get deletePetAction;
 
   /// No description provided for @details.
   ///

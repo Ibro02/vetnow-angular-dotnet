@@ -64,6 +64,9 @@ class AppLocalizationsSr extends AppLocalizations {
       'Prijavi se da potvrdiš termin — traje sekund.';
 
   @override
+  String get loginWelcomeSubtitle => 'Drago nam je da si opet tu! 🐾';
+
+  @override
   String get usernameOrEmail => 'Korisničko ime / Email';
 
   @override
@@ -265,6 +268,27 @@ class AppLocalizationsSr extends AppLocalizations {
   String get pickTimeAbove => 'Izaberi vreme iznad';
 
   @override
+  String get choosePet => 'Izaberi ljubimca';
+
+  @override
+  String get noPetsYet => 'Nemaš dodatih ljubimaca.';
+
+  @override
+  String get addPetFirst => 'Dodaj ljubimca da nastaviš';
+
+  @override
+  String get noSlotsToday =>
+      'Nema slobodnih termina danas kod ovog zaposlenog.';
+
+  @override
+  String get bookingFailed =>
+      'Rezervacija nije uspela — termin je možda upravo zauzet. Pokušaj ponovo.';
+
+  @override
+  String get signInToSeeRealAvailability =>
+      'Prijavljen/a si — sad biraš iz stvarno dostupnog osoblja i termina.';
+
+  @override
   String get anyAvailable => 'Bilo ko dostupan';
 
   @override
@@ -377,6 +401,20 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get petInfoNote =>
       'Vakcinacije i druge detalje možeš dodati kasnije sa profila ljubimca.';
+
+  @override
+  String get deletePet => 'Ukloni ljubimca';
+
+  @override
+  String deletePetConfirmTitle(String name) {
+    return 'Ukloniti $name?';
+  }
+
+  @override
+  String get deletePetConfirmMessage => 'Ovo ne može da se poništi.';
+
+  @override
+  String get deletePetAction => 'Ukloni';
 
   @override
   String get details => 'Detalji';

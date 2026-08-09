@@ -46,6 +46,7 @@ class ApiConfig {
   // ─── Animal / Pets ──────────────────────────────────────
   static const String animalByOwner = '/api/Animal/GetByOwnerId';
   static const String petsSave = '/api/PetsUpdateOrInsert/Save';
+  static const String petsSoftDelete = '/api/Pets/SoftDelete';
 
   // ─── Species / Breed ────────────────────────────────────
   static const String speciesGetAll = '/api/SpeciesGetAll/Get';
@@ -54,4 +55,5 @@ class ApiConfig {
   // ─── Appointments ───────────────────────────────────────
   static const String appointmentByCustomer = '/api/Appointment/GetByCustomerId';
   static const String appointmentAdd = '/api/Appointment/Add';
+  static const String appointmentCancel = '/api/Appointment/Cancel';
 }

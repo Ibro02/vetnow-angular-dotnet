@@ -53,4 +53,9 @@ class PetsApiService {
     );
     return result as int;
   }
+
+  /// DELETE /api/Pets/SoftDelete?id= — [Authorize].
+  static Future<void> delete({required int id, required String token}) async {
+    await ApiClient.delete(ApiConfig.petsSoftDelete, query: {'id': id}, token: token);
+  }
 }

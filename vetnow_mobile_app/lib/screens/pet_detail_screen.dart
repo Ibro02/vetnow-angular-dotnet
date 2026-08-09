@@ -2,17 +2,62 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
+import '../services/api_client.dart';
+import '../services/pets_api_service.dart';
+import '../state/auth_state.dart';
+import '../widgets/paw_loader.dart';
+import '../widgets/premium_dialog.dart';
 
 /// Shows a pet's profile — mirrors Animal.cs fields where the backend
 /// has them (name, species, breed, birth date) plus a couple that
 /// aren't on the Animal table yet (weight, microchip — see pet.dart).
-class PetDetailScreen extends StatelessWidget {
+/// Deleting calls DELETE /api/Pets/SoftDelete (real, [Authorize]).
+class PetDetailScreen extends StatefulWidget {
   final Pet pet;
 
   const PetDetailScreen({super.key, required this.pet});
 
   @override
+  State<PetDetailScreen> createState() => _PetDetailScreenState();
+}
+
+class _PetDetailScreenState extends State<PetDetailScreen> {
+  bool _isDeleting = false;
+
+  Future<void> _delete() async {
+    final l10n = AppLocalizations.of(context)!;
+    final auth = AuthScope.of(context);
+    if (auth.token == null) return;
+
+    final confirmed = await showPremiumConfirmDialog(
+      context,
+      icon: Icons.delete_outline_rounded,
+      accentColor: AppColors.danger,
+      title: l10n.deletePetConfirmTitle(widget.pet.name),
+      message: l10n.deletePetConfirmMessage,
+      confirmLabel: l10n.deletePetAction,
+      cancelLabel: l10n.keepIt,
+      isDangerous: true,
+    );
+    if (!confirmed || !mounted) return;
+
+    setState(() => _isDeleting = true);
+    try {
+      await PetsApiService.delete(id: widget.pet.id, token: auth.token!);
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } on ApiException catch (_) {
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pet = widget.pet;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.bgSoft,
@@ -23,6 +68,15 @@ class PetDetailScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: AppColors.ink,
             iconTheme: const IconThemeData(color: Colors.white),
+            actions: [
+              IconButton(
+                icon: _isDeleting
+                    ? const PawLoader(size: 18, color: Colors.white)
+                    : const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                onPressed: _isDeleting ? null : _delete,
+                tooltip: l10n.deletePet,
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -56,7 +110,7 @@ class PetDetailScreen extends StatelessWidget {
                       Text(pet.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
                       const SizedBox(height: 2),
                       Text(
-                        '${pet.species} · ${pet.ageLabel}',
+                        pet.species.isNotEmpty ? '${pet.species} · ${pet.ageLabel}' : pet.ageLabel,
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5),
                       ),
                     ],
@@ -96,8 +150,8 @@ class _InfoGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final rows = <(IconData, String, String)>[
-      (Icons.pets_outlined, l10n.species, pet.species),
-      (Icons.category_outlined, l10n.breed, pet.breed),
+      (Icons.pets_outlined, l10n.species, pet.species.isNotEmpty ? pet.species : '—'),
+      (Icons.category_outlined, l10n.breed, pet.breed.isNotEmpty ? pet.breed : '—'),
       (Icons.cake_outlined, l10n.age, pet.ageLabel),
       if (pet.weightKg != null) (Icons.monitor_weight_outlined, l10n.weight, '${pet.weightKg} kg'),
       if (pet.microchipNumber != null) (Icons.qr_code_2_outlined, l10n.microchip, pet.microchipNumber!),

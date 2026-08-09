@@ -77,4 +77,9 @@ class ApiClient {
     final res = await http.post(_uri(path), headers: _headers(token), body: body == null ? null : jsonEncode(body));
     return _decode(res);
   }
+
+  static Future<dynamic> delete(String path, {Map<String, dynamic>? query, String? token}) async {
+    final res = await http.delete(_uri(path, query), headers: _headers(token));
+    return _decode(res);
+  }
 }

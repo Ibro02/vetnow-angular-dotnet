@@ -7,8 +7,10 @@ import '../services/vet_station_api_service.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/verified_badge.dart';
 import '../widgets/hover_card.dart';
+import '../widgets/app_button.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/vet_hero_background.dart';
 import 'vet_station_detail_screen.dart';
 
 /// The app's real front door — no login required. Mirrors the
@@ -204,7 +206,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               AppSpacing.pagePadding,
               0,
               AppSpacing.pagePadding,
-              AppSpacing.s10,
+              110,
             ),
             sliver: SliverList.separated(
               itemCount: stations.length,
@@ -237,12 +239,7 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.pagePadding,
-        AppSpacing.s5,
-        AppSpacing.pagePadding,
-        AppSpacing.s8,
-      ),
+      clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.ink, AppColors.primaryDark],
@@ -254,7 +251,17 @@ class _Hero extends StatelessWidget {
           bottomRight: Radius.circular(AppRadius.xl2),
         ),
       ),
-      child: Column(
+      child: Stack(
+        children: [
+          const Positioned.fill(child: VetHeroBackground()),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pagePadding,
+              AppSpacing.s5,
+              AppSpacing.pagePadding,
+              AppSpacing.s8,
+            ),
+            child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -351,6 +358,9 @@ class _Hero extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
           ),
         ],
       ),
@@ -556,14 +566,21 @@ class _ErrorState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16, horizontal: AppSpacing.pagePadding),
       child: Column(
         children: [
-          const Icon(Icons.cloud_off_outlined, size: 36, color: AppColors.textMuted),
-          const SizedBox(height: AppSpacing.s3),
-          Text(l10n.networkError, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary)),
+          Container(
+            height: 64,
+            width: 64,
+            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
+          ),
           const SizedBox(height: AppSpacing.s4),
-          OutlinedButton.icon(
+          Text(l10n.networkError, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary)),
+          const SizedBox(height: AppSpacing.s5),
+          AppButton(
+            label: l10n.retry,
+            icon: Icons.refresh,
+            fullWidth: false,
+            variant: AppButtonVariant.secondary,
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 16),
-            label: Text(l10n.retry),
           ),
         ],
       ),
@@ -577,12 +594,21 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16, horizontal: AppSpacing.pagePadding),
       child: Column(
         children: [
-          const Icon(Icons.search_off, size: 40, color: AppColors.textMuted),
-          const SizedBox(height: AppSpacing.s3),
-          Text(AppLocalizations.of(context)!.noClinicsMatch, style: const TextStyle(color: AppColors.textSecondary)),
+          Container(
+            height: 64,
+            width: 64,
+            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            child: const Icon(Icons.search_off, size: 28, color: AppColors.textMuted),
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          Text(
+            AppLocalizations.of(context)!.noClinicsMatch,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
         ],
       ),
     );

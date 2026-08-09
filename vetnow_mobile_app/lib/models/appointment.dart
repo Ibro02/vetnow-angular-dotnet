@@ -4,6 +4,8 @@ enum AppointmentStatus { upcoming, completed, cancelled }
 /// TimeSlot, Animal) flattened into display-ready fields for the UI.
 class Appointment {
   final int id;
+  final int employeeId;
+  final int vetStationId;
   final String clinicName;
   final String clinicAddress;
   final String clinicPhone;
@@ -19,6 +21,8 @@ class Appointment {
 
   const Appointment({
     required this.id,
+    required this.employeeId,
+    required this.vetStationId,
     required this.clinicName,
     required this.clinicAddress,
     required this.clinicPhone,

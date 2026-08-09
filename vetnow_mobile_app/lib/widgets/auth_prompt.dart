@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/app_button.dart';
+import '../widgets/vet_hero_background.dart';
 import '../screens/login_screen.dart';
 
 /// Shown inside a tab (Appointments / Profile) when the visitor is
-/// browsing as a guest. Designed to feel calm and premium rather than
-/// like a hard paywall — big icon, plain-language benefits, one clear
-/// button. Kept deliberately simple (large text, high contrast, a
-/// single obvious action) since this app is used by people of very
-/// different ages and comfort levels with apps.
+/// browsing as a guest. Full-bleed dark gradient backdrop (same
+/// language as the Explore hero — animated paw prints, glow orbs,
+/// heartbeat pulse) with a floating card on top, gradient-bordered
+/// like the login screen — so "you're not logged in yet" feels like a
+/// deliberate premium moment instead of a bare error state.
 class AuthPrompt extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -26,87 +27,143 @@ class AuthPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.pagePadding),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.s8),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.xl2),
-              boxShadow: AppShadows.elevated,
-              border: Border.all(color: AppColors.borderLight),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.ink, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 84,
-                  width: 84,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
-                    shape: BoxShape.circle,
+          ),
+          child: const VetHeroBackground(),
+        ),
+        Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.pagePadding),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadius.xl2 + 2),
+                  gradient: LinearGradient(
+                    colors: [AppColors.gold.withValues(alpha: 0.4), AppColors.primary.withValues(alpha: 0.4)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: Icon(icon, color: Colors.white, size: 38),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 30, offset: const Offset(0, 16)),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.s5),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 19, color: AppColors.text),
-                ),
-                const SizedBox(height: AppSpacing.s2),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
-                ),
-                if (benefits.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.s6),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: benefits
-                        .map(
-                          (b) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Row(
-                              children: [
-                                Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: const BoxDecoration(color: AppColors.successSoft, shape: BoxShape.circle),
-                                  child: const Icon(Icons.check, size: 13, color: AppColors.success),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(b, style: const TextStyle(fontSize: 13.5, color: AppColors.text)),
-                                ),
-                              ],
-                            ),
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.s8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppRadius.xl2),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 88,
+                        width: 88,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.gold.withValues(alpha: 0.4), width: 1.5),
+                        ),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: AppColors.primary, blurRadius: 20, offset: Offset(0, 8)),
+                            ],
                           ),
-                        )
-                        .toList(),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.s6),
-                AppButton(
-                  label: AppLocalizations.of(context)!.logInRegister,
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          child: Icon(icon, color: Colors.white, size: 38),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.s5),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: AppColors.text),
+                      ),
+                      const SizedBox(height: AppSpacing.s2),
+                      Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
+                      ),
+                      if (benefits.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.s6),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.s4),
+                          decoration: BoxDecoration(
+                            color: AppColors.bgSoft,
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: benefits
+                                .map(
+                                  (b) => Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          margin: const EdgeInsets.only(top: 1),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(colors: [AppColors.accent, AppColors.primary]),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.check, size: 13, color: Colors.white),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(b, style: const TextStyle(fontSize: 13.5, color: AppColors.text, height: 1.3)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.s6),
+                      AppButton(
+                        label: AppLocalizations.of(context)!.logInRegister,
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.s3),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.bolt_rounded, size: 13, color: AppColors.gold),
+                          const SizedBox(width: 3),
+                          Text(
+                            AppLocalizations.of(context)!.takesLessThanMinute,
+                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.s3),
-                Text(
-                  AppLocalizations.of(context)!.takesLessThanMinute,
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5),
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -66,4 +66,33 @@ class AppointmentApiService {
     final list = result as List<dynamic>? ?? [];
     return list.map((e) => RemoteAppointment.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  /// POST /api/Appointment/Add — [Authorize]. CustomerId is set
+  /// server-side from the token, so we don't send it. The backend
+  /// validates the animal belongs to the caller and the slot is still
+  /// free, so a 409/400 here is a real, user-facing conflict (e.g. slot
+  /// just got taken) — not a bug.
+  static Future<void> add({
+    required int animalId,
+    required int timeSlotId,
+    required int employeeId,
+    required int vetStationId,
+    required String token,
+  }) async {
+    await ApiClient.post(
+      ApiConfig.appointmentAdd,
+      token: token,
+      body: {
+        'animalId': animalId,
+        'timeSlotId': timeSlotId,
+        'employeeId': employeeId,
+        'vetStationId': vetStationId,
+      },
+    );
+  }
+
+  /// DELETE /api/Appointment/Cancel?appointmentId= — [Authorize].
+  static Future<void> cancel({required int appointmentId, required String token}) async {
+    await ApiClient.delete(ApiConfig.appointmentCancel, query: {'appointmentId': appointmentId}, token: token);
+  }
 }

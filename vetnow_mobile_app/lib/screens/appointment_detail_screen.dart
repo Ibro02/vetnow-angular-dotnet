@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/appointment.dart';
+import '../models/staff_member.dart';
+import '../models/vet_station.dart';
+import '../services/api_client.dart';
+import '../services/appointment_api_service.dart';
+import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
+import '../widgets/paw_loader.dart';
 import '../widgets/premium_dialog.dart';
+import 'staff_profile_screen.dart';
 
 /// Full detail view for a single appointment — past or future. Reached
 /// by tapping a card in MyAppointmentsScreen.
@@ -63,28 +70,54 @@ class AppointmentDetailScreen extends StatelessWidget {
                   _SectionCard(
                     title: l10n.sectionSpecialist,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            height: 44,
-                            width: 44,
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
-                              shape: BoxShape.circle,
+                      InkWell(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => StaffProfileScreen(
+                              staff: StaffMember(
+                                id: a.employeeId,
+                                name: a.staffName,
+                                role: a.staffRole,
+                              ),
+                              station: VetStation(
+                                id: a.vetStationId,
+                                name: a.clinicName,
+                                stationImage: '',
+                                contactNumber: a.clinicPhone,
+                                inOffice: false,
+                                onField: false,
+                                parking: false,
+                                wheelchair: false,
+                                wifi: false,
+                              ),
                             ),
-                            child: const Icon(Icons.person, color: Colors.white, size: 20),
                           ),
-                          const SizedBox(width: AppSpacing.s3),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(a.staffName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-                                Text(a.staffRole, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
-                              ],
+                        ),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 44,
+                              width: 44,
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.person, color: Colors.white, size: 20),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: AppSpacing.s3),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(a.staffName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                                  Text(a.staffRole, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -138,6 +171,7 @@ class AppointmentDetailScreen extends StatelessWidget {
 
   void _confirmCancel(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    final auth = AuthScope.of(context);
     final confirmed = await showPremiumConfirmDialog(
       context,
       icon: Icons.event_busy_rounded,
@@ -148,8 +182,35 @@ class AppointmentDetailScreen extends StatelessWidget {
       cancelLabel: l10n.keepIt,
       isDangerous: true,
     );
-    if (confirmed && context.mounted) {
+    if (!confirmed || !context.mounted) return;
+
+    if (auth.token == null) {
       Navigator.of(context).pop();
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: PawLoader(size: 36, color: Colors.white)),
+    );
+    try {
+      await AppointmentApiService.cancel(appointmentId: appointment.id, token: auth.token!);
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loading
+      Navigator.of(context).pop(true); // close screen, signal refresh
+    } on ApiException catch (_) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.networkError)),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.networkError)),
+      );
     }
   }
 

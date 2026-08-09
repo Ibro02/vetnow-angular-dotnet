@@ -8,6 +8,7 @@ import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/gradient_app_bar.dart';
+import '../widgets/hover_card.dart';
 import '../widgets/paw_loader.dart';
 import 'add_pet_screen.dart';
 import 'pet_detail_screen.dart';
@@ -82,6 +83,9 @@ class _PetsScreenState extends State<PetsScreen> {
     }
   }
 
+  static const _palette = [AppColors.primary, AppColors.accent, AppColors.gold, AppColors.info, AppColors.secondary];
+  Color _paletteFor(int index) => _palette[index % _palette.length];
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -99,48 +103,90 @@ class _PetsScreenState extends State<PetsScreen> {
                       padding: const EdgeInsets.only(bottom: AppSpacing.s4),
                       child: Text(l10n.networkError, style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5)),
                     ),
-                  ..._pets.map(
-                    (p) => InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => PetDetailScreen(pet: p)),
-                      ),
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: AppSpacing.s3),
-                        padding: const EdgeInsets.all(AppSpacing.s4),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppRadius.xl),
-                          boxShadow: AppShadows.card,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 56,
-                              width: 56,
-                              decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
-                              child: const Icon(Icons.pets, color: AppColors.primary, size: 26),
-                            ),
-                            const SizedBox(width: AppSpacing.s4),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    p.species.isNotEmpty ? '${p.species} · ${p.ageLabel}' : p.ageLabel,
-                                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Icon(Icons.chevron_right, color: AppColors.textMuted),
-                          ],
-                        ),
+                  if (_pets.isEmpty && _error == null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s10),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 72,
+                            width: 72,
+                            decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                            child: const Icon(Icons.pets, size: 32, color: AppColors.primary),
+                          ),
+                          const SizedBox(height: AppSpacing.s4),
+                          Text(l10n.noPetsYet, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.textSecondary)),
+                        ],
                       ),
                     ),
-                  ),
+                  ..._pets.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final p = entry.value;
+                    final color = _paletteFor(index);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+                      child: HoverCard(
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
+                        onTap: () async {
+                          final deleted = await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(builder: (_) => PetDetailScreen(pet: p)),
+                          );
+                          if (deleted == true) _load();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.s4),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
+                            border: Border.all(color: AppColors.borderLight),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 56,
+                                width: 56,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 4))],
+                                ),
+                                child: const Icon(Icons.pets, color: Colors.white, size: 26),
+                              ),
+                              const SizedBox(width: AppSpacing.s4),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                                    const SizedBox(height: 3),
+                                    Row(
+                                      children: [
+                                        if (p.species.isNotEmpty)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: color.withValues(alpha: 0.12),
+                                              borderRadius: BorderRadius.circular(AppRadius.full),
+                                            ),
+                                            child: Text(
+                                              p.species,
+                                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color),
+                                            ),
+                                          ),
+                                        if (p.species.isNotEmpty) const SizedBox(width: 6),
+                                        Text(p.ageLabel, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: AppSpacing.s3),
                   AppButton(
                     label: l10n.addPet,
