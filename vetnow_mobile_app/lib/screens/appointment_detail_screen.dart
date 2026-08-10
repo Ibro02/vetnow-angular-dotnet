@@ -58,6 +58,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.s8),
                   _SectionCard(
                     title: l10n.sectionAppointment,
+                    icon: Icons.event_note_outlined,
                     children: [
                       _DetailRow(icon: Icons.medical_services_outlined, label: l10n.labelService, value: a.serviceName),
                       _DetailRow(icon: Icons.notes_outlined, label: l10n.labelDetails, value: a.serviceDescription),
@@ -69,6 +70,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.s5),
                   _SectionCard(
                     title: l10n.sectionSpecialist,
+                    icon: Icons.badge_outlined,
                     children: [
                       InkWell(
                         onTap: () => Navigator.of(context).push(
@@ -99,9 +101,10 @@ class AppointmentDetailScreen extends StatelessWidget {
                             Container(
                               height: 44,
                               width: 44,
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
                                 shape: BoxShape.circle,
+                                boxShadow: [BoxShadow(color: AppColors.primaryDark.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                               ),
                               child: const Icon(Icons.person, color: Colors.white, size: 20),
                             ),
@@ -110,12 +113,16 @@ class AppointmentDetailScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(a.staffName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                                  Text(a.staffName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
                                   Text(a.staffRole, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                              child: const Icon(Icons.chevron_right, color: AppColors.primaryDark, size: 16),
+                            ),
                           ],
                         ),
                       ),
@@ -124,6 +131,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.s5),
                   _SectionCard(
                     title: l10n.sectionClinic,
+                    icon: Icons.storefront_outlined,
                     children: [
                       _DetailRow(icon: Icons.storefront_outlined, label: l10n.labelName, value: a.clinicName),
                       _DetailRow(icon: Icons.location_on_outlined, label: l10n.labelAddress, value: a.clinicAddress),
@@ -280,15 +288,24 @@ class _StatusHero extends StatelessWidget {
 
 class _SectionCard extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final List<Widget> children;
-  const _SectionCard({required this.title, required this.children});
+  const _SectionCard({required this.title, this.icon, required this.children});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
+        Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 14, color: AppColors.textMuted),
+              const SizedBox(width: 6),
+            ],
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
+          ],
+        ),
         const SizedBox(height: AppSpacing.s3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.s4),
@@ -296,6 +313,7 @@ class _SectionCard extends StatelessWidget {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: AppColors.borderLight),
+            boxShadow: AppShadows.card,
           ),
           child: Column(children: children),
         ),
@@ -326,9 +344,9 @@ class _PillActionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           gradient: filled ? const LinearGradient(colors: [AppColors.danger, AppColors.dangerHover]) : null,
-          color: filled ? null : AppColors.surface,
+          color: filled ? null : AppColors.primary50,
           borderRadius: BorderRadius.circular(AppRadius.full),
-          border: filled ? null : Border.all(color: AppColors.border, width: 1.5),
+          border: filled ? null : Border.all(color: AppColors.primary.withValues(alpha: 0.35), width: 1.5),
           boxShadow: filled
               ? [BoxShadow(color: AppColors.danger.withValues(alpha: 0.25), blurRadius: 14, offset: const Offset(0, 6))]
               : null,
@@ -336,14 +354,14 @@ class _PillActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: filled ? Colors.white : AppColors.text),
+            Icon(icon, size: 16, color: filled ? Colors.white : AppColors.primaryDark),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: filled ? Colors.white : AppColors.text,
+                color: filled ? Colors.white : AppColors.primaryDark,
               ),
             ),
           ],
@@ -366,16 +384,21 @@ class _DetailRow extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.s3),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 16, color: AppColors.primary),
-          const SizedBox(width: 10),
+          Container(
+            height: 30,
+            width: 30,
+            decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+            child: Icon(icon, size: 15, color: AppColors.primaryDark),
+          ),
+          const SizedBox(width: 12),
           SizedBox(
-            width: 80,
+            width: 74,
             child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
           ),
           Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.text)),
+            child: Text(value, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text)),
           ),
         ],
       ),

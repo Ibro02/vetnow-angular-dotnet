@@ -351,6 +351,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get closedOpensTomorrow => 'Zatvoreno sada · Otvara se pon u 08:00';
 
   @override
+  String get workingHoursLabel => 'Radno vrijeme';
+
+  @override
+  String get workingHoursValue => 'Pon–Sub, 08:00–18:00';
+
+  @override
   String get sortByRating => 'Sortiraj po ocjeni';
 
   @override
@@ -382,6 +388,70 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get savePet => 'Spremi ljubimca';
+
+  @override
+  String get saveChanges => 'Spremi izmjene';
+
+  @override
+  String get editPet => 'Uredi ljubimca';
+
+  @override
+  String get favourites => 'Omiljeni';
+
+  @override
+  String get mostVisited => 'Najčešće dolazi';
+
+  @override
+  String get visits => 'termina';
+
+  @override
+  String get dragToReorderHint =>
+      'Drži i povuci ikonicu za promjenu redoslijeda.';
+
+  @override
+  String get markFavourite => 'Označi kao omiljenog';
+
+  @override
+  String get unmarkFavourite => 'Ukloni iz omiljenih';
+
+  @override
+  String get petsDashboardSubtitle => 'Tvoji ljubimci, na jednom mjestu';
+
+  @override
+  String get viewList => 'Popis';
+
+  @override
+  String get viewDashboard => 'Nadzorna ploča';
+
+  @override
+  String get searchPetsHint => 'Pretraži po imenu…';
+
+  @override
+  String get filterAllSpecies => 'Sve vrste';
+
+  @override
+  String get noPetsMatchFilter => 'Nijedan ljubimac ne odgovara pretrazi.';
+
+  @override
+  String get dragWholeCardHint =>
+      'Drži karticu i povuci za promjenu redoslijeda.';
+
+  @override
+  String get chooseSpecies => 'Odaberi vrstu';
+
+  @override
+  String get searchSpeciesHint => 'Pretraži vrste…';
+
+  @override
+  String get noSpeciesFound => 'Nema pronađenih vrsta.';
+
+  @override
+  String approxAge(String age) {
+    return 'Star/a otprilike $age';
+  }
+
+  @override
+  String get selectBirthDate => 'Odaberi datum';
 
   @override
   String get tellUsAboutFriend => 'Reci nam o svom prijatelju';
@@ -513,6 +583,21 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get amenityWifiDesc =>
       'Besplatan bežični internet dostupan u čekaonici.';
+
+  @override
+  String get filterClinics => 'Filtriraj klinike';
+
+  @override
+  String get applyFilters => 'Primijeni';
+
+  @override
+  String get resetFilters => 'Poništi';
+
+  @override
+  String get trustNoAccount => 'Bez računa za pregledavanje';
+
+  @override
+  String get trustFewTaps => 'Rezervacija za par klikova';
 
   @override
   String get roleVeterinarian => 'Veterinar';

@@ -221,24 +221,16 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.s3),
                         decoration: BoxDecoration(
-                          color: station.openNow ? AppColors.successSoft : AppColors.dangerSoft,
+                          color: AppColors.primary50,
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              station.openNow ? Icons.check_circle : Icons.schedule,
-                              size: 16,
-                              color: station.openNow ? AppColors.success : AppColors.danger,
-                            ),
+                            const Icon(Icons.schedule, size: 16, color: AppColors.primaryDark),
                             const SizedBox(width: 8),
                             Text(
-                              station.openNow ? l10n.openHoursToday : l10n.closedOpensTomorrow,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w600,
-                                color: station.openNow ? AppColors.success : AppColors.dangerHover,
-                              ),
+                              '${l10n.workingHoursLabel} · ${l10n.workingHoursValue}',
+                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.primaryDark),
                             ),
                           ],
                         ),
@@ -300,9 +292,35 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                               ),
                             )),
                       const SizedBox(height: AppSpacing.s8),
-                      Text(l10n.allServices, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                      const SizedBox(height: AppSpacing.s3),
-                      _ServicesList(services: allServices, station: station),
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              width: 3,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [AppColors.primary, AppColors.gold],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                                borderRadius: BorderRadius.circular(AppRadius.full),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.s3),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(l10n.allServices, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                                  const SizedBox(height: AppSpacing.s3),
+                                  _ServicesList(services: allServices, station: station),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: AppSpacing.s8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -494,9 +512,10 @@ class _StaffCard extends StatelessWidget {
             Container(
               height: 52,
               width: 52,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
                 shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: AppColors.primaryDark.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: const Icon(Icons.person, color: Colors.white, size: 24),
             ),
@@ -505,14 +524,18 @@ class _StaffCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(staff.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  Text(staff.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
                   Text(staff.role, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                   const SizedBox(height: 4),
                   RatingBadge(rating: staff.rating, reviewCount: staff.reviewCount, dense: true),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+              child: const Icon(Icons.chevron_right, color: AppColors.primaryDark, size: 16),
+            ),
           ],
         ),
       ),

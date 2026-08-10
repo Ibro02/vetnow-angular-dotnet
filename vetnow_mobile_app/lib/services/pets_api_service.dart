@@ -23,15 +23,18 @@ class PetsApiService {
       id: json['id'] as int,
       name: json['name'] as String? ?? '',
       species: speciesId != null ? (speciesNames?[speciesId] ?? '') : '',
+      speciesId: speciesId,
       // Breed name isn't included on the Animal entity itself (only
       // breedId) — showing blank here until we also fetch/join Breed.
       breed: '',
       birthDate: json['birthDate'] != null ? DateTime.tryParse(json['birthDate'] as String) : null,
+      isFavourite: json['isFavourite'] as bool? ?? false,
     );
   }
 
   /// POST /api/PetsUpdateOrInsert/Save — [Authorize]. Pass id: null (or
   /// omit) to insert a new pet; pass an existing id to update it.
+  /// Also used to toggle isFavourite alone (pass just id + isFavourite).
   static Future<int> save({
     required String token,
     int? id,
@@ -39,6 +42,7 @@ class PetsApiService {
     DateTime? birthDate,
     int? animalSpeciesId,
     int? breedId,
+    bool? isFavourite,
   }) async {
     final result = await ApiClient.post(
       ApiConfig.petsSave,
@@ -49,6 +53,7 @@ class PetsApiService {
         if (birthDate != null) 'birthDate': birthDate.toIso8601String(),
         if (animalSpeciesId != null) 'animalSpeciesId': animalSpeciesId,
         if (breedId != null) 'breedId': breedId,
+        if (isFavourite != null) 'isFavourite': isFavourite,
       },
     );
     return result as int;

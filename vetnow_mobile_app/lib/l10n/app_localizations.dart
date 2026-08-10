@@ -742,6 +742,18 @@ abstract class AppLocalizations {
   /// **'Zatvoreno sada · Otvara se pon u 08:00'**
   String get closedOpensTomorrow;
 
+  /// No description provided for @workingHoursLabel.
+  ///
+  /// In bs, this message translates to:
+  /// **'Radno vrijeme'**
+  String get workingHoursLabel;
+
+  /// No description provided for @workingHoursValue.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pon–Sub, 08:00–18:00'**
+  String get workingHoursValue;
+
   /// No description provided for @sortByRating.
   ///
   /// In bs, this message translates to:
@@ -807,6 +819,126 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Sačuvaj ljubimca'**
   String get savePet;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sačuvaj izmjene'**
+  String get saveChanges;
+
+  /// No description provided for @editPet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Uredi ljubimca'**
+  String get editPet;
+
+  /// No description provided for @favourites.
+  ///
+  /// In bs, this message translates to:
+  /// **'Omiljeni'**
+  String get favourites;
+
+  /// No description provided for @mostVisited.
+  ///
+  /// In bs, this message translates to:
+  /// **'Najčešće dolazi'**
+  String get mostVisited;
+
+  /// No description provided for @visits.
+  ///
+  /// In bs, this message translates to:
+  /// **'termina'**
+  String get visits;
+
+  /// No description provided for @dragToReorderHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Drži i prevuci ikonicu da promijeniš redoslijed.'**
+  String get dragToReorderHint;
+
+  /// No description provided for @markFavourite.
+  ///
+  /// In bs, this message translates to:
+  /// **'Označi kao omiljenog'**
+  String get markFavourite;
+
+  /// No description provided for @unmarkFavourite.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ukloni iz omiljenih'**
+  String get unmarkFavourite;
+
+  /// No description provided for @petsDashboardSubtitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Tvoji ljubimci, na jednom mjestu'**
+  String get petsDashboardSubtitle;
+
+  /// No description provided for @viewList.
+  ///
+  /// In bs, this message translates to:
+  /// **'Lista'**
+  String get viewList;
+
+  /// No description provided for @viewDashboard.
+  ///
+  /// In bs, this message translates to:
+  /// **'Dashboard'**
+  String get viewDashboard;
+
+  /// No description provided for @searchPetsHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pretraži po imenu…'**
+  String get searchPetsHint;
+
+  /// No description provided for @filterAllSpecies.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sve vrste'**
+  String get filterAllSpecies;
+
+  /// No description provided for @noPetsMatchFilter.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nijedan ljubimac ne odgovara pretrazi.'**
+  String get noPetsMatchFilter;
+
+  /// No description provided for @dragWholeCardHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Drži karticu i prevuci da promijeniš redoslijed.'**
+  String get dragWholeCardHint;
+
+  /// No description provided for @chooseSpecies.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi vrstu'**
+  String get chooseSpecies;
+
+  /// No description provided for @searchSpeciesHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pretraži vrste…'**
+  String get searchSpeciesHint;
+
+  /// No description provided for @noSpeciesFound.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema pronađenih vrsta.'**
+  String get noSpeciesFound;
+
+  /// No description provided for @approxAge.
+  ///
+  /// In bs, this message translates to:
+  /// **'Star/a otprilike {age}'**
+  String approxAge(String age);
+
+  /// No description provided for @selectBirthDate.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi datum'**
+  String get selectBirthDate;
 
   /// No description provided for @tellUsAboutFriend.
   ///
@@ -1053,6 +1185,36 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Besplatan bežični internet dostupan u čekaonici.'**
   String get amenityWifiDesc;
+
+  /// No description provided for @filterClinics.
+  ///
+  /// In bs, this message translates to:
+  /// **'Filtriraj klinike'**
+  String get filterClinics;
+
+  /// No description provided for @applyFilters.
+  ///
+  /// In bs, this message translates to:
+  /// **'Primijeni'**
+  String get applyFilters;
+
+  /// No description provided for @resetFilters.
+  ///
+  /// In bs, this message translates to:
+  /// **'Poništi'**
+  String get resetFilters;
+
+  /// No description provided for @trustNoAccount.
+  ///
+  /// In bs, this message translates to:
+  /// **'Bez računa za gledanje'**
+  String get trustNoAccount;
+
+  /// No description provided for @trustFewTaps.
+  ///
+  /// In bs, this message translates to:
+  /// **'Rezervacija za par klika'**
+  String get trustFewTaps;
 
   /// No description provided for @roleVeterinarian.
   ///

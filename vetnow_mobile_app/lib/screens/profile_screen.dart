@@ -205,24 +205,30 @@ class _PetsRow extends StatelessWidget {
   final VoidCallback onAdded;
   const _PetsRow({required this.isLoading, required this.pets, required this.onAdded});
 
+  static const _palette = [AppColors.primary, AppColors.accent, AppColors.gold, AppColors.info, AppColors.secondary];
+  Color _colorFor(int i) => _palette[i % _palette.length];
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     if (isLoading) {
       return const SizedBox(
-        height: 118,
+        height: 130,
         child: Center(child: PawLoader(size: 26, color: AppColors.primary)),
       );
     }
 
     return SizedBox(
-      height: 118,
+      height: 130,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          ...pets.map(
-            (p) => Padding(
+          ...pets.asMap().entries.map((entry) {
+            final index = entry.key;
+            final p = entry.value;
+            final color = _colorFor(index);
+            return Padding(
               padding: const EdgeInsets.only(right: AppSpacing.s3),
               child: HoverCard(
                 borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -233,39 +239,57 @@ class _PetsRow extends StatelessWidget {
                   if (deleted == true) onAdded();
                 },
                 child: Container(
-                  width: 100,
+                  width: 106,
                   padding: const EdgeInsets.all(AppSpacing.s3),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: p.isFavourite ? AppColors.gold.withValues(alpha: 0.55) : AppColors.borderLight, width: p.isFavourite ? 1.5 : 1),
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.pets, color: Colors.white, size: 18),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            height: 44,
+                            width: 44,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: color.withValues(alpha: 0.32), blurRadius: 10, offset: const Offset(0, 4))],
+                            ),
+                            child: const Icon(Icons.pets, color: Colors.white, size: 20),
+                          ),
+                          if (p.isFavourite)
+                            Positioned(
+                              right: -3,
+                              top: -3,
+                              child: Container(
+                                padding: const EdgeInsets.all(2.5),
+                                decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
+                                child: const Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(p.name, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                      Text(
-                        p.species.isNotEmpty ? '${p.species} · ${p.ageLabel}' : p.ageLabel,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
-                      ),
+                      const SizedBox(height: 8),
+                      Text(p.name, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+                      const SizedBox(height: 3),
+                      if (p.species.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                          decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppRadius.full)),
+                          child: Text(p.species, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: color)),
+                        )
+                      else
+                        Text(p.ageLabel, style: const TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
           HoverCard(
             borderRadius: BorderRadius.circular(AppRadius.lg),
             onTap: () async {
@@ -275,7 +299,7 @@ class _PetsRow extends StatelessWidget {
               if (added == true) onAdded();
             },
             child: Container(
-              width: 100,
+              width: 106,
               decoration: BoxDecoration(
                 color: AppColors.primary50,
                 borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -285,9 +309,14 @@ class _PetsRow extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_circle_outline, color: AppColors.primary),
-                    const SizedBox(height: 4),
-                    Text(l10n.addPet, style: const TextStyle(fontSize: 11, color: AppColors.primaryDark, fontWeight: FontWeight.w600)),
+                    Container(
+                      height: 36,
+                      width: 36,
+                      decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                      child: const Icon(Icons.add, color: Colors.white, size: 20),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(l10n.addPet, style: const TextStyle(fontSize: 11, color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -335,17 +364,22 @@ class _SettingsGroup extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      height: 32,
-                      width: 32,
+                      height: 34,
+                      width: 34,
                       decoration: BoxDecoration(
-                        color: items[i].$3.withValues(alpha: 0.12),
+                        gradient: LinearGradient(colors: [items[i].$3, items[i].$3.withValues(alpha: 0.7)]),
                         shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: items[i].$3.withValues(alpha: 0.28), blurRadius: 8, offset: const Offset(0, 3))],
                       ),
-                      child: Icon(items[i].$1, size: 16, color: items[i].$3),
+                      child: Icon(items[i].$1, size: 16, color: Colors.white),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(items[i].$2, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600))),
-                    const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                    Expanded(child: Text(items[i].$2, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text))),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                      child: const Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 15),
+                    ),
                   ],
                 ),
               ),
@@ -383,9 +417,13 @@ class _LogoutButton extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(l10n.logOut, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.danger)),
+              child: Text(l10n.logOut, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.danger)),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(color: AppColors.dangerSoft, shape: BoxShape.circle),
+              child: const Icon(Icons.chevron_right, color: AppColors.danger, size: 15),
+            ),
           ],
         ),
       ),

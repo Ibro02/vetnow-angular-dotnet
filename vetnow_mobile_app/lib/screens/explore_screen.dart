@@ -30,6 +30,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
   String _selectedCity = 'Sarajevo';
   _SortFilter _activeFilter = _SortFilter.recommended;
 
+  bool _amenityParking = false;
+  bool _amenityWifi = false;
+  bool _amenityWheelchair = false;
+  bool _amenityInOffice = false;
+  bool _amenityOnField = false;
+
+  bool get _hasActiveAmenityFilters => _amenityParking || _amenityWifi || _amenityWheelchair || _amenityInOffice || _amenityOnField;
+
   static const _cities = ['Sarajevo', 'Mostar', 'Banja Luka', 'Tuzla', 'Zenica'];
 
   List<VetStation> _stations = [];
@@ -78,6 +86,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
       final q = _searchController.text.trim().toLowerCase();
       list = list.where((s) => s.name.toLowerCase().contains(q)).toList();
     }
+    if (_amenityParking) list = list.where((s) => s.parking).toList();
+    if (_amenityWifi) list = list.where((s) => s.wifi).toList();
+    if (_amenityWheelchair) list = list.where((s) => s.wheelchair).toList();
+    if (_amenityInOffice) list = list.where((s) => s.inOffice).toList();
+    if (_amenityOnField) list = list.where((s) => s.onField).toList();
     switch (_activeFilter) {
       case _SortFilter.recommended:
         list.sort((a, b) => (b.rating * b.reviewCount).compareTo(a.rating * a.reviewCount));
@@ -107,6 +120,56 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
+  void _openAmenitiesFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => _AmenitiesFilterSheet(
+          parking: _amenityParking,
+          wifi: _amenityWifi,
+          wheelchair: _amenityWheelchair,
+          inOffice: _amenityInOffice,
+          onField: _amenityOnField,
+          onToggle: (key) {
+            setSheetState(() {});
+            setState(() {
+              switch (key) {
+                case 'parking':
+                  _amenityParking = !_amenityParking;
+                  break;
+                case 'wifi':
+                  _amenityWifi = !_amenityWifi;
+                  break;
+                case 'wheelchair':
+                  _amenityWheelchair = !_amenityWheelchair;
+                  break;
+                case 'inOffice':
+                  _amenityInOffice = !_amenityInOffice;
+                  break;
+                case 'onField':
+                  _amenityOnField = !_amenityOnField;
+                  break;
+              }
+            });
+          },
+          onReset: () {
+            setState(() {
+              _amenityParking = false;
+              _amenityWifi = false;
+              _amenityWheelchair = false;
+              _amenityInOffice = false;
+              _amenityOnField = false;
+            });
+            Navigator.of(sheetContext).pop();
+          },
+          onApply: () => Navigator.of(sheetContext).pop(),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -120,7 +183,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: _Hero(city: _selectedCity, onTapCity: _openCityPicker)),
+        SliverToBoxAdapter(child: const _Hero()),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -132,23 +195,64 @@ class _ExploreScreenState extends State<ExploreScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: _searchController,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    hintText: l10n.searchHint,
-                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                      borderSide: const BorderSide(color: AppColors.border),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          boxShadow: AppShadows.card,
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (_) => setState(() {}),
+                          style: const TextStyle(fontSize: 14),
+                          decoration: InputDecoration(
+                            hintText: l10n.searchHint,
+                            hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13.5),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                                child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: AppColors.surface,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                          ),
+                        ),
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: _openCityPicker,
                       borderRadius: BorderRadius.circular(AppRadius.full),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          boxShadow: AppShadows.card,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.location_on, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 4),
+                            Text(_selectedCity, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
+                            const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.s4),
                 SizedBox(
@@ -186,7 +290,33 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       l10n.clinicsInCity(stations.length, _selectedCity),
                       style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
                     ),
-                    const Icon(Icons.tune, size: 18, color: AppColors.textMuted),
+                    InkWell(
+                      onTap: _openAmenitiesFilterSheet,
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.tune, size: 16, color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
+                          ),
+                          if (_hasActiveAmenityFilters)
+                            Positioned(
+                              right: -1,
+                              top: -1,
+                              child: Container(
+                                height: 9,
+                                width: 9,
+                                decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.s3),
@@ -231,10 +361,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 /// This is the "serious but sweet" moment — confident dark surface,
 /// a paw mark, and a friendly one-liner underneath.
 class _Hero extends StatelessWidget {
-  final String city;
-  final VoidCallback onTapCity;
-
-  const _Hero({required this.city, required this.onTapCity});
+  const _Hero();
 
   @override
   Widget build(BuildContext context) {
@@ -337,31 +464,43 @@ class _Hero extends StatelessWidget {
             style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.75), height: 1.4),
           ),
           const SizedBox(height: AppSpacing.s5),
-          InkWell(
-            onTap: onTapCity,
-            borderRadius: BorderRadius.circular(AppRadius.full),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppRadius.full),
-                boxShadow: AppShadows.card,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 6),
-                  Text(city, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.text)),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
-                ],
-              ),
-            ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _TrustPill(icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
+              _TrustPill(icon: Icons.bolt_rounded, label: AppLocalizations.of(context)!.trustFewTaps),
+            ],
           ),
         ],
       ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrustPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _TrustPill({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadius.full),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: AppColors.gold),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white)),
         ],
       ),
     );
@@ -720,6 +859,140 @@ class _CityPickerSheet extends StatelessWidget {
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+}
+
+class _AmenitiesFilterSheet extends StatelessWidget {
+  final bool parking;
+  final bool wifi;
+  final bool wheelchair;
+  final bool inOffice;
+  final bool onField;
+  final ValueChanged<String> onToggle;
+  final VoidCallback onReset;
+  final VoidCallback onApply;
+
+  const _AmenitiesFilterSheet({
+    required this.parking,
+    required this.wifi,
+    required this.wheelchair,
+    required this.inOffice,
+    required this.onField,
+    required this.onToggle,
+    required this.onReset,
+    required this.onApply,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final options = <(String key, IconData icon, String label, bool value)>[
+      ('inOffice', Icons.local_hospital_outlined, l10n.amenityInOffice, inOffice),
+      ('onField', Icons.home_work_outlined, l10n.amenityOnField, onField),
+      ('parking', Icons.local_parking_outlined, l10n.amenityParking, parking),
+      ('wheelchair', Icons.accessible_outlined, l10n.amenityWheelchair, wheelchair),
+      ('wifi', Icons.wifi, l10n.amenityWifi, wifi),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              height: 4,
+              width: 40,
+              margin: const EdgeInsets.only(bottom: AppSpacing.s5),
+              decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(AppRadius.full)),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(l10n.filterClinics, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text)),
+              InkWell(
+                onTap: () => Navigator.of(context).pop(),
+                borderRadius: BorderRadius.circular(AppRadius.full),
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                  child: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          ...options.map((opt) {
+            final selected = opt.$4;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.s2),
+              child: InkWell(
+                onTap: () => onToggle(opt.$1),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s3, vertical: AppSpacing.s3),
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.primary50 : AppColors.bgSoft,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    border: Border.all(color: selected ? AppColors.primary : AppColors.borderLight, width: selected ? 1.5 : 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: selected ? AppColors.primary : AppColors.bgMuted,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(opt.$2, size: 17, color: selected ? Colors.white : AppColors.textSecondary),
+                      ),
+                      const SizedBox(width: AppSpacing.s3),
+                      Expanded(
+                        child: Text(opt.$3, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
+                      ),
+                      Icon(
+                        selected ? Icons.check_circle_rounded : Icons.radio_button_off,
+                        color: selected ? AppColors.primary : AppColors.textMuted,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: AppSpacing.s4),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onReset,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                  ),
+                  child: Text(l10n.resetFilters, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s3),
+              Expanded(
+                child: AppButton(label: l10n.applyFilters, onPressed: onApply),
+              ),
+            ],
+          ),
         ],
       ),
     );
