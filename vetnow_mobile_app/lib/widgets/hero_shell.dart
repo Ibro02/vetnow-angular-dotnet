@@ -38,6 +38,131 @@ class HeroSweepClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant HeroSweepClipper oldClipper) => oldClipper.sweep != sweep;
 }
 
+/// Traces a hero's swept bottom edge in gold, fading out towards the
+/// corners so it reads as light catching a rim rather than as a border.
+class HeroEdgeLight extends StatelessWidget {
+  final double sweep;
+
+  const HeroEdgeLight({super.key, this.sweep = 26});
+
+  @override
+  Widget build(BuildContext context) =>
+      IgnorePointer(child: CustomPaint(painter: _EdgeLightPainter(sweep)));
+}
+
+class _EdgeLightPainter extends CustomPainter {
+  final double sweep;
+
+  _EdgeLightPainter(this.sweep);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // The same curve HeroSweepClipper cuts, stroked instead of cut — and
+    // lifted a hair inside it. Drawn exactly on the boundary, the clip
+    // eats the outer half of the stroke and the rest is invisible.
+    const inset = 1.2;
+    final h = size.height - inset;
+
+    final path = Path()
+      ..moveTo(0, h - AppRadius.xl2)
+      ..quadraticBezierTo(0, h, AppRadius.xl2, h)
+      ..cubicTo(
+        size.width * 0.28, h - sweep,
+        size.width * 0.72, h - sweep,
+        size.width - AppRadius.xl2, h,
+      )
+      ..quadraticBezierTo(size.width, h, size.width, h - AppRadius.xl2);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..shader = const LinearGradient(
+          colors: [Color(0x00E8A73C), Color(0xCCE8A73C), Color(0x00E8A73C)],
+          stops: [0.10, 0.5, 0.90],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _EdgeLightPainter oldDelegate) => oldDelegate.sweep != sweep;
+}
+
+/// The header panel every main screen sits under.
+///
+/// One widget rather than a recipe repeated per screen, so Explore,
+/// Pets, Appointments and Profile cannot drift apart: same sweep, same
+/// rim light, same layering, same shadow. Pass [background] for a screen
+/// that wants its own texture behind the content.
+///
+/// The layers, deepest first: the ink gradient, an optional texture, the
+/// top-left sheen every branded surface in the app carries, a vignette
+/// that darkens the corners so the middle reads as lit, the content, and
+/// finally the gold rim tracing the swept edge.
+class HeroSurface extends StatelessWidget {
+  final Widget child;
+
+  /// Painted between the gradient and the sheen — drifting paws, say.
+  final Widget? background;
+
+  final double sweep;
+
+  const HeroSurface({
+    super.key,
+    required this.child,
+    this.background,
+    this.sweep = 26,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // The shadow has to sit outside the clip: clipped, it would be cut
+        // off at the very edge it is supposed to be falling from.
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.xl2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.ink.withValues(alpha: 0.22),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        ClipPath(
+          clipper: HeroSweepClipper(sweep: sweep),
+          child: DecoratedBox(
+            decoration: const BoxDecoration(gradient: AppGradients.ink),
+            child: Stack(
+              children: [
+                if (background != null) Positioned.fill(child: background!),
+                const Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+                  ),
+                ),
+                const Positioned.fill(child: HeroVignette()),
+                child,
+                Positioned.fill(child: HeroEdgeLight(sweep: sweep)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// A translucent "glass" surface for controls sitting on the hero.
 ///
 /// Deliberately not a BackdropFilter. Real blur behind four chips inside

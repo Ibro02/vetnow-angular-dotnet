@@ -5,7 +5,9 @@ import '../models/pet.dart';
 import '../services/api_client.dart';
 import '../services/pets_api_service.dart';
 import '../state/auth_state.dart';
+import '../widgets/hero_shell.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/pet_avatar.dart';
 import '../widgets/pet_age.dart';
 import '../widgets/premium_dialog.dart';
 
@@ -79,40 +81,47 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: AppGradients.ink,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: 84,
-                        width: 84,
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 2),
-                        ),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(colors: [AppColors.accent, AppColors.gold]),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.pets, color: Colors.white, size: 38),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.s3),
-                      Text(pet.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
-                      const SizedBox(height: 2),
-                      Text(
-                        pet.species.isNotEmpty ? '${pet.species} · ${petAgeLabel(context, pet)}' : petAgeLabel(context, pet),
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5),
-                      ),
-                    ],
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.ink)),
+                  // The same lit-from-the-top-left surface every other
+                  // header in the app is built on.
+                  const IgnorePointer(
+                    child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
                   ),
-                ),
+                  const HeroVignette(),
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          height: 84,
+                          width: 84,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 2),
+                          ),
+                          // This pet's own portrait, not the generic paw every
+                          // pet used to share.
+                          child: PetAvatar(species: pet.species, seed: pet.id, size: 78),
+                        ),
+                        const SizedBox(height: AppSpacing.s3),
+                        Text(pet.name,
+                            style: const TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
+                        const SizedBox(height: 2),
+                        Text(
+                          pet.species.isNotEmpty
+                              ? '${pet.species} · ${petAgeLabel(context, pet)}'
+                              : petAgeLabel(context, pet),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -122,11 +131,15 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.details, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
+                  Text(l10n.details,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
                   const SizedBox(height: AppSpacing.s3),
                   _InfoGrid(pet: pet),
                   const SizedBox(height: AppSpacing.s8),
-                  Text(l10n.vaccinationHistory, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
+                  Text(l10n.vaccinationHistory,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
                   const SizedBox(height: AppSpacing.s3),
                   const _EmptyVaccinations(),
                 ],
@@ -175,7 +188,9 @@ class _InfoGrid extends StatelessWidget {
                     child: Icon(rows[i].$1, color: AppColors.primary, size: 16),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: Text(rows[i].$2, style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted))),
+                  Expanded(
+                      child: Text(rows[i].$2,
+                          style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted))),
                   Text(rows[i].$3, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 ],
               ),

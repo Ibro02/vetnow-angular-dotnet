@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/app_button.dart';
+import '../widgets/hero_shell.dart';
 import '../widgets/vet_hero_background.dart';
 import '../screens/login_screen.dart';
 
@@ -30,12 +31,17 @@ class AuthPrompt extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Container(
-          decoration: const BoxDecoration(
-            gradient: AppGradients.ink,
-          ),
-          child: const VetHeroBackground(),
+        // The same layered ink surface as every header in the app: the
+        // gradient, the paw texture, the top-left sheen, then a vignette
+        // that darkens the corners so the card in the middle reads as lit.
+        const DecoratedBox(
+          decoration: BoxDecoration(gradient: AppGradients.ink),
+          child: VetHeroBackground(),
         ),
+        const IgnorePointer(
+          child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+        ),
+        const HeroVignette(),
         Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.pagePadding),

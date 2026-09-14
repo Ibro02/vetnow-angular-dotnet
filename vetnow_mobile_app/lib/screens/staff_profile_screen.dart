@@ -7,6 +7,7 @@ import '../models/staff_member.dart';
 import '../models/vet_station.dart';
 import '../widgets/app_button.dart';
 import '../services/review_api_service.dart';
+import '../widgets/hero_shell.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
@@ -40,12 +41,20 @@ class StaffProfileScreen extends StatelessWidget {
                 surfaceTintColor: Colors.transparent,
                 iconTheme: const IconThemeData(color: Colors.white),
                 flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: AppGradients.ink,
-                    ),
+                  background: DecoratedBox(
+                    decoration: const BoxDecoration(gradient: AppGradients.ink),
                     child: Stack(
                       children: [
+                        // The same lit-from-the-top-left surface, and the
+                        // same vignette, as every other header in the app.
+                        const Positioned.fill(
+                          child: IgnorePointer(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(gradient: AppGradients.inkSheen),
+                            ),
+                          ),
+                        ),
+                        const Positioned.fill(child: HeroVignette()),
                         // Faint decorative rings for depth, echoing the
                         // vet-brand paw motif without being literal.
                         Positioned(

@@ -320,27 +320,27 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           icon: Icons.auto_awesome,
                           selected: _activeFilter == _SortFilter.recommended,
                           onTap: () {
-                          Haptics.select();
-                          setState(() => _activeFilter = _SortFilter.recommended);
-                        },
+                            Haptics.select();
+                            setState(() => _activeFilter = _SortFilter.recommended);
+                          },
                         ),
                         _FilterChip(
                           label: l10n.filterTopRated,
                           icon: Icons.star_rounded,
                           selected: _activeFilter == _SortFilter.topRated,
                           onTap: () {
-                          Haptics.select();
-                          setState(() => _activeFilter = _SortFilter.topRated);
-                        },
+                            Haptics.select();
+                            setState(() => _activeFilter = _SortFilter.topRated);
+                          },
                         ),
                         _FilterChip(
                           label: l10n.filterMostReviewed,
                           icon: Icons.reviews_outlined,
                           selected: _activeFilter == _SortFilter.mostReviewed,
                           onTap: () {
-                          Haptics.select();
-                          setState(() => _activeFilter = _SortFilter.mostReviewed);
-                        },
+                            Haptics.select();
+                            setState(() => _activeFilter = _SortFilter.mostReviewed);
+                          },
                         ),
                       ],
                     ),
@@ -449,146 +449,107 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Stack(
-      children: [
-        // The shadow has to sit outside the clip: clipped, it would be cut
-        // off at the very edge it is supposed to be falling from.
-        Positioned.fill(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.xl2)),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.ink.withValues(alpha: 0.22),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    // The panel itself — sweep, layering, rim light, shadow — is
+    // HeroSurface, shared with every other header in the app so they
+    // cannot drift apart. Only the content below is Explore's own.
+    return HeroSurface(
+      background: const VetHeroBackground(),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.pagePadding,
+          AppSpacing.s5,
+          AppSpacing.pagePadding,
+          AppSpacing.s10,
         ),
-        ClipPath(
-          clipper: const HeroSweepClipper(),
-          child: DecoratedBox(
-            decoration: const BoxDecoration(gradient: AppGradients.ink),
-            child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Positioned.fill(child: VetHeroBackground()),
-                // The same top-left light every branded surface in the app
-                // carries, so the header belongs to the same family.
-                const Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
-                  ),
+                const _BrandMark(),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GlassSurface(
+                      circle: true,
+                      padding: const EdgeInsets.all(9),
+                      onTap: () => showLanguagePicker(context),
+                      child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
+                    ),
+                    const SizedBox(width: 8),
+                    // The bell used to be a decorative circle with
+                    // no tap target at all.
+                    GlassSurface(
+                      circle: true,
+                      padding: const EdgeInsets.all(9),
+                      onTap: () {
+                        Haptics.select();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                        );
+                      },
+                      child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
+                    ),
+                  ],
                 ),
-                const Positioned.fill(child: HeroVignette()),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.pagePadding,
-                    AppSpacing.s5,
-                    AppSpacing.pagePadding,
-                    AppSpacing.s10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const _BrandMark(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GlassSurface(
-                                circle: true,
-                                padding: const EdgeInsets.all(9),
-                                onTap: () => showLanguagePicker(context),
-                                child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              // The bell used to be a decorative circle with
-                              // no tap target at all.
-                              GlassSurface(
-                                circle: true,
-                                padding: const EdgeInsets.all(9),
-                                onTap: () {
-                                  Haptics.select();
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                                  );
-                                },
-                                child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.s8),
-                      // A vertical fade across the headline. Flat white on a
-                      // dark panel reads as a label; letting the lower half
-                      // sit back a little gives the type some depth.
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.white, Color(0xD6FFFFFF)],
-                        ).createShader(bounds),
-                        child: Text(
-                          l10n.exploreHeroTitle,
-                          style: const TextStyle(
-                            fontFamily: AppFonts.display,
-                            fontSize: 29,
-                            height: 1.18,
-                            letterSpacing: -0.4,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.s3),
-                      // A short gold rule under the headline — the one warm
-                      // mark on a cool panel, and the thing that makes the
-                      // block read as composed rather than stacked.
-                      Container(
-                        height: 3,
-                        width: 44,
-                        decoration: BoxDecoration(
-                          gradient: AppGradients.gold,
-                          borderRadius: BorderRadius.circular(AppRadius.full),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.s3),
-                      Text(
-                        l10n.exploreHeroSubtitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.72),
-                          height: 1.45,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.s5),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          _TrustPill(icon: Icons.verified_rounded, label: l10n.trustNoAccount),
-                          _TrustPill(icon: Icons.bolt_rounded, label: l10n.trustFewTaps),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // A gold hairline tracing the swept edge, bright in the
-                // middle and vanishing at the corners.
-                const Positioned.fill(child: IgnorePointer(child: _HeroEdgeLight())),
               ],
             ),
-          ),
+            const SizedBox(height: AppSpacing.s8),
+            // A vertical fade across the headline. Flat white on a
+            // dark panel reads as a label; letting the lower half
+            // sit back a little gives the type some depth.
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white, Color(0xD6FFFFFF)],
+              ).createShader(bounds),
+              child: Text(
+                l10n.exploreHeroTitle,
+                style: const TextStyle(
+                  fontFamily: AppFonts.display,
+                  fontSize: 29,
+                  height: 1.18,
+                  letterSpacing: -0.4,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s3),
+            // A short gold rule under the headline — the one warm
+            // mark on a cool panel, and the thing that makes the
+            // block read as composed rather than stacked.
+            Container(
+              height: 3,
+              width: 44,
+              decoration: BoxDecoration(
+                gradient: AppGradients.gold,
+                borderRadius: BorderRadius.circular(AppRadius.full),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s3),
+            Text(
+              l10n.exploreHeroSubtitle,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white.withValues(alpha: 0.72),
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s5),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _TrustPill(icon: Icons.verified_rounded, label: l10n.trustNoAccount),
+                _TrustPill(icon: Icons.bolt_rounded, label: l10n.trustFewTaps),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -636,50 +597,6 @@ class _BrandMark extends StatelessWidget {
   }
 }
 
-/// Traces the hero's swept bottom edge in gold, fading out towards the
-/// corners so it reads as light catching a rim rather than as a border.
-class _HeroEdgeLight extends StatelessWidget {
-  const _HeroEdgeLight();
-
-  @override
-  Widget build(BuildContext context) => CustomPaint(painter: _EdgeLightPainter());
-}
-
-class _EdgeLightPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // The same curve HeroSweepClipper cuts, stroked instead of cut — and
-    // lifted a hair inside it. Drawn exactly on the boundary, the clip
-    // eats the outer half of the stroke and the rest is invisible.
-    const inset = 1.2;
-    final h = size.height - inset;
-
-    final path = Path()
-      ..moveTo(0, h - AppRadius.xl2)
-      ..quadraticBezierTo(0, h, AppRadius.xl2, h)
-      ..cubicTo(
-        size.width * 0.28, h - 26,
-        size.width * 0.72, h - 26,
-        size.width - AppRadius.xl2, h,
-      )
-      ..quadraticBezierTo(size.width, h, size.width, h - AppRadius.xl2);
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6
-        ..strokeCap = StrokeCap.round
-        ..shader = const LinearGradient(
-          colors: [Color(0x00E8A73C), Color(0xCCE8A73C), Color(0x00E8A73C)],
-          stops: [0.10, 0.5, 0.90],
-        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _EdgeLightPainter oldDelegate) => false;
-}
 
 class _TrustPill extends StatelessWidget {
   final IconData icon;
