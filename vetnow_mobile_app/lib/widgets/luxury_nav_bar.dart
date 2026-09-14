@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/haptics.dart';
 import '../config/theme.dart';
 
 class NavItem {
@@ -105,7 +106,10 @@ class LuxuryNavBar extends StatelessWidget {
                     final item = items[i];
                     return Expanded(
                       child: InkWell(
-                        onTap: () => onSelect(i),
+                        onTap: () {
+                          if (!selected) Haptics.select();
+                          onSelect(i);
+                        },
                         borderRadius: BorderRadius.circular(AppRadius.full),
                         child: AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 250),

@@ -111,6 +111,43 @@ class AppLocalizationsHr extends AppLocalizations {
   String get pickRating => 'Odaberi ocjenu';
 
   @override
+  String get couldNotOpenMaps => 'Ne mogu otvoriti mape na ovom uređaju.';
+
+  @override
+  String get notificationsEmpty => 'Sve je čisto — nema ničega novog.';
+
+  @override
+  String get notificationsUpcoming => 'Nadolazeći termini';
+
+  @override
+  String get notificationsAwaitingReview => 'Čekaju tvoju ocjenu';
+
+  @override
+  String get notificationsRateCta => 'Ocijeni';
+
+  @override
+  String get notificationsGuest =>
+      'Prijavi se da vidiš svoje termine i podsjetnike.';
+
+  @override
+  String todayAt(String time) {
+    return 'Danas u $time';
+  }
+
+  @override
+  String tomorrowAt(String time) {
+    return 'Sutra u $time';
+  }
+
+  @override
+  String dateAt(String date, String time) {
+    return '$date u $time';
+  }
+
+  @override
+  String get somethingWentWrong => 'Nešto je pošlo po zlu';
+
+  @override
   String get sortByName => 'Po imenu';
 
   @override

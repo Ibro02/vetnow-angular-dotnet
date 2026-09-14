@@ -11,6 +11,7 @@ import '../services/employee_api_service.dart';
 import '../services/review_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
+import '../widgets/clinic_avatar.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
@@ -254,6 +255,40 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
     }
   }
 
+  /// Opens the clinic's address in whatever maps app the phone has.
+  ///
+  /// `geo:0,0?q=<address>` is the Android intent every maps app registers,
+  /// so this doesn't hard-code Google Maps. If nothing handles it — an
+  /// emulator without maps, or the web build — it falls back to the
+  /// Google Maps URL, which any browser can open.
+  Future<void> _openInMaps(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final query = [widget.station.address, widget.station.city, widget.station.country]
+        .where((p) => p.trim().isNotEmpty)
+        .join(', ');
+    if (query.isEmpty) return;
+
+    final encoded = Uri.encodeComponent(query);
+    final candidates = [
+      Uri.parse('geo:0,0?q=$encoded'),
+      Uri.parse('https://www.google.com/maps/search/?api=1&query=$encoded'),
+    ];
+
+    for (final uri in candidates) {
+      try {
+        if (await launchUrl(uri, mode: LaunchMode.externalApplication)) return;
+      } catch (_) {
+        // Try the next one rather than giving up on the first refusal.
+      }
+    }
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.couldNotOpenMaps)),
+      );
+    }
+  }
+
   /// All services across every staff member, deduplicated by name, for
   /// people who'd rather pick "what" before "who". Always sourced from
   /// the mock catalog (see note above) regardless of whether real
@@ -289,11 +324,38 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                 backgroundColor: AppColors.ink,
                 iconTheme: const IconThemeData(color: Colors.white),
                 flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: AppGradients.ink,
-                    ),
-                    child: const Center(child: Icon(Icons.pets, color: Colors.white, size: 52)),
+                  // The clinic's own gradient block, flown in from the card
+                  // that was tapped. It used to be the same ink panel with the
+                  // same paw for every clinic, so arriving here told you
+                  // nothing about where you'd arrived.
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Hero(
+                        tag: clinicHeroTag(station.id),
+                        child: ClinicAvatar(station: station, discSize: 86, fontSize: 30),
+                      ),
+                      // Each clinic's gradient is a different brightness, so
+                      // the white back arrow can't rely on any one of them for
+                      // contrast. A short scrim at the very top guarantees it.
+                      const Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 96,
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0x4D0F2E2C), Color(0x000F2E2C)],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -323,18 +385,40 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                             emptyLabel: l10n.noRatingsYet,
                           ),
                           const SizedBox(width: 10),
-                          const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted),
-                          const SizedBox(width: 2),
                           // The clinic address, not the placeholder distance that
-                          // used to read "0.0 km" on every single clinic.
-                          Expanded(
-                            child: Text(
-                              station.locationLine,
-                              style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          // used to read "0.0 km" on every single clinic — and
+                          // tappable, since an address someone can't navigate to
+                          // is just decoration.
+                          if (station.locationLine.isNotEmpty)
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _openInMaps(context),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 3),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.location_on_outlined, size: 14, color: AppColors.primary),
+                                      const SizedBox(width: 3),
+                                      Flexible(
+                                        child: Text(
+                                          station.locationLine,
+                                          style: const TextStyle(
+                                            fontSize: 12.5,
+                                            color: AppColors.primaryDark,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      const Icon(Icons.north_east_rounded, size: 11, color: AppColors.primary),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                       if (station.verifiedPartner) ...[

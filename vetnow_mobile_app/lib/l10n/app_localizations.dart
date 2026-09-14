@@ -262,6 +262,66 @@ abstract class AppLocalizations {
   /// **'Odaberi ocjenu'**
   String get pickRating;
 
+  /// No description provided for @couldNotOpenMaps.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ne mogu otvoriti mape na ovom uređaju.'**
+  String get couldNotOpenMaps;
+
+  /// No description provided for @notificationsEmpty.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sve je čisto — nema ničega novog.'**
+  String get notificationsEmpty;
+
+  /// No description provided for @notificationsUpcoming.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nadolazeći termini'**
+  String get notificationsUpcoming;
+
+  /// No description provided for @notificationsAwaitingReview.
+  ///
+  /// In bs, this message translates to:
+  /// **'Čekaju tvoju ocjenu'**
+  String get notificationsAwaitingReview;
+
+  /// No description provided for @notificationsRateCta.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ocijeni'**
+  String get notificationsRateCta;
+
+  /// No description provided for @notificationsGuest.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prijavi se da vidiš svoje termine i podsjetnike.'**
+  String get notificationsGuest;
+
+  /// No description provided for @todayAt.
+  ///
+  /// In bs, this message translates to:
+  /// **'Danas u {time}'**
+  String todayAt(String time);
+
+  /// No description provided for @tomorrowAt.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sutra u {time}'**
+  String tomorrowAt(String time);
+
+  /// No description provided for @dateAt.
+  ///
+  /// In bs, this message translates to:
+  /// **'{date} u {time}'**
+  String dateAt(String date, String time);
+
+  /// No description provided for @somethingWentWrong.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nešto je pošlo po zlu'**
+  String get somethingWentWrong;
+
   /// No description provided for @sortByName.
   ///
   /// In bs, this message translates to:

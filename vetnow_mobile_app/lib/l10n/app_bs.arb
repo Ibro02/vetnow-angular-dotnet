@@ -46,6 +46,32 @@
   },
   "clinicReviews": "Recenzije klinike",
   "pickRating": "Odaberi ocjenu",
+  "couldNotOpenMaps": "Ne mogu otvoriti mape na ovom uređaju.",
+  "notificationsEmpty": "Sve je čisto — nema ničega novog.",
+  "notificationsUpcoming": "Nadolazeći termini",
+  "notificationsAwaitingReview": "Čekaju tvoju ocjenu",
+  "notificationsRateCta": "Ocijeni",
+  "notificationsGuest": "Prijavi se da vidiš svoje termine i podsjetnike.",
+  "todayAt": "Danas u {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "tomorrowAt": "Sutra u {time}",
+  "@tomorrowAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "dateAt": "{date} u {time}",
+  "@dateAt": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "somethingWentWrong": "Nešto je pošlo po zlu",
   "sortByName": "Po imenu",
   "sortDefault": "Redoslijed",
   "filterMostReviewed": "Najviše recenzija",

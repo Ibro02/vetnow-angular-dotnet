@@ -8,8 +8,8 @@ import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/gradient_app_bar.dart';
-import '../widgets/paw_loader.dart';
 import '../widgets/section_hero.dart';
+import '../widgets/skeleton.dart';
 import 'appointment_detail_screen.dart';
 
 /// Premium tabbed appointments view: Upcoming / Past, each rendered as
@@ -199,7 +199,10 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
               const SizedBox(height: AppSpacing.s3),
               Expanded(
                 child: _isLoading
-                    ? const Center(child: PawLoader(size: 28, color: AppColors.primary))
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                        child: SkeletonList(count: 3, itemBuilder: () => const AppointmentCardSkeleton()),
+                      )
                     : TabBarView(
                         controller: _tabController,
                         children: [
@@ -229,28 +232,43 @@ class _AppointmentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (appointments.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.pagePadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 64,
-                width: 64,
-                decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                child: const Icon(Icons.event_busy_outlined, size: 28, color: AppColors.textMuted),
-              ),
-              const SizedBox(height: AppSpacing.s4),
-              Text(emptyText, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textMuted)),
-            ],
-          ),
-        ),
-      );
-    }
+    // Wrapped either way — an empty tab is exactly where someone is most
+    // likely to pull down expecting a refresh.
+    return RefreshIndicator(
+      onRefresh: () async => onChanged(),
+      color: AppColors.primary,
+      backgroundColor: AppColors.surface,
+      child: appointments.isEmpty ? _empty(context) : _list(),
+    );
+  }
 
+  Widget _empty(BuildContext context) {
+    return ListView(
+      // A plain Center can't be pulled; a scrollable that is always
+      // scrollable can.
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      children: [
+        const SizedBox(height: AppSpacing.s16),
+        Column(
+          children: [
+            Container(
+              height: 64,
+              width: 64,
+              decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+              child: const Icon(Icons.event_busy_outlined, size: 28, color: AppColors.textMuted),
+            ),
+            const SizedBox(height: AppSpacing.s4),
+            Text(emptyText, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textMuted)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _list() {
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 110),
       itemCount: appointments.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),

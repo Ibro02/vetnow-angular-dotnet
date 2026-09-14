@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/haptics.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/appointment.dart';
@@ -107,6 +108,7 @@ class _RescheduleScreenState extends State<RescheduleScreen> {
         token: auth.token!,
       );
       if (!mounted) return;
+      Haptics.success();
       Navigator.of(context).pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -176,7 +178,10 @@ class _RescheduleScreenState extends State<RescheduleScreen> {
           return _SlotChip(
             label: _shortTime(slot),
             selected: selected,
-            onTap: () => setState(() => _selectedSlotId = slot.id),
+            onTap: () {
+              Haptics.select();
+              setState(() => _selectedSlotId = slot.id);
+            },
           );
         }).toList(),
       ),

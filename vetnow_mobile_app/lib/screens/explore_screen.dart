@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import '../config/haptics.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/vet_station.dart';
 import '../services/api_client.dart';
 import '../services/vet_station_api_service.dart';
 import '../widgets/rating_badge.dart';
+import '../widgets/skeleton.dart';
 import '../widgets/verified_badge.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/app_button.dart';
+import '../widgets/clinic_avatar.dart';
 import '../widgets/language_picker.dart';
-import '../widgets/paw_loader.dart';
 import '../widgets/vet_hero_background.dart';
+import 'notifications_screen.dart';
 import 'vet_station_detail_screen.dart';
 
 /// The app's real front door — no login required. Mirrors the
@@ -30,6 +33,7 @@ enum _SortFilter { recommended, topRated, mostReviewed }
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final _searchController = TextEditingController();
+
   /// `null` means "all cities". The picker used to default to a hard-coded
   /// "Sarajevo", which — now that the backend actually returns a city — would
   /// have silently hidden every clinic outside it on first open.
@@ -48,12 +52,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   /// Built from what the API actually returned, so the list can never offer a
   /// city with no clinics in it — or omit one that has them.
   List<String> get _cities {
-    final seen = _stations
-        .map((s) => s.city.trim())
-        .where((c) => c.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final seen = _stations.map((s) => s.city.trim()).where((c) => c.isNotEmpty).toSet().toList()..sort();
     return seen;
   }
 
@@ -103,7 +102,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
         : _stations.where((s) => s.city.isEmpty || s.city == city).toList();
     if (_searchController.text.trim().isNotEmpty) {
       final q = _searchController.text.trim().toLowerCase();
-      list = list.where((s) => s.name.toLowerCase().contains(q)).toList();
+      // Matches the name, the street and the city — people search for
+      // "Ferhadija" or "Mostar" at least as often as for a clinic's name,
+      // and until now both returned nothing.
+      list = list
+          .where((s) =>
+              s.name.toLowerCase().contains(q) ||
+              s.address.toLowerCase().contains(q) ||
+              s.city.toLowerCase().contains(q))
+          .toList();
     }
     if (_amenityParking) list = list.where((s) => s.parking).toList();
     if (_amenityWifi) list = list.where((s) => s.wifi).toList();
@@ -138,6 +145,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         cities: _cities,
         selected: _selectedCity,
         onSelect: (city) {
+          Haptics.select();
           setState(() => _selectedCity = city);
           Navigator.of(context).pop();
         },
@@ -206,189 +214,215 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final stations = _filtered;
     final l10n = AppLocalizations.of(context)!;
 
-    return CustomScrollView(
-      slivers: [
-        const SliverToBoxAdapter(child: _Hero()),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.pagePadding,
-              AppSpacing.s5,
-              AppSpacing.pagePadding,
-              0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppRadius.full),
-                          boxShadow: AppShadows.card,
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (_) => setState(() {}),
-                          style: const TextStyle(fontSize: 14),
-                          decoration: InputDecoration(
-                            hintText: l10n.searchHint,
-                            hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13.5),
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: Container(
-                                height: 30,
-                                width: 30,
-                                decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
-                                child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
+    return RefreshIndicator(
+      // Pulling down to refresh is the first thing people try on a list
+      // like this; before, nothing happened.
+      onRefresh: _loadStations,
+      color: AppColors.primary,
+      backgroundColor: AppColors.surface,
+      displacement: 28,
+      child: CustomScrollView(
+        // Always scrollable so the pull gesture still works when the
+        // filtered list is short enough to fit on one screen.
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          const SliverToBoxAdapter(child: _Hero()),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePadding,
+                AppSpacing.s5,
+                AppSpacing.pagePadding,
+                0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                            boxShadow: AppShadows.card,
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (_) => setState(() {}),
+                            style: const TextStyle(fontSize: 14),
+                            decoration: InputDecoration(
+                              hintText: l10n.searchHint,
+                              hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13.5),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration:
+                                      const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                                  child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
+                                ),
                               ),
+                              filled: true,
+                              fillColor: AppColors.surface,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                                  borderSide: BorderSide.none),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                                  borderSide: BorderSide.none),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
                             ),
-                            filled: true,
-                            fillColor: AppColors.surface,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.full),
-                                borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: _openCityPicker,
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppRadius.full),
-                          boxShadow: AppShadows.card,
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: _openCityPicker,
+                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                            boxShadow: AppShadows.card,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.location_on, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 4),
+                              Text(_selectedCity ?? l10n.allCities,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
+                              const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
+                            ],
+                          ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                            const SizedBox(width: 4),
-                            Text(_selectedCity ?? l10n.allCities,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
-                            const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.s4),
-                SizedBox(
-                  height: 40,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    clipBehavior: Clip.none,
-                    children: [
-                      _FilterChip(
-                        label: l10n.filterRecommended,
-                        icon: Icons.auto_awesome,
-                        selected: _activeFilter == _SortFilter.recommended,
-                        onTap: () => setState(() => _activeFilter = _SortFilter.recommended),
-                      ),
-                      _FilterChip(
-                        label: l10n.filterTopRated,
-                        icon: Icons.star_rounded,
-                        selected: _activeFilter == _SortFilter.topRated,
-                        onTap: () => setState(() => _activeFilter = _SortFilter.topRated),
-                      ),
-                      _FilterChip(
-                        label: l10n.filterMostReviewed,
-                        icon: Icons.reviews_outlined,
-                        selected: _activeFilter == _SortFilter.mostReviewed,
-                        onTap: () => setState(() => _activeFilter = _SortFilter.mostReviewed),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: AppSpacing.s5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      // With no city selected the "… in {city}" phrasing would
-                      // read as a lie, so fall back to a plain count.
-                      _selectedCity == null
-                          ? l10n.clinicsFound(stations.length)
-                          : l10n.clinicsInCity(stations.length, _selectedCity!),
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+                  const SizedBox(height: AppSpacing.s4),
+                  SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      children: [
+                        _FilterChip(
+                          label: l10n.filterRecommended,
+                          icon: Icons.auto_awesome,
+                          selected: _activeFilter == _SortFilter.recommended,
+                          onTap: () {
+                          Haptics.select();
+                          setState(() => _activeFilter = _SortFilter.recommended);
+                        },
+                        ),
+                        _FilterChip(
+                          label: l10n.filterTopRated,
+                          icon: Icons.star_rounded,
+                          selected: _activeFilter == _SortFilter.topRated,
+                          onTap: () {
+                          Haptics.select();
+                          setState(() => _activeFilter = _SortFilter.topRated);
+                        },
+                        ),
+                        _FilterChip(
+                          label: l10n.filterMostReviewed,
+                          icon: Icons.reviews_outlined,
+                          selected: _activeFilter == _SortFilter.mostReviewed,
+                          onTap: () {
+                          Haptics.select();
+                          setState(() => _activeFilter = _SortFilter.mostReviewed);
+                        },
+                        ),
+                      ],
                     ),
-                    InkWell(
-                      onTap: _openAmenitiesFilterSheet,
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.tune,
-                                size: 16, color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
-                          ),
-                          if (_hasActiveAmenityFilters)
-                            Positioned(
-                              right: -1,
-                              top: -1,
-                              child: Container(
-                                height: 9,
-                                width: 9,
-                                decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.s3),
-              ],
-            ),
-          ),
-        ),
-        if (_isLoading)
-          const SliverToBoxAdapter(child: _LoadingState())
-        else if (_loadError != null)
-          SliverToBoxAdapter(child: _ErrorState(onRetry: _loadStations))
-        else if (stations.isEmpty)
-          const SliverToBoxAdapter(child: _EmptyState())
-        else
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.pagePadding,
-              0,
-              AppSpacing.pagePadding,
-              110,
-            ),
-            sliver: SliverList.separated(
-              itemCount: stations.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
-              itemBuilder: (context, index) {
-                final station = stations[index];
-                return _StationCard(
-                  station: station,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => VetStationDetailScreen(station: station)),
                   ),
-                );
-              },
+                  const SizedBox(height: AppSpacing.s5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        // With no city selected the "… in {city}" phrasing would
+                        // read as a lie, so fall back to a plain count.
+                        _selectedCity == null
+                            ? l10n.clinicsFound(stations.length)
+                            : l10n.clinicsInCity(stations.length, _selectedCity!),
+                        style:
+                            const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+                      ),
+                      InkWell(
+                        onTap: _openAmenitiesFilterSheet,
+                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.tune,
+                                  size: 16,
+                                  color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
+                            ),
+                            if (_hasActiveAmenityFilters)
+                              Positioned(
+                                right: -1,
+                                top: -1,
+                                child: Container(
+                                  height: 9,
+                                  width: 9,
+                                  decoration:
+                                      const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.s3),
+                ],
+              ),
             ),
           ),
-      ],
+          if (_isLoading)
+            const SliverToBoxAdapter(child: _LoadingState())
+          else if (_loadError != null)
+            SliverToBoxAdapter(child: _ErrorState(onRetry: _loadStations))
+          else if (stations.isEmpty)
+            const SliverToBoxAdapter(child: _EmptyState())
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePadding,
+                0,
+                AppSpacing.pagePadding,
+                110,
+              ),
+              sliver: SliverList.separated(
+                itemCount: stations.length,
+                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
+                itemBuilder: (context, index) {
+                  final station = stations[index];
+                  return _StationCard(
+                    station: station,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => VetStationDetailScreen(station: station)),
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -466,14 +500,25 @@ class _Hero extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Container(
-                          height: 34,
-                          width: 34,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            shape: BoxShape.circle,
+                        // The bell used to be a decorative circle with no tap
+                        // target at all.
+                        InkWell(
+                          onTap: () {
+                            Haptics.select();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          child: Container(
+                            height: 34,
+                            width: 34,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.14),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
                           ),
-                          child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
                         ),
                       ],
                     ),
@@ -500,7 +545,8 @@ class _Hero extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _TrustPill(icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
+                    _TrustPill(
+                        icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
                     _TrustPill(icon: Icons.bolt_rounded, label: AppLocalizations.of(context)!.trustFewTaps),
                   ],
                 ),
@@ -532,7 +578,8 @@ class _TrustPill extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: AppColors.gold),
           const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white)),
+          Text(label,
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white)),
         ],
       ),
     );
@@ -623,31 +670,11 @@ class _StationCard extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [AppColors.primaryLight, AppColors.primary],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                        ),
-                        // Same top-left light as every other branded surface,
-                        // so the thumbnail is lit rather than flat-filled.
-                        const Positioned.fill(
-                          child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
-                        ),
-                        Center(
-                          child: Container(
-                            width: 42,
-                            height: 42,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.18),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
-                            ),
-                            child: const Icon(Icons.pets, color: Colors.white, size: 21),
-                          ),
+                        // Flies into the detail header on tap, so the two
+                        // screens read as one surface opening up.
+                        Hero(
+                          tag: clinicHeroTag(station.id),
+                          child: ClinicAvatar(station: station),
                         ),
                         if (!station.openNow)
                           Positioned(
@@ -659,7 +686,8 @@ class _StationCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 3),
                               color: Colors.black54,
                               child: const Text('Closed',
-                                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
                             ),
                           ),
                       ],
@@ -756,14 +784,17 @@ class _MiniTag extends StatelessWidget {
   }
 }
 
+/// Placeholder cards rather than a spinner: the list keeps its shape
+/// while it loads, so nothing jumps when the clinics arrive and the
+/// wait reads as loading instead of stalling.
 class _LoadingState extends StatelessWidget {
   const _LoadingState();
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: AppSpacing.s16),
-      child: Center(child: PawLoader(size: 32, color: AppColors.primary)),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, AppSpacing.s10),
+      child: SkeletonList(count: 4, itemBuilder: () => const ClinicCardSkeleton()),
     );
   }
 }
@@ -786,7 +817,8 @@ class _ErrorState extends StatelessWidget {
             child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
           ),
           const SizedBox(height: AppSpacing.s4),
-          Text(l10n.networkError, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(l10n.networkError,
+              textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: AppSpacing.s5),
           AppButton(
             label: l10n.retry,
@@ -861,7 +893,8 @@ class _CityPickerSheet extends StatelessWidget {
               height: 4,
               width: 40,
               margin: const EdgeInsets.only(bottom: AppSpacing.s5),
-              decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(AppRadius.full)),
+              decoration:
+                  BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(AppRadius.full)),
             ),
           ),
           Row(
@@ -896,7 +929,9 @@ class _CityPickerSheet extends StatelessWidget {
                   duration: const Duration(milliseconds: 150),
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
                   decoration: BoxDecoration(
-                    gradient: isSelected ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]) : null,
+                    gradient: isSelected
+                        ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark])
+                        : null,
                     color: isSelected ? null : AppColors.bgSoft,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(color: isSelected ? Colors.transparent : AppColors.borderLight),
@@ -979,8 +1014,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        borderRadius:
-            BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -991,7 +1026,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
               height: 4,
               width: 40,
               margin: const EdgeInsets.only(bottom: AppSpacing.s5),
-              decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(AppRadius.full)),
+              decoration:
+                  BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(AppRadius.full)),
             ),
           ),
           Row(
@@ -1026,7 +1062,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                     color: selected ? AppColors.primary50 : AppColors.bgSoft,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(
-                        color: selected ? AppColors.primary : AppColors.borderLight, width: selected ? 1.5 : 1),
+                        color: selected ? AppColors.primary : AppColors.borderLight,
+                        width: selected ? 1.5 : 1),
                   ),
                   child: Row(
                     children: [
@@ -1037,12 +1074,14 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                           color: selected ? AppColors.primary : AppColors.bgMuted,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(opt.$2, size: 17, color: selected ? Colors.white : AppColors.textSecondary),
+                        child:
+                            Icon(opt.$2, size: 17, color: selected ? Colors.white : AppColors.textSecondary),
                       ),
                       const SizedBox(width: AppSpacing.s3),
                       Expanded(
                         child: Text(opt.$3,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                       ),
                       Icon(
                         selected ? Icons.check_circle_rounded : Icons.radio_button_off,

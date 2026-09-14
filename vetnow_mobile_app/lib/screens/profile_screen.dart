@@ -9,6 +9,7 @@ import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/paw_loader.dart';
 import 'edit_profile_screen.dart';
+import 'notifications_screen.dart';
 import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/gradient_app_bar.dart';
@@ -361,7 +362,14 @@ class _SettingsGroup extends StatelessWidget {
     final items = <(IconData, String, Color, VoidCallback)>[
       (Icons.person_outline, l10n.personalInfo, AppColors.primary, () => _openEditProfile(context)),
       (Icons.lock_outline, l10n.passwordSecurity, AppColors.info, () => _openEditProfile(context)),
-      (Icons.notifications_outlined, l10n.notifications, AppColors.gold, () {}),
+      (
+        Icons.notifications_outlined,
+        l10n.notifications,
+        AppColors.gold,
+        () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+            ),
+      ),
       (Icons.translate_rounded, l10n.language, AppColors.accent, () => showLanguagePicker(context)),
       (Icons.help_outline, l10n.helpSupport, AppColors.secondary, () {}),
     ];

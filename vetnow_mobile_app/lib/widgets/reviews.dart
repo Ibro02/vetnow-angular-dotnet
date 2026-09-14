@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../config/haptics.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/review.dart';
 import '../services/api_client.dart';
 import '../services/review_api_service.dart';
 import 'app_button.dart';
-import 'paw_loader.dart';
+import 'skeleton.dart';
 
 /// Day.month.year, the way a date is written locally.
 ///
@@ -62,10 +63,9 @@ class ReviewsSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.s3),
         ],
         if (isLoading)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.s6),
-            child: Center(child: PawLoader(size: 28)),
-          )
+          // Shaped like the reviews that are coming, so the section keeps its
+          // height and nothing below it jumps when they land.
+          SkeletonList(count: 2, itemBuilder: () => const ReviewSkeleton())
         else if (data == null || !data.hasReviews)
           _EmptyReviews(canRate: pending != null)
         else ...[
@@ -357,9 +357,11 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
         token: widget.token,
       );
       if (!mounted) return;
+      Haptics.success();
       Navigator.of(context).pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
+      Haptics.warn();
       // The backend's own wording is the useful message here — "already
       // reviewed", "visit hasn't happened yet" — so it is shown verbatim.
       setState(() {
@@ -425,7 +427,12 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
                 children: List.generate(5, (i) {
                   final star = i + 1;
                   return IconButton(
-                    onPressed: _submitting ? null : () => setState(() => _rating = star),
+                    onPressed: _submitting
+                        ? null
+                        : () {
+                            Haptics.select();
+                            setState(() => _rating = star);
+                          },
                     icon: Icon(
                       star <= _rating ? Icons.star_rounded : Icons.star_border_rounded,
                       size: 38,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/haptics.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/service_catalog.dart';
@@ -196,12 +197,14 @@ class _BookingScreenState extends State<BookingScreen> {
         token: auth.token!,
       );
       if (!mounted) return;
+      Haptics.success();
       setState(() {
         _isConfirming = false;
         _confirmed = true;
       });
     } on ApiException catch (_) {
       if (!mounted) return;
+      Haptics.warn();
       final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isConfirming = false;
@@ -315,7 +318,10 @@ class _BookingScreenState extends State<BookingScreen> {
                 children: _mockSlots.map((slot) {
                   final selected = _selectedSlot == slot;
                   return InkWell(
-                    onTap: () => setState(() => _selectedSlot = slot),
+                    onTap: () {
+                      Haptics.select();
+                      setState(() => _selectedSlot = slot);
+                    },
                     borderRadius: BorderRadius.circular(AppRadius.md),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
