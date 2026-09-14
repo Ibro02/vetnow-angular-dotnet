@@ -169,7 +169,7 @@ abstract class AppLocalizations {
   /// No description provided for @clinicsInCity.
   ///
   /// In bs, this message translates to:
-  /// **'{count} klinika u {city}'**
+  /// **'{count, plural, one{{count} klinika u {city}} few{{count} klinike u {city}} other{{count} klinika u {city}}}'**
   String clinicsInCity(int count, String city);
 
   /// No description provided for @noClinicsMatch.
@@ -183,6 +183,108 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Odaberi grad'**
   String get chooseCity;
+
+  /// No description provided for @allCities.
+  ///
+  /// In bs, this message translates to:
+  /// **'Svi gradovi'**
+  String get allCities;
+
+  /// No description provided for @noRatingsYet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nova'**
+  String get noRatingsYet;
+
+  /// No description provided for @noReviewsYet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Još nema recenzija'**
+  String get noReviewsYet;
+
+  /// No description provided for @beFirstToReview.
+  ///
+  /// In bs, this message translates to:
+  /// **'Budi prvi koji će ocijeniti ovu kliniku.'**
+  String get beFirstToReview;
+
+  /// No description provided for @rateYourVisit.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ocijeni svoju posjetu'**
+  String get rateYourVisit;
+
+  /// No description provided for @rateVisitHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Bio si ovdje — kako je prošlo?'**
+  String get rateVisitHint;
+
+  /// No description provided for @reviewCommentHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Napiši par riječi (nije obavezno)'**
+  String get reviewCommentHint;
+
+  /// No description provided for @submitReview.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pošalji recenziju'**
+  String get submitReview;
+
+  /// No description provided for @reviewThanks.
+  ///
+  /// In bs, this message translates to:
+  /// **'Hvala na recenziji!'**
+  String get reviewThanks;
+
+  /// No description provided for @reviewsCount.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{{count} recenzija} few{{count} recenzije} other{{count} recenzija}}'**
+  String reviewsCount(int count);
+
+  /// No description provided for @visitOn.
+  ///
+  /// In bs, this message translates to:
+  /// **'Posjeta {date}'**
+  String visitOn(String date);
+
+  /// No description provided for @clinicReviews.
+  ///
+  /// In bs, this message translates to:
+  /// **'Recenzije klinike'**
+  String get clinicReviews;
+
+  /// No description provided for @pickRating.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi ocjenu'**
+  String get pickRating;
+
+  /// No description provided for @sortByName.
+  ///
+  /// In bs, this message translates to:
+  /// **'Po imenu'**
+  String get sortByName;
+
+  /// No description provided for @sortDefault.
+  ///
+  /// In bs, this message translates to:
+  /// **'Redoslijed'**
+  String get sortDefault;
+
+  /// No description provided for @filterMostReviewed.
+  ///
+  /// In bs, this message translates to:
+  /// **'Najviše recenzija'**
+  String get filterMostReviewed;
+
+  /// No description provided for @clinicsFound.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{{count} pronađena klinika} few{{count} pronađene klinike} other{{count} pronađenih klinika}}'**
+  String clinicsFound(int count);
 
   /// No description provided for @loginTitle.
   ///

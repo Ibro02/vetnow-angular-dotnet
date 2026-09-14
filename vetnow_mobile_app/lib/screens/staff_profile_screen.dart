@@ -6,7 +6,10 @@ import '../models/review.dart';
 import '../models/staff_member.dart';
 import '../models/vet_station.dart';
 import '../widgets/app_button.dart';
+import '../services/review_api_service.dart';
+import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
+import '../widgets/reviews.dart';
 import 'booking_screen.dart';
 
 /// Tapped from the staff list on VetStationDetailScreen. Premium
@@ -19,11 +22,6 @@ class StaffProfileScreen extends StatelessWidget {
   final VetStation station;
 
   const StaffProfileScreen({super.key, required this.staff, required this.station});
-
-  static const _reviews = [
-    Review(authorName: 'Selma K.', rating: 5, comment: 'Very patient with a nervous dog, highly recommend.', timeAgo: '4 days ago'),
-    Review(authorName: 'Ivan T.', rating: 5, comment: 'Clear explanations, no rushing.', timeAgo: '2 weeks ago'),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -94,14 +92,17 @@ class StaffProfileScreen extends StatelessWidget {
                                 style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 13),
                               ),
                               const SizedBox(height: AppSpacing.s3),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.14),
-                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                              // Employee ratings are not recorded on the backend,
+                              // so this only appears when a score actually exists.
+                              if (staff.reviewCount > 0)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.14),
+                                    borderRadius: BorderRadius.circular(AppRadius.full),
+                                  ),
+                                  child: RatingBadge(rating: staff.rating, reviewCount: staff.reviewCount, dense: true),
                                 ),
-                                child: RatingBadge(rating: staff.rating, reviewCount: staff.reviewCount, dense: true),
-                              ),
                             ],
                           ),
                         ),
@@ -209,43 +210,39 @@ class StaffProfileScreen extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: AppSpacing.s8),
-                      Text(l10n.reviewsForSpecialist, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      // Reviews are recorded per clinic, not per employee, so
+                      // this shows the clinic's feed under a heading that says
+                      // so. It used to show two invented reviews attributed to
+                      // whichever specialist was on screen — a made-up opinion
+                      // about a named real person.
+                      Text(l10n.clinicReviews,
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                       const SizedBox(height: AppSpacing.s3),
-                      ..._reviews.map(
-                        (r) => Container(
-                          margin: const EdgeInsets.only(bottom: AppSpacing.s2),
-                          padding: const EdgeInsets.all(AppSpacing.s3),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(color: AppColors.borderLight),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(r.authorName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
-                                  Text(r.timeAgo, style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted)),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: List.generate(
-                                  5,
-                                  (i) => Icon(
-                                    i < r.rating.round() ? Icons.star_rounded : Icons.star_border_rounded,
-                                    size: 12,
-                                    color: AppColors.gold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(r.comment, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4)),
-                            ],
-                          ),
-                        ),
+                      FutureBuilder<ReviewSummary>(
+                        future: ReviewApiService.getByVetStation(station.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: AppSpacing.s5),
+                              child: Center(child: PawLoader(size: 26)),
+                            );
+                          }
+                          final data = snapshot.data;
+                          if (data == null || !data.hasReviews) {
+                            return Text(
+                              l10n.noReviewsYet,
+                              style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                            );
+                          }
+                          // Capped: this is context on the clinic, not the
+                          // point of the page.
+                          return Column(
+                            children: data.reviews
+                                .take(3)
+                                .map((r) => ReviewCard(review: r))
+                                .toList(),
+                          );
+                        },
                       ),
                     ],
                   ),

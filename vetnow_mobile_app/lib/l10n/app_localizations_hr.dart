@@ -44,7 +44,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String clinicsInCity(int count, String city) {
-    return '$count klinika u gradu $city';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count klinika u $city',
+      few: '$count klinike u $city',
+      one: '$count klinika u $city',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -52,6 +59,77 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get chooseCity => 'Odaberi grad';
+
+  @override
+  String get allCities => 'Svi gradovi';
+
+  @override
+  String get noRatingsYet => 'Nova';
+
+  @override
+  String get noReviewsYet => 'Još nema recenzija';
+
+  @override
+  String get beFirstToReview => 'Budi prvi koji će ocijeniti ovu kliniku.';
+
+  @override
+  String get rateYourVisit => 'Ocijeni svoju posjetu';
+
+  @override
+  String get rateVisitHint => 'Bio si ovdje — kako je prošlo?';
+
+  @override
+  String get reviewCommentHint => 'Napiši par riječi (nije obavezno)';
+
+  @override
+  String get submitReview => 'Pošalji recenziju';
+
+  @override
+  String get reviewThanks => 'Hvala na recenziji!';
+
+  @override
+  String reviewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recenzija',
+      few: '$count recenzije',
+      one: '$count recenzija',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String visitOn(String date) {
+    return 'Posjeta $date';
+  }
+
+  @override
+  String get clinicReviews => 'Recenzije klinike';
+
+  @override
+  String get pickRating => 'Odaberi ocjenu';
+
+  @override
+  String get sortByName => 'Po imenu';
+
+  @override
+  String get sortDefault => 'Redoslijed';
+
+  @override
+  String get filterMostReviewed => 'Najviše recenzija';
+
+  @override
+  String clinicsFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pronađenih klinika',
+      few: '$count pronađene klinike',
+      one: '$count pronađena klinika',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get loginTitle => 'Prijava';

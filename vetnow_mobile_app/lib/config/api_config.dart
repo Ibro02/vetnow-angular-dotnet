@@ -81,4 +81,17 @@ class ApiConfig {
   /// PUT /api/Appointment/Reschedule — moves an existing appointment to
   /// another free slot of the SAME employee (the backend enforces that).
   static const String appointmentReschedule = '/api/Appointment/Reschedule';
+
+  // ─── Reviews ────────────────────────────────────────────
+
+  /// GET — anonymous. Score, star distribution and the review list for one
+  /// clinic, so a guest can read them before ever signing up.
+  static const String reviewByVetStation = '/api/Review/GetByVetStation';
+
+  /// POST — authenticated. Rates one past appointment; the backend checks
+  /// the visit is this person's, already happened, and is not yet rated.
+  static const String reviewAdd = '/api/Review/Add';
+
+  /// GET — authenticated. Past visits of mine that still have no review.
+  static const String reviewPending = '/api/Review/Pending';
 }

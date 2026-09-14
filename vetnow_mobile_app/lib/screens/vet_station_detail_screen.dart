@@ -8,10 +8,12 @@ import '../models/staff_member.dart';
 import '../models/vet_service.dart';
 import '../models/vet_station.dart';
 import '../services/employee_api_service.dart';
+import '../services/review_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
+import '../widgets/reviews.dart';
 import '../widgets/verified_badge.dart';
 import 'booking_screen.dart';
 import 'staff_profile_screen.dart';
@@ -29,7 +31,10 @@ class VetStationDetailScreen extends StatefulWidget {
   State<VetStationDetailScreen> createState() => _VetStationDetailScreenState();
 }
 
-enum _StaffSort { featured, topRated }
+/// Team ordering. "Featured" is the order the backend returned; the
+/// alternative sorts by name, because employee ratings do not exist server-side
+/// — the old "top rated" option sorted every real staff list by a constant 0.
+enum _StaffSort { featured, byName }
 
 class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   _StaffSort _staffSort = _StaffSort.featured;
@@ -43,6 +48,16 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   bool _loadingReal = false;
   bool _attemptedLoad = false;
 
+  /// Guarded separately from the staff load: reviews are anonymous, so they
+  /// start loading immediately, while staff waits for a session.
+  bool _attemptedReviewLoad = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReviews();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -50,6 +65,11 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
     if (auth.isLoggedIn && !_attemptedLoad && !_loadingReal) {
       _attemptedLoad = true;
       _loadRealStaff();
+    }
+    final token = auth.token;
+    if (token != null && !_attemptedReviewLoad) {
+      _attemptedReviewLoad = true;
+      _loadPendingReview(token);
     }
   }
 
@@ -136,16 +156,74 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
         ),
       ];
 
-  static const _reviews = [
-    Review(authorName: 'Faruk M.', rating: 5, comment: 'Very gentle with my cat, explained everything clearly.', timeAgo: '2 days ago'),
-    Review(authorName: 'Ana P.', rating: 5, comment: 'Booked same-day, no waiting. Great experience.', timeAgo: '1 week ago'),
-    Review(authorName: 'Denis H.', rating: 4, comment: 'Good service, a bit pricier than average.', timeAgo: '3 weeks ago'),
-  ];
+  // ─── Reviews ──────────────────────────────────────────────
+  //
+  // Loaded anonymously, so a guest weighing up clinics sees the same scores
+  // and comments a signed-in customer does. This replaced a hard-coded list
+  // of three invented English reviews that every clinic displayed identically.
+
+  ReviewSummary? _reviewSummary;
+  bool _loadingReviews = true;
+
+  /// The visit this person can rate at *this* clinic, if there is one.
+  /// Only fetched when signed in — the endpoint is per-account.
+  PendingReview? _pendingReview;
+
+  Future<void> _loadReviews() async {
+    try {
+      final summary = await ReviewApiService.getByVetStation(widget.station.id);
+      if (!mounted) return;
+      setState(() {
+        _reviewSummary = summary;
+        _loadingReviews = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      // An empty summary renders as "no reviews yet", which is a truthful
+      // thing to show when the feed could not be read.
+      setState(() => _loadingReviews = false);
+    }
+  }
+
+  Future<void> _loadPendingReview(String token) async {
+    try {
+      final pending = await ReviewApiService.pending(token);
+      if (!mounted) return;
+      final here = pending.where((p) => p.vetStationId == widget.station.id).toList();
+      setState(() => _pendingReview = here.isEmpty ? null : here.first);
+    } catch (_) {
+      // Not being able to offer the prompt is not worth interrupting the
+      // page for; the reviews themselves are already on screen.
+    }
+  }
+
+  Future<void> _openReviewSheet(PendingReview pending) async {
+    final auth = AuthScope.of(context);
+    final token = auth.token;
+    if (token == null) return;
+
+    final submitted = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => LeaveReviewSheet(pending: pending, token: token),
+    );
+
+    if (submitted == true && mounted) {
+      // The score above the list has just changed, so refetch rather than
+      // patching it locally and risking a number that disagrees with the API.
+      setState(() {
+        _pendingReview = null;
+        _loadingReviews = true;
+      });
+      await _loadReviews();
+    }
+  }
 
   List<StaffMember> _sortedStaff(BuildContext context) {
     final list = List<StaffMember>.from(_realStaff ?? _staff(context));
-    if (_staffSort == _StaffSort.topRated) {
-      list.sort((a, b) => b.rating.compareTo(a.rating));
+    if (_staffSort == _StaffSort.byName) {
+      list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     }
     return list;
   }
@@ -239,11 +317,24 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          RatingBadge(rating: station.rating, reviewCount: station.reviewCount),
+                          RatingBadge(
+                            rating: _reviewSummary?.averageRating ?? station.rating,
+                            reviewCount: _reviewSummary?.reviewCount ?? station.reviewCount,
+                            emptyLabel: l10n.noRatingsYet,
+                          ),
                           const SizedBox(width: 10),
                           const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted),
                           const SizedBox(width: 2),
-                          Text('${station.city} · ${station.distanceKm.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted)),
+                          // The clinic address, not the placeholder distance that
+                          // used to read "0.0 km" on every single clinic.
+                          Expanded(
+                            child: Text(
+                              station.locationLine,
+                              style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       if (station.verifiedPartner) ...[
@@ -301,18 +392,18 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                           Text(l10n.meetTheTeam, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                           InkWell(
                             onTap: () => setState(
-                              () => _staffSort = _staffSort == _StaffSort.featured ? _StaffSort.topRated : _StaffSort.featured,
+                              () => _staffSort = _staffSort == _StaffSort.featured ? _StaffSort.byName : _StaffSort.featured,
                             ),
                             child: Row(
                               children: [
                                 Icon(
-                                  _staffSort == _StaffSort.topRated ? Icons.star_rounded : Icons.sort,
+                                  _staffSort == _StaffSort.byName ? Icons.sort_by_alpha_rounded : Icons.sort,
                                   size: 14,
                                   color: AppColors.primary,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _staffSort == _StaffSort.topRated ? l10n.filterTopRated : l10n.sortByRating,
+                                  _staffSort == _StaffSort.byName ? l10n.sortByName : l10n.sortDefault,
                                   style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.w600),
                                 ),
                               ],
@@ -387,21 +478,12 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.s8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(l10n.reviews, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                          Row(
-                            children: [
-                              const Icon(Icons.star_rounded, size: 16, color: AppColors.gold),
-                              const SizedBox(width: 4),
-                              Text('${station.rating} · ${station.reviewCount} reviews', style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary)),
-                            ],
-                          ),
-                        ],
+                      ReviewsSection(
+                        summary: _reviewSummary,
+                        isLoading: _loadingReviews,
+                        pending: _pendingReview,
+                        onRate: _pendingReview == null ? null : () => _openReviewSheet(_pendingReview!),
                       ),
-                      const SizedBox(height: AppSpacing.s3),
-                      ..._reviews.map((r) => _ReviewCard(review: r)),
                     ],
                   ),
                 ),
@@ -592,7 +674,11 @@ class _StaffCard extends StatelessWidget {
                   Text(staff.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
                   Text(staff.role, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                   const SizedBox(height: 4),
-                  RatingBadge(rating: staff.rating, reviewCount: staff.reviewCount, dense: true),
+                  // Only shown when there is a score behind it. Employee
+                  // ratings are not recorded on the backend, so real staff
+                  // would otherwise all wear an identical empty badge.
+                  if (staff.reviewCount > 0)
+                    RatingBadge(rating: staff.rating, reviewCount: staff.reviewCount, dense: true),
                 ],
               ),
             ),
@@ -685,51 +771,6 @@ class _ServicesList extends StatelessWidget {
             ),
           )
           .toList(),
-    );
-  }
-}
-
-class _ReviewCard extends StatelessWidget {
-  final Review review;
-  const _ReviewCard({required this.review});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.s2),
-      padding: const EdgeInsets.all(AppSpacing.s3),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const CircleAvatar(radius: 12, backgroundColor: AppColors.primary50, child: Icon(Icons.person, size: 13, color: AppColors.primary)),
-                  const SizedBox(width: 6),
-                  Text(review.authorName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
-                ],
-              ),
-              Text(review.timeAgo, style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: List.generate(
-              5,
-              (i) => Icon(i < review.rating.round() ? Icons.star_rounded : Icons.star_border_rounded, size: 13, color: AppColors.gold),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(review.comment, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4)),
-        ],
-      ),
     );
   }
 }

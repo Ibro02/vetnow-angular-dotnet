@@ -14,7 +14,7 @@
   "filterTopRated": "Najbolje ocijenjeno",
   "filterNearest": "Najbliže",
   "filterOpenNow": "Otvoreno sada",
-  "clinicsInCity": "{count} klinika u gradu {city}",
+  "clinicsInCity": "{count, plural, one{{count} klinika u {city}} few{{count} klinike u {city}} other{{count} klinika u {city}}}",
   "@clinicsInCity": {
     "placeholders": {
       "count": {"type": "int"},
@@ -23,6 +23,38 @@
   },
   "noClinicsMatch": "Nijedna klinika ne odgovara tvojim filterima",
   "chooseCity": "Odaberi grad",
+  "allCities": "Svi gradovi",
+  "noRatingsYet": "Nova",
+  "noReviewsYet": "Još nema recenzija",
+  "beFirstToReview": "Budi prvi koji će ocijeniti ovu kliniku.",
+  "rateYourVisit": "Ocijeni svoju posjetu",
+  "rateVisitHint": "Bio si ovdje — kako je prošlo?",
+  "reviewCommentHint": "Napiši par riječi (nije obavezno)",
+  "submitReview": "Pošalji recenziju",
+  "reviewThanks": "Hvala na recenziji!",
+  "reviewsCount": "{count, plural, one{{count} recenzija} few{{count} recenzije} other{{count} recenzija}}",
+  "@reviewsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "visitOn": "Posjeta {date}",
+  "@visitOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "clinicReviews": "Recenzije klinike",
+  "pickRating": "Odaberi ocjenu",
+  "sortByName": "Po imenu",
+  "sortDefault": "Redoslijed",
+  "filterMostReviewed": "Najviše recenzija",
+  "clinicsFound": "{count, plural, one{{count} pronađena klinika} few{{count} pronađene klinike} other{{count} pronađenih klinika}}",
+  "@clinicsFound": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
 
   "loginTitle": "Prijava",
   "loginBookingGateTitle": "Gotovo",

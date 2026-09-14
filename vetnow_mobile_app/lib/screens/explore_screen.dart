@@ -23,11 +23,17 @@ class ExploreScreen extends StatefulWidget {
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-enum _SortFilter { recommended, topRated, nearest }
+/// Every one of these sorts on a value the backend actually computes.
+/// "Nearest" used to sit here too, sorting by a distance the server never
+/// sends — so it reordered nothing while looking like it did.
+enum _SortFilter { recommended, topRated, mostReviewed }
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final _searchController = TextEditingController();
-  String _selectedCity = 'Sarajevo';
+  /// `null` means "all cities". The picker used to default to a hard-coded
+  /// "Sarajevo", which — now that the backend actually returns a city — would
+  /// have silently hidden every clinic outside it on first open.
+  String? _selectedCity;
   _SortFilter _activeFilter = _SortFilter.recommended;
 
   bool _amenityParking = false;
@@ -39,7 +45,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool get _hasActiveAmenityFilters =>
       _amenityParking || _amenityWifi || _amenityWheelchair || _amenityInOffice || _amenityOnField;
 
-  static const _cities = ['Sarajevo', 'Mostar', 'Banja Luka', 'Tuzla', 'Zenica'];
+  /// Built from what the API actually returned, so the list can never offer a
+  /// city with no clinics in it — or omit one that has them.
+  List<String> get _cities {
+    final seen = _stations
+        .map((s) => s.city.trim())
+        .where((c) => c.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+    return seen;
+  }
 
   List<VetStation> _stations = [];
   bool _isLoading = true;
@@ -79,10 +95,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   List<VetStation> get _filtered {
-    // Real stations don't carry a `city` field yet (backend has no
-    // City column on VetStation), so we don't filter those out —
-    // the city picker stays purely cosmetic until that field exists.
-    var list = _stations.where((s) => s.city.isEmpty || s.city == _selectedCity).toList();
+    // A null selection means "all cities". A station with no city recorded is
+    // kept either way rather than being filtered into invisibility.
+    final city = _selectedCity;
+    var list = city == null
+        ? List<VetStation>.from(_stations)
+        : _stations.where((s) => s.city.isEmpty || s.city == city).toList();
     if (_searchController.text.trim().isNotEmpty) {
       final q = _searchController.text.trim().toLowerCase();
       list = list.where((s) => s.name.toLowerCase().contains(q)).toList();
@@ -94,13 +112,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
     if (_amenityOnField) list = list.where((s) => s.onField).toList();
     switch (_activeFilter) {
       case _SortFilter.recommended:
+        // Score weighted by how many people stand behind it, so one lone
+        // five-star review doesn't outrank a clinic with fifty good ones.
         list.sort((a, b) => (b.rating * b.reviewCount).compareTo(a.rating * a.reviewCount));
         break;
       case _SortFilter.topRated:
-        list.sort((a, b) => b.rating.compareTo(a.rating));
+        // Unrated clinics sort last instead of tying at 0.0 with the worst.
+        list.sort((a, b) {
+          if (a.hasReviews != b.hasReviews) return a.hasReviews ? -1 : 1;
+          return b.rating.compareTo(a.rating);
+        });
         break;
-      case _SortFilter.nearest:
-        list.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+      case _SortFilter.mostReviewed:
+        list.sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
         break;
     }
     return list;
@@ -251,7 +275,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           children: [
                             const Icon(Icons.location_on, size: 16, color: AppColors.primary),
                             const SizedBox(width: 4),
-                            Text(_selectedCity,
+                            Text(_selectedCity ?? l10n.allCities,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
                             const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
@@ -281,10 +305,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         onTap: () => setState(() => _activeFilter = _SortFilter.topRated),
                       ),
                       _FilterChip(
-                        label: l10n.filterNearest,
-                        icon: Icons.near_me_outlined,
-                        selected: _activeFilter == _SortFilter.nearest,
-                        onTap: () => setState(() => _activeFilter = _SortFilter.nearest),
+                        label: l10n.filterMostReviewed,
+                        icon: Icons.reviews_outlined,
+                        selected: _activeFilter == _SortFilter.mostReviewed,
+                        onTap: () => setState(() => _activeFilter = _SortFilter.mostReviewed),
                       ),
                     ],
                   ),
@@ -294,7 +318,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      l10n.clinicsInCity(stations.length, _selectedCity),
+                      // With no city selected the "… in {city}" phrasing would
+                      // read as a lie, so fall back to a plain count.
+                      _selectedCity == null
+                          ? l10n.clinicsFound(stations.length)
+                          : l10n.clinicsInCity(stations.length, _selectedCity!),
                       style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
                     ),
                     InkWell(
@@ -663,12 +691,27 @@ class _StationCard extends StatelessWidget {
                           ],
                           Row(
                             children: [
-                              RatingBadge(rating: station.rating, reviewCount: station.reviewCount, dense: true),
+                              RatingBadge(
+                                rating: station.rating,
+                                reviewCount: station.reviewCount,
+                                dense: true,
+                                emptyLabel: AppLocalizations.of(context)!.noRatingsYet,
+                              ),
                               const SizedBox(width: 8),
                               const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
                               const SizedBox(width: 2),
-                              Text('${station.distanceKm.toStringAsFixed(1)} km',
-                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                              // The real street and city, now that the search
+                              // endpoint returns them. This slot used to show
+                              // "0.0 km" for every clinic — the distance it showed
+                              // had no source and was always zero.
+                              Expanded(
+                                child: Text(
+                                  station.locationLine,
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -787,8 +830,10 @@ class _EmptyState extends StatelessWidget {
 
 class _CityPickerSheet extends StatelessWidget {
   final List<String> cities;
-  final String selected;
-  final ValueChanged<String> onSelect;
+
+  /// `null` is a real choice here, not "nothing picked": it means every city.
+  final String? selected;
+  final ValueChanged<String?> onSelect;
 
   const _CityPickerSheet({
     required this.cities,
@@ -837,7 +882,10 @@ class _CityPickerSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s5),
-          ...cities.map((c) {
+          // "All cities" leads the list so there is always a way back out of a
+          // filter — and so the sheet is never empty when the API returns
+          // clinics with no city recorded.
+          ...<String?>[null, ...cities].map((c) {
             final isSelected = c == selected;
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.s2),
@@ -863,7 +911,7 @@ class _CityPickerSheet extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.location_city_rounded,
+                          c == null ? Icons.public_rounded : Icons.location_city_rounded,
                           size: 16,
                           color: isSelected ? Colors.white : AppColors.primary,
                         ),
@@ -871,7 +919,7 @@ class _CityPickerSheet extends StatelessWidget {
                       const SizedBox(width: AppSpacing.s3),
                       Expanded(
                         child: Text(
-                          c,
+                          c ?? AppLocalizations.of(context)!.allCities,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
