@@ -42,19 +42,76 @@ class Pet {
         isFavourite: isFavourite ?? this.isFavourite,
       );
 
-  String get ageLabel {
-    if (birthDate == null) return 'Age unknown';
-    final now = DateTime.now();
+  /// Completed years, or null when there is no birth date — and null for
+  /// a pet under one, where months are the useful unit.
+  int? ageInYears([DateTime? asOf]) {
+    if (birthDate == null) return null;
+    final now = asOf ?? DateTime.now();
     var years = now.year - birthDate!.year;
     if (now.month < birthDate!.month ||
         (now.month == birthDate!.month && now.day < birthDate!.day)) {
       years--;
     }
-    if (years < 1) {
-      final months = (now.difference(birthDate!).inDays / 30).floor();
-      return '$months mo';
+    return years < 1 ? null : years;
+  }
+
+  /// Whole months, used only while a pet is under a year old — "8 months"
+  /// says something about a puppy that "0 years" does not.
+  int? ageInMonths([DateTime? asOf]) {
+    if (birthDate == null || ageInYears(asOf) != null) return null;
+    final now = asOf ?? DateTime.now();
+    var months = (now.year - birthDate!.year) * 12 + now.month - birthDate!.month;
+    if (now.day < birthDate!.day) months--;
+    return months < 0 ? 0 : months;
+  }
+
+  // ─── Birthdays ───────────────────────────────────────────────────────
+  //
+  // Every pet in the database has a birth date and nothing ever used it
+  // beyond an untranslated "7 yr". A vet app that knows when your dog was
+  // born and never mentions it is leaving the nicest thing it knows on
+  // the floor.
+
+  /// The next time this pet's birthday comes round, from [asOf].
+  /// Today counts as the birthday, not as one already missed.
+  DateTime? nextBirthday([DateTime? asOf]) {
+    if (birthDate == null) return null;
+    final now = asOf ?? DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // A 29 February birthday falls back to the 28th in common years,
+    // rather than silently rolling into March.
+    DateTime on(int year) {
+      final lastDay = DateTime(year, birthDate!.month + 1, 0).day;
+      return DateTime(year, birthDate!.month, birthDate!.day.clamp(1, lastDay));
     }
-    return '$years yr';
+
+    final thisYear = on(today.year);
+    return thisYear.isBefore(today) ? on(today.year + 1) : thisYear;
+  }
+
+  /// Days until the next birthday; 0 means it is today.
+  int? daysUntilBirthday([DateTime? asOf]) {
+    final next = nextBirthday(asOf);
+    if (next == null) return null;
+    final now = asOf ?? DateTime.now();
+    return next.difference(DateTime(now.year, now.month, now.day)).inDays;
+  }
+
+  bool isBirthdayToday([DateTime? asOf]) => daysUntilBirthday(asOf) == 0;
+
+  /// The age this pet reaches on its next birthday.
+  int? turningAge([DateTime? asOf]) {
+    final next = nextBirthday(asOf);
+    if (next == null || birthDate == null) return null;
+    return next.year - birthDate!.year;
+  }
+
+  /// Whether the birthday is close enough to be worth mentioning.
+  /// Two weeks: far enough to be useful, near enough not to be noise.
+  bool birthdayIsNear([DateTime? asOf]) {
+    final days = daysUntilBirthday(asOf);
+    return days != null && days <= 14;
   }
 }
 

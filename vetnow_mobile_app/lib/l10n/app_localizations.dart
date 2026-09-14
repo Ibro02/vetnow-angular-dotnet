@@ -268,6 +268,48 @@ abstract class AppLocalizations {
   /// **'Ne mogu otvoriti mape na ovom uređaju.'**
   String get couldNotOpenMaps;
 
+  /// No description provided for @ageYears.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{{count} godina} few{{count} godine} other{{count} godina}}'**
+  String ageYears(int count);
+
+  /// No description provided for @ageMonths.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{{count} mjesec} few{{count} mjeseca} other{{count} mjeseci}}'**
+  String ageMonths(int count);
+
+  /// No description provided for @ageUnknown.
+  ///
+  /// In bs, this message translates to:
+  /// **'Starost nepoznata'**
+  String get ageUnknown;
+
+  /// No description provided for @birthdayToday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Rođendan danas!'**
+  String get birthdayToday;
+
+  /// No description provided for @birthdayInDays.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{Rođendan za {count} dan} few{Rođendan za {count} dana} other{Rođendan za {count} dana}}'**
+  String birthdayInDays(int count);
+
+  /// No description provided for @turnsAge.
+  ///
+  /// In bs, this message translates to:
+  /// **'{name} puni {age}'**
+  String turnsAge(String name, String age);
+
+  /// No description provided for @notificationsBirthdays.
+  ///
+  /// In bs, this message translates to:
+  /// **'Rođendani'**
+  String get notificationsBirthdays;
+
   /// No description provided for @dayMonday.
   ///
   /// In bs, this message translates to:

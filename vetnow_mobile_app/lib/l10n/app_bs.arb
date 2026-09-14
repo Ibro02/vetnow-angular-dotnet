@@ -47,6 +47,34 @@
   "clinicReviews": "Recenzije klinike",
   "pickRating": "Odaberi ocjenu",
   "couldNotOpenMaps": "Ne mogu otvoriti mape na ovom uređaju.",
+  "ageYears": "{count, plural, one{{count} godina} few{{count} godine} other{{count} godina}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "ageMonths": "{count, plural, one{{count} mjesec} few{{count} mjeseca} other{{count} mjeseci}}",
+  "@ageMonths": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "ageUnknown": "Starost nepoznata",
+  "birthdayToday": "Rođendan danas!",
+  "birthdayInDays": "{count, plural, one{Rođendan za {count} dan} few{Rođendan za {count} dana} other{Rođendan za {count} dana}}",
+  "@birthdayInDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "turnsAge": "{name} puni {age}",
+  "@turnsAge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "age": {"type": "String"}
+    }
+  },
+  "notificationsBirthdays": "Rođendani",
   "dayMonday": "Ponedjeljak",
   "dayTuesday": "Utorak",
   "dayWednesday": "Srijeda",

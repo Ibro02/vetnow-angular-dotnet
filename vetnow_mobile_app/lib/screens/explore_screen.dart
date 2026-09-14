@@ -11,6 +11,7 @@ import '../widgets/verified_badge.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/app_button.dart';
 import '../widgets/clinic_avatar.dart';
+import '../widgets/entrance.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/vet_hero_background.dart';
 import 'notifications_screen.dart';
@@ -412,10 +413,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
                 itemBuilder: (context, index) {
                   final station = stations[index];
-                  return _StationCard(
-                    station: station,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => VetStationDetailScreen(station: station)),
+                  // Keyed by clinic, so re-sorting or filtering doesn't replay
+                  // the entrance on cards that were already on screen.
+                  return Entrance(
+                    key: ValueKey(station.id),
+                    index: index,
+                    child: _StationCard(
+                      station: station,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => VetStationDetailScreen(station: station)),
+                      ),
                     ),
                   );
                 },

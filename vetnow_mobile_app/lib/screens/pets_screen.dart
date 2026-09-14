@@ -7,8 +7,11 @@ import '../services/appointment_api_service.dart';
 import '../services/pets_api_service.dart';
 import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
+import '../widgets/entrance.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/pet_age.dart';
+import '../widgets/pet_avatar.dart';
 import '../widgets/action_sheet.dart';
 import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
@@ -47,7 +50,13 @@ class _PetsScreenState extends State<PetsScreen> {
   String? _speciesFilter;
   bool _favouritesOnly = false;
 
-  static const _palette = [AppColors.primary, AppColors.accent, AppColors.gold, AppColors.info, AppColors.secondary];
+  static const _palette = [
+    AppColors.primary,
+    AppColors.accent,
+    AppColors.gold,
+    AppColors.info,
+    AppColors.secondary
+  ];
   Color _paletteFor(int index) => _palette[index % _palette.length];
 
   @override
@@ -238,7 +247,12 @@ class _PetsScreenState extends State<PetsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(colors: [AppColors.accent, AppColors.accentHover]),
-                boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6))],
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6))
+                ],
               ),
               child: FloatingActionButton(
                 onPressed: () async {
@@ -286,7 +300,8 @@ class _PetsScreenState extends State<PetsScreen> {
                   ),
                   if (_pets.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
                       child: _ViewModeSwitch(
                         mode: _viewMode,
                         onChanged: (m) => setState(() => _viewMode = m),
@@ -297,12 +312,15 @@ class _PetsScreenState extends State<PetsScreen> {
                         ? Center(
                             child: Padding(
                               padding: const EdgeInsets.all(AppSpacing.pagePadding),
-                              child: Text(l10n.networkError, style: const TextStyle(color: AppColors.textMuted)),
+                              child:
+                                  Text(l10n.networkError, style: const TextStyle(color: AppColors.textMuted)),
                             ),
                           )
                         : _pets.isEmpty
                             ? _EmptyPetsState(l10n: l10n)
-                            : (_viewMode == _ViewMode.list ? _buildListView(l10n) : _buildDashboardView(l10n)),
+                            : (_viewMode == _ViewMode.list
+                                ? _buildListView(l10n)
+                                : _buildDashboardView(l10n)),
                   ),
                 ],
               ),
@@ -314,20 +332,23 @@ class _PetsScreenState extends State<PetsScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 0),
+          padding:
+              const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 0),
           child: Row(
             children: [
               const Icon(Icons.swap_vert_rounded, size: 14, color: AppColors.textMuted),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(l10n.dragWholeCardHint, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                child: Text(l10n.dragWholeCardHint,
+                    style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
               ),
             ],
           ),
         ),
         Expanded(
           child: ReorderableListView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 100),
+            padding:
+                const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 100),
             itemCount: _pets.length,
             onReorderItem: _onReorder,
             itemBuilder: (context, index) {
@@ -372,7 +393,8 @@ class _PetsScreenState extends State<PetsScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
+          padding:
+              const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surface,
@@ -404,9 +426,13 @@ class _PetsScreenState extends State<PetsScreen> {
                 filled: true,
                 fillColor: AppColors.surface,
                 contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
               ),
             ),
           ),
@@ -426,10 +452,16 @@ class _PetsScreenState extends State<PetsScreen> {
                 onTap: () => setState(() => _favouritesOnly = !_favouritesOnly),
               ),
               const SizedBox(width: 8),
-              _FilterPill(label: l10n.filterAllSpecies, selected: _speciesFilter == null, onTap: () => setState(() => _speciesFilter = null)),
+              _FilterPill(
+                  label: l10n.filterAllSpecies,
+                  selected: _speciesFilter == null,
+                  onTap: () => setState(() => _speciesFilter = null)),
               ...species.map((s) => Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: _FilterPill(label: s, selected: _speciesFilter == s, onTap: () => setState(() => _speciesFilter = s)),
+                    child: _FilterPill(
+                        label: s,
+                        selected: _speciesFilter == s,
+                        onTap: () => setState(() => _speciesFilter = s)),
                   )),
             ],
           ),
@@ -437,7 +469,8 @@ class _PetsScreenState extends State<PetsScreen> {
         const SizedBox(height: AppSpacing.s3),
         Expanded(
           child: filtered.isEmpty
-              ? Center(child: Text(l10n.noPetsMatchFilter, style: const TextStyle(color: AppColors.textMuted)))
+              ? Center(
+                  child: Text(l10n.noPetsMatchFilter, style: const TextStyle(color: AppColors.textMuted)))
               : GridView.builder(
                   padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 100),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -450,24 +483,30 @@ class _PetsScreenState extends State<PetsScreen> {
                   itemBuilder: (context, index) {
                     final pet = filtered[index];
                     final colorIndex = _pets.indexOf(pet);
-                    return _PetGridCard(
-                      pet: pet,
-                      color: _paletteFor(colorIndex),
-                      visitCount: _visitCounts[pet.id] ?? 0,
-                      onTap: () async {
-                        final changed = await Navigator.of(context).push<bool>(
-                          MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
-                        );
-                        if (changed == true) _load();
-                      },
-                      onEdit: () async {
-                        final changed = await Navigator.of(context).push<bool>(
-                          MaterialPageRoute(builder: (_) => AddPetScreen(existingPet: pet)),
-                        );
-                        if (changed == true) _load();
-                      },
-                      onDelete: () => _deletePet(pet),
-                      onToggleFavourite: () => _toggleFavourite(pet),
+                    // Keyed by pet, so filtering the grid doesn't replay the
+                    // entrance on tiles that never left the screen.
+                    return Entrance(
+                      key: ValueKey(pet.id),
+                      index: index,
+                      child: _PetGridCard(
+                        pet: pet,
+                        color: _paletteFor(colorIndex),
+                        visitCount: _visitCounts[pet.id] ?? 0,
+                        onTap: () async {
+                          final changed = await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
+                          );
+                          if (changed == true) _load();
+                        },
+                        onEdit: () async {
+                          final changed = await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(builder: (_) => AddPetScreen(existingPet: pet)),
+                          );
+                          if (changed == true) _load();
+                        },
+                        onDelete: () => _deletePet(pet),
+                        onToggleFavourite: () => _toggleFavourite(pet),
+                      ),
                     );
                   },
                 ),
@@ -487,11 +526,13 @@ class _ViewModeSwitch extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: AppColors.bgMuted, borderRadius: BorderRadius.circular(AppRadius.full)),
+      decoration:
+          BoxDecoration(color: AppColors.bgMuted, borderRadius: BorderRadius.circular(AppRadius.full)),
       child: Row(
         children: [
           Expanded(child: _segment(context, _ViewMode.list, Icons.view_list_rounded, l10n.viewList)),
-          Expanded(child: _segment(context, _ViewMode.dashboard, Icons.grid_view_rounded, l10n.viewDashboard)),
+          Expanded(
+              child: _segment(context, _ViewMode.dashboard, Icons.grid_view_rounded, l10n.viewDashboard)),
         ],
       ),
     );
@@ -514,7 +555,11 @@ class _ViewModeSwitch extends StatelessWidget {
           children: [
             Icon(icon, size: 15, color: selected ? Colors.white : AppColors.textSecondary),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: selected ? Colors.white : AppColors.textSecondary)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : AppColors.textSecondary)),
           ],
         ),
       ),
@@ -528,7 +573,8 @@ class _FilterPill extends StatelessWidget {
   final VoidCallback onTap;
   final IconData? icon;
   final Color? accentColor;
-  const _FilterPill({required this.label, required this.selected, required this.onTap, this.icon, this.accentColor});
+  const _FilterPill(
+      {required this.label, required this.selected, required this.onTap, this.icon, this.accentColor});
 
   @override
   Widget build(BuildContext context) {
@@ -553,7 +599,11 @@ class _FilterPill extends StatelessWidget {
               Icon(icon, size: 13, color: selected ? Colors.white : AppColors.textSecondary),
               const SizedBox(width: 5),
             ],
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? Colors.white : AppColors.textSecondary)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : AppColors.textSecondary)),
           ],
         ),
       ),
@@ -587,7 +637,9 @@ class _PetListCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: pet.isFavourite ? AppColors.gold.withValues(alpha: 0.5) : AppColors.borderLight, width: pet.isFavourite ? 1.5 : 1),
+        border: Border.all(
+            color: pet.isFavourite ? AppColors.gold.withValues(alpha: 0.5) : AppColors.borderLight,
+            width: pet.isFavourite ? 1.5 : 1),
         boxShadow: AppShadows.card,
       ),
       child: Material(
@@ -602,15 +654,21 @@ class _PetListCard extends StatelessWidget {
               children: [
                 Stack(
                   children: [
-                    Container(
-                      height: 56,
-                      width: 56,
+                    // Its own species, its own colours. Every pet used to wear
+                    // the identical paw icon, so a list of ten pets read as
+                    // one pet listed ten times.
+                    DecoratedBox(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(Icons.pets, color: Colors.white, size: 26),
+                      child: PetAvatar(species: pet.species, seed: pet.id, size: 56),
                     ),
                     if (pet.isFavourite)
                       Positioned(
@@ -629,7 +687,10 @@ class _PetListCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(pet.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(pet.name,
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       Wrap(
                         spacing: 6,
@@ -639,13 +700,22 @@ class _PetListCard extends StatelessWidget {
                           if (pet.species.isNotEmpty)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppRadius.full)),
-                              child: Text(pet.species, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
+                              decoration: BoxDecoration(
+                                  color: color.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(AppRadius.full)),
+                              child: Text(pet.species,
+                                  style:
+                                      TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
                             ),
-                          Text(pet.ageLabel, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                          Text(petAgeLabel(context, pet),
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                          // Only appears in the fortnight before the day, and
+                          // only turns gold on the day itself.
+                          PetBirthdayBadge(pet: pet),
                           if (visitCount > 0) ...[
                             const Icon(Icons.event_available, size: 12, color: AppColors.textMuted),
-                            Text('$visitCount ${l10n.visits}', style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                            Text('$visitCount ${l10n.visits}',
+                                style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
                           ],
                         ],
                       ),
@@ -670,8 +740,17 @@ class _PetListCard extends StatelessWidget {
                         context,
                         title: pet.name,
                         items: [
-                          ActionSheetItem(icon: Icons.edit_outlined, label: l10n.editPet, color: AppColors.primary, onTap: onEdit),
-                          ActionSheetItem(icon: Icons.delete_outline, label: l10n.deletePet, color: AppColors.danger, onTap: onDelete, isDestructive: true),
+                          ActionSheetItem(
+                              icon: Icons.edit_outlined,
+                              label: l10n.editPet,
+                              color: AppColors.primary,
+                              onTap: onEdit),
+                          ActionSheetItem(
+                              icon: Icons.delete_outline,
+                              label: l10n.deletePet,
+                              color: AppColors.danger,
+                              onTap: onDelete,
+                              isDestructive: true),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(AppRadius.full),
@@ -719,7 +798,9 @@ class _PetGridCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: pet.isFavourite ? AppColors.gold.withValues(alpha: 0.6) : AppColors.borderLight, width: pet.isFavourite ? 1.5 : 1),
+        border: Border.all(
+            color: pet.isFavourite ? AppColors.gold.withValues(alpha: 0.6) : AppColors.borderLight,
+            width: pet.isFavourite ? 1.5 : 1),
         boxShadow: AppShadows.card,
       ),
       clipBehavior: Clip.antiAlias,
@@ -735,12 +816,7 @@ class _PetGridCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.65)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                      ),
-                      child: const Center(child: Icon(Icons.pets, color: Colors.white, size: 38)),
-                    ),
+                    PetAvatar(species: pet.species, seed: pet.id, expand: true),
                     Positioned(
                       top: 6,
                       right: 6,
@@ -749,7 +825,8 @@ class _PetGridCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadius.full),
                         child: Container(
                           padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
                           child: Icon(
                             pet.isFavourite ? Icons.star_rounded : Icons.star_border_rounded,
                             color: pet.isFavourite ? AppColors.gold : Colors.white,
@@ -766,14 +843,24 @@ class _PetGridCard extends StatelessWidget {
                           context,
                           title: pet.name,
                           items: [
-                            ActionSheetItem(icon: Icons.edit_outlined, label: l10n.editPet, color: AppColors.primary, onTap: onEdit),
-                            ActionSheetItem(icon: Icons.delete_outline, label: l10n.deletePet, color: AppColors.danger, onTap: onDelete, isDestructive: true),
+                            ActionSheetItem(
+                                icon: Icons.edit_outlined,
+                                label: l10n.editPet,
+                                color: AppColors.primary,
+                                onTap: onEdit),
+                            ActionSheetItem(
+                                icon: Icons.delete_outline,
+                                label: l10n.deletePet,
+                                color: AppColors.danger,
+                                onTap: onDelete,
+                                isDestructive: true),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(AppRadius.full),
                         child: Container(
                           padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
                           child: const Icon(Icons.more_vert, color: Colors.white, size: 15),
                         ),
                       ),
@@ -782,27 +869,36 @@ class _PetGridCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.s3, AppSpacing.s2, AppSpacing.s3, AppSpacing.s2),
+                padding:
+                    const EdgeInsets.fromLTRB(AppSpacing.s3, AppSpacing.s2, AppSpacing.s3, AppSpacing.s2),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(pet.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(pet.name,
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 3),
                     if (pet.species.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppRadius.full)),
-                        child: Text(pet.species, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color)),
+                        decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(AppRadius.full)),
+                        child: Text(pet.species,
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color)),
                       ),
                     const SizedBox(height: 3),
-                    Text(pet.ageLabel, style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                    Text(petAgeLabel(context, pet),
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
                     if (visitCount > 0) ...[
                       const SizedBox(height: 1),
                       Row(
                         children: [
                           const Icon(Icons.event_available, size: 11, color: AppColors.textMuted),
                           const SizedBox(width: 3),
-                          Text('$visitCount ${l10n.visits}', style: const TextStyle(color: AppColors.textMuted, fontSize: 10.5)),
+                          Text('$visitCount ${l10n.visits}',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 10.5)),
                         ],
                       ),
                     ],
@@ -836,7 +932,8 @@ class _EmptyPetsState extends StatelessWidget {
               child: const Icon(Icons.pets, size: 38, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.s5),
-            Text(l10n.noPetsYet, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.text)),
+            Text(l10n.noPetsYet,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.text)),
           ],
         ),
       ),

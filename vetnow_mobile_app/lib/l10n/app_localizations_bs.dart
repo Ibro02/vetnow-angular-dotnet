@@ -114,6 +114,56 @@ class AppLocalizationsBs extends AppLocalizations {
   String get couldNotOpenMaps => 'Ne mogu otvoriti mape na ovom uređaju.';
 
   @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count godina',
+      few: '$count godine',
+      one: '$count godina',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mjeseci',
+      few: '$count mjeseca',
+      one: '$count mjesec',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ageUnknown => 'Starost nepoznata';
+
+  @override
+  String get birthdayToday => 'Rođendan danas!';
+
+  @override
+  String birthdayInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Rođendan za $count dana',
+      few: 'Rođendan za $count dana',
+      one: 'Rođendan za $count dan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String turnsAge(String name, String age) {
+    return '$name puni $age';
+  }
+
+  @override
+  String get notificationsBirthdays => 'Rođendani';
+
+  @override
   String get dayMonday => 'Ponedjeljak';
 
   @override

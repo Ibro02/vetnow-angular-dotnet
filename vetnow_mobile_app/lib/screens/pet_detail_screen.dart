@@ -6,6 +6,7 @@ import '../services/api_client.dart';
 import '../services/pets_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/pet_age.dart';
 import '../widgets/premium_dialog.dart';
 
 /// Shows a pet's profile — mirrors Animal.cs fields where the backend
@@ -106,7 +107,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       Text(pet.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
                       const SizedBox(height: 2),
                       Text(
-                        pet.species.isNotEmpty ? '${pet.species} · ${pet.ageLabel}' : pet.ageLabel,
+                        pet.species.isNotEmpty ? '${pet.species} · ${petAgeLabel(context, pet)}' : petAgeLabel(context, pet),
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5),
                       ),
                     ],
@@ -148,7 +149,7 @@ class _InfoGrid extends StatelessWidget {
     final rows = <(IconData, String, String)>[
       (Icons.pets_outlined, l10n.species, pet.species.isNotEmpty ? pet.species : '—'),
       (Icons.category_outlined, l10n.breed, pet.breed.isNotEmpty ? pet.breed : '—'),
-      (Icons.cake_outlined, l10n.age, pet.ageLabel),
+      (Icons.cake_outlined, l10n.age, petAgeLabel(context, pet)),
       if (pet.weightKg != null) (Icons.monitor_weight_outlined, l10n.weight, '${pet.weightKg} kg'),
       if (pet.microchipNumber != null) (Icons.qr_code_2_outlined, l10n.microchip, pet.microchipNumber!),
     ];

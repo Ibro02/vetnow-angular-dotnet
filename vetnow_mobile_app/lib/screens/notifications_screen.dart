@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
+import '../models/pet.dart';
 import '../models/review.dart';
 import '../services/appointment_api_service.dart';
+import '../services/pets_api_service.dart';
 import '../services/review_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
@@ -35,6 +37,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   List<RemoteAppointment> _upcoming = const [];
   List<PendingReview> _pending = const [];
 
+  /// Pets with a birthday inside the fortnight. The dates were sitting in
+  /// the database all along, used for nothing but an age label.
+  List<Pet> _birthdays = const [];
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -63,12 +69,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       AppointmentApiService.getByCustomer(customerId: userId, token: token)
           .catchError((_) => <RemoteAppointment>[]),
       ReviewApiService.pending(token).catchError((_) => <PendingReview>[]),
+      // Species names aren't needed to spot a birthday, so the pets are
+      // fetched raw and mapped without waiting on the species list.
+      PetsApiService.getByOwnerRaw(ownerId: userId, token: token)
+          .catchError((_) => <Map<String, dynamic>>[]),
     ]);
 
     if (!mounted) return;
+
+    final pets = PetsApiService.mapPets(results[2] as List<Map<String, dynamic>>, null);
+    final soon = pets.where((p) => p.birthdayIsNear()).toList()
+      ..sort((a, b) => a.daysUntilBirthday()!.compareTo(b.daysUntilBirthday()!));
+
     setState(() {
       _upcoming = results[0] as List<RemoteAppointment>;
       _pending = results[1] as List<PendingReview>;
+      _birthdays = soon;
       _loading = false;
     });
   }
@@ -142,7 +158,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _content(BuildContext context, AppLocalizations l10n) {
-    if (_upcoming.isEmpty && _pending.isEmpty) {
+    if (_upcoming.isEmpty && _pending.isEmpty && _birthdays.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
@@ -177,7 +193,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         AppSpacing.s16,
       ),
       children: [
-        // Ratings first: they're the only rows with something to do.
+        // Birthdays lead when one is today — nothing else on this screen
+        // is worth burying that under.
+        if (_birthdays.isNotEmpty) ...[
+          NotificationSectionLabel(text: l10n.notificationsBirthdays, count: _birthdays.length),
+          const SizedBox(height: AppSpacing.s3),
+          ..._birthdays.map(
+            (p) => NotificationTile(
+              icon: Icons.cake_rounded,
+              iconGradient: AppGradients.gold,
+              title: l10n.turnsAge(p.name, l10n.ageYears(p.turningAge() ?? 0)),
+              subtitle: p.isBirthdayToday()
+                  ? l10n.birthdayToday
+                  : l10n.birthdayInDays(p.daysUntilBirthday()!),
+              trailingNote: p.species,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s6),
+        ],
+        // Ratings next: they're the only rows with something to do.
         if (_pending.isNotEmpty) ...[
           NotificationSectionLabel(text: l10n.notificationsAwaitingReview, count: _pending.length),
           const SizedBox(height: AppSpacing.s3),

@@ -8,6 +8,7 @@ import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/pet_age.dart';
 import 'edit_profile_screen.dart';
 import 'notifications_screen.dart';
 import '../widgets/premium_dialog.dart';
@@ -287,7 +288,7 @@ class _PetsRow extends StatelessWidget {
                           child: Text(p.species, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: color)),
                         )
                       else
-                        Text(p.ageLabel, style: const TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
+                        Text(petAgeLabel(context, p), style: const TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
                     ],
                   ),
                 ),
