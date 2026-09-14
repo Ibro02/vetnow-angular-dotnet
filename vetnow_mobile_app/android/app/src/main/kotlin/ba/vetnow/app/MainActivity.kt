@@ -1,4 +1,4 @@
-package com.example.vetnow_mobile
+package ba.vetnow.app
 
 import io.flutter.embedding.android.FlutterActivity
 

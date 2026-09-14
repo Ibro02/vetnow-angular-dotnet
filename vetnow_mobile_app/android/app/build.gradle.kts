@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.vetnow_mobile"
+    namespace = "ba.vetnow.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,8 +15,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.vetnow_mobile"
+        // Real application id. Google Play refuses anything under
+        // "com.example", so the default Flutter placeholder could never
+        // have been published.
+        applicationId = "ba.vetnow.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
