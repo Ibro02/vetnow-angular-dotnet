@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Endpoints.PersonEndpoints;
+using VetStat.DTOs.Responses;
 using VetStat.Models;
 using Xunit;
 
@@ -32,8 +33,11 @@ public class PersonAddEndpointTests
 
         var result = await endpoint.HandleAsync(ValidPerson());
 
+        // Registration answers with a DTO, never the Person entity — which is
+        // what keeps the password hash off the wire. This test still expected
+        // the raw entity from before that change.
         var ok = Assert.IsType<OkObjectResult>(result.Result);
-        var person = Assert.IsType<Person>(ok.Value);
+        var person = Assert.IsType<PersonResponse>(ok.Value);
         Assert.Equal("user@example.com", person.Email);
     }
 

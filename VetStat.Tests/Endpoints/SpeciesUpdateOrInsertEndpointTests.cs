@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using VetStat.Data;
+using VetStat.Helpers.Auth;
 using VetStat.Endpoints.SpeciesEndpoints;
 using VetStat.Helpers.Services;
 using VetStat.Models;
@@ -56,21 +58,24 @@ public class SpeciesUpdateOrInsertEndpointTests
     }
 
     [Fact]
-    public async Task Save_WhenNotLoggedIn_ReturnsBadRequest()
+    public void Save_IsGuardedByTheAuthorizationPipeline()
     {
-        var db = CreateDb("Species_NotLoggedIn");
-        // No token in DB and no header → IsLogged() returns false
-        var endpoint = CreateEndpoint(db, tokenHeader: null);
+        // This used to assert that the handler itself returned BadRequest for
+        // an anonymous caller. It no longer checks: the guard moved onto the
+        // class as a policy, which is the better place for it — the request is
+        // rejected before any handler code runs, so an unauthenticated call
+        // can't reach the database at all.
+        //
+        // The thing worth protecting now is that the attribute stays put, so
+        // that is what this asserts. Deleting the [Authorize] would silently
+        // open the endpoint to anyone; this fails instead.
+        var attribute = typeof(SpeciesUpdateOrInsertEndpoint)
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
+            .Cast<AuthorizeAttribute>()
+            .SingleOrDefault();
 
-        var result = await endpoint.HandleAsync(new SpeciesUpdateOrInsertRequest
-        {
-            SpeciesName = "Cat",
-            Behavior = "Curious",
-            Diet = "Carnivore"
-        });
-
-        var bad = Assert.IsType<BadRequestObjectResult>(result.Result);
-        Assert.Contains("not logged in", bad.Value?.ToString());
+        Assert.NotNull(attribute);
+        Assert.Equal(AuthorizationPolicies.AtLeastEmployee, attribute!.Policy);
     }
 
     [Fact]
