@@ -685,9 +685,15 @@ class _StationCard extends StatelessWidget {
                               alignment: Alignment.center,
                               padding: const EdgeInsets.symmetric(vertical: 3),
                               color: Colors.black54,
-                              child: const Text('Closed',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                              // Real now — the search endpoint sends the clinic's
+                              // open state, worked out from its staff schedules.
+                              // This ribbon was untranslated English and never
+                              // appeared, because nothing ever set the flag.
+                              child: Text(
+                                AppLocalizations.of(context)!.closedDay,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+                              ),
                             ),
                           ),
                       ],

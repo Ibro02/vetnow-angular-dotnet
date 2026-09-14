@@ -268,6 +268,84 @@ abstract class AppLocalizations {
   /// **'Ne mogu otvoriti mape na ovom uređaju.'**
   String get couldNotOpenMaps;
 
+  /// No description provided for @dayMonday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ponedjeljak'**
+  String get dayMonday;
+
+  /// No description provided for @dayTuesday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Utorak'**
+  String get dayTuesday;
+
+  /// No description provided for @dayWednesday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Srijeda'**
+  String get dayWednesday;
+
+  /// No description provided for @dayThursday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Četvrtak'**
+  String get dayThursday;
+
+  /// No description provided for @dayFriday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Petak'**
+  String get dayFriday;
+
+  /// No description provided for @daySaturday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Subota'**
+  String get daySaturday;
+
+  /// No description provided for @daySunday.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nedjelja'**
+  String get daySunday;
+
+  /// No description provided for @closedDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Zatvoreno'**
+  String get closedDay;
+
+  /// No description provided for @openNowLabel.
+  ///
+  /// In bs, this message translates to:
+  /// **'Otvoreno sada'**
+  String get openNowLabel;
+
+  /// No description provided for @closedNowLabel.
+  ///
+  /// In bs, this message translates to:
+  /// **'Trenutno zatvoreno'**
+  String get closedNowLabel;
+
+  /// No description provided for @openingHours.
+  ///
+  /// In bs, this message translates to:
+  /// **'Radno vrijeme'**
+  String get openingHours;
+
+  /// No description provided for @noScheduleYet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Radno vrijeme još nije uneseno.'**
+  String get noScheduleYet;
+
+  /// No description provided for @staffOnDuty.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count} u smjeni'**
+  String staffOnDuty(int count);
+
   /// No description provided for @notificationsEmpty.
   ///
   /// In bs, this message translates to:

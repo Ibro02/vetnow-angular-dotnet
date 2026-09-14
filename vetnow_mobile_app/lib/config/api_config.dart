@@ -94,4 +94,10 @@ class ApiConfig {
 
   /// GET — authenticated. Past visits of mine that still have no review.
   static const String reviewPending = '/api/Review/Pending';
+
+  // ─── Opening hours ──────────────────────────────────────
+
+  /// GET — anonymous. Per-day hours for one clinic, derived from its staff
+  /// schedules, plus whether it is open right now.
+  static const String vetStationOpeningHours = '/api/VetStation/OpeningHours';
 }

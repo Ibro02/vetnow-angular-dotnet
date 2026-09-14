@@ -114,6 +114,47 @@ class AppLocalizationsSr extends AppLocalizations {
   String get couldNotOpenMaps => 'Ne mogu otvoriti mape na ovom uređaju.';
 
   @override
+  String get dayMonday => 'Ponedjeljak';
+
+  @override
+  String get dayTuesday => 'Utorak';
+
+  @override
+  String get dayWednesday => 'Srijeda';
+
+  @override
+  String get dayThursday => 'Četvrtak';
+
+  @override
+  String get dayFriday => 'Petak';
+
+  @override
+  String get daySaturday => 'Subota';
+
+  @override
+  String get daySunday => 'Nedjelja';
+
+  @override
+  String get closedDay => 'Zatvoreno';
+
+  @override
+  String get openNowLabel => 'Otvoreno sada';
+
+  @override
+  String get closedNowLabel => 'Trenutno zatvoreno';
+
+  @override
+  String get openingHours => 'Radno vrijeme';
+
+  @override
+  String get noScheduleYet => 'Radno vrijeme još nije uneseno.';
+
+  @override
+  String staffOnDuty(int count) {
+    return '$count u smjeni';
+  }
+
+  @override
   String get notificationsEmpty => 'Sve je čisto — nema ničega novog.';
 
   @override

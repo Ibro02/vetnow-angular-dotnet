@@ -47,6 +47,24 @@
   "clinicReviews": "Recenzije klinike",
   "pickRating": "Odaberi ocjenu",
   "couldNotOpenMaps": "Ne mogu otvoriti mape na ovom uređaju.",
+  "dayMonday": "Ponedjeljak",
+  "dayTuesday": "Utorak",
+  "dayWednesday": "Srijeda",
+  "dayThursday": "Četvrtak",
+  "dayFriday": "Petak",
+  "daySaturday": "Subota",
+  "daySunday": "Nedjelja",
+  "closedDay": "Zatvoreno",
+  "openNowLabel": "Otvoreno sada",
+  "closedNowLabel": "Trenutno zatvoreno",
+  "openingHours": "Radno vrijeme",
+  "noScheduleYet": "Radno vrijeme još nije uneseno.",
+  "staffOnDuty": "{count} u smjeni",
+  "@staffOnDuty": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "notificationsEmpty": "Sve je čisto — nema ničega novog.",
   "notificationsUpcoming": "Nadolazeći termini",
   "notificationsAwaitingReview": "Čekaju tvoju ocjenu",

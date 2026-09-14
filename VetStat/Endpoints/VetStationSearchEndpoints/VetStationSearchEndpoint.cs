@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 using static VetStat.Endpoints.VetStationSearchEndpoints.VetStationSearchEndpoint;
 
 namespace VetStat.Endpoints.VetStationSearchEndpoints;
@@ -14,10 +15,12 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
     .WithResult<VetStationSearchResponse>
 {
     private readonly DataContext _db;
+    private readonly OpeningHoursService _hours;
 
-    public VetStationSearchEndpoint(DataContext db)
+    public VetStationSearchEndpoint(DataContext db, OpeningHoursService hours)
     {
         _db = db;
+        _hours = hours;
     }
 
     [HttpGet]
@@ -116,6 +119,17 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
         foreach (var station in vetStations)
             station.AverageRating = Math.Round(station.AverageRating, 1);
 
+        // "Open now" for the whole page in two queries, not one per clinic.
+        // The list used to render an open/closed state the server never sent,
+        // so every clinic silently read as open around the clock.
+        var now = DateTime.Now;
+        var weeks = await _hours.GetWeekAsync(vetStations.Select(s => s.Id).ToList(), cancellationToken);
+        foreach (var station in vetStations)
+        {
+            if (weeks.TryGetValue(station.Id, out var week))
+                station.IsOpenNow = OpeningHoursService.IsOpenAt(week, now);
+        }
+
         return new VetStationSearchResponse
         {
             VetStations = vetStations
@@ -166,6 +180,9 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
         /// <summary>Mean of every review for this clinic, 0 when it has none.</summary>
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+
+        /// <summary>Whether the clinic is open at the moment of the request.</summary>
+        public bool IsOpenNow { get; set; }
 
         public bool InOffice { get; set; } = false;
         public bool OnField { get; set; } = false;

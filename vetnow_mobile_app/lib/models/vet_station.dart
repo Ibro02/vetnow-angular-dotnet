@@ -5,9 +5,12 @@
 // picker and the address line below it are backed by real data rather than
 // being decorative.
 //
-// `verifiedPartner` and `openNow` are the two the backend does not send yet.
-// They default to values that render nothing, so a clinic looks correct either
-// way and starts showing the badge the day the API grows the field.
+// `openNow` is real too: the search endpoint works it out from the clinic's
+// staff schedules and sends it with every result.
+//
+// `verifiedPartner` is the one the backend still does not send. It defaults to
+// a value that renders nothing, so a clinic looks correct either way and starts
+// showing the badge the day the API grows the field.
 //
 // `distanceKm` used to live here too and was removed: with no geocoding on the
 // server it was 0.0 for every clinic, which the card rendered as a literal
@@ -95,7 +98,9 @@ class VetStation {
           0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
       verifiedPartner: json['verifiedPartner'] as bool? ?? false,
-      openNow: json['openNow'] as bool? ?? true,
+      // Defaults to true so a clinic never reads as "closed" just because an
+      // older server did not send the field.
+      openNow: json['isOpenNow'] as bool? ?? json['openNow'] as bool? ?? true,
     );
   }
 }

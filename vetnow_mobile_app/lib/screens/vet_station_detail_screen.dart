@@ -4,14 +4,17 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/service_catalog.dart';
 import '../models/review.dart';
+import '../models/opening_hours.dart';
 import '../models/staff_member.dart';
 import '../models/vet_service.dart';
 import '../models/vet_station.dart';
 import '../services/employee_api_service.dart';
 import '../services/review_api_service.dart';
+import '../services/vet_station_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/clinic_avatar.dart';
+import '../widgets/opening_hours_card.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
@@ -53,10 +56,32 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   /// start loading immediately, while staff waits for a session.
   bool _attemptedReviewLoad = false;
 
+  /// Opening hours. Anonymous like the reviews, so both start loading the
+  /// moment the page opens rather than waiting on a session.
+  OpeningHours? _openingHours;
+  bool _loadingHours = true;
+
   @override
   void initState() {
     super.initState();
     _loadReviews();
+    _loadOpeningHours();
+  }
+
+  Future<void> _loadOpeningHours() async {
+    try {
+      final hours = await VetStationApiService.openingHours(widget.station.id);
+      if (!mounted) return;
+      setState(() {
+        _openingHours = hours;
+        _loadingHours = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      // The card falls back to "hours not recorded yet", which is the
+      // honest thing to show when they could not be read.
+      setState(() => _loadingHours = false);
+    }
   }
 
   @override
@@ -435,23 +460,10 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                         ),
                       ],
                       const SizedBox(height: AppSpacing.s5),
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.s3),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary50,
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.schedule, size: 16, color: AppColors.primaryDark),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${l10n.workingHoursLabel} · ${l10n.workingHoursValue}',
-                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.primaryDark),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Real hours, per day, from the staff schedules — this
+                      // was a fixed line reading the same thing on every
+                      // clinic, and claiming 18:00 where the data says 16:00.
+                      OpeningHoursCard(hours: _openingHours, isLoading: _loadingHours),
                       const SizedBox(height: AppSpacing.s6),
                       Wrap(
                         spacing: 8,

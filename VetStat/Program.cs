@@ -68,6 +68,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddScoped<OpeningHoursService>();
 //builder.Services.AddScoped<IVetStationSearchRequest,VetStationSearchResponse>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
