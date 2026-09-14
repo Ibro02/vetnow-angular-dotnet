@@ -62,13 +62,33 @@ RootShell (bottom nav, always visible)
   `BookingScreen`, `LoginScreen`, `RegisterScreen`,
   `MyAppointmentsScreen`, `ProfileScreen`.
 
-## What's still a stub
+## What talks to the backend
 
-Every screen uses mock/local data — no real HTTP calls yet. Every spot
-that needs one is marked `// TODO:`. Suggested next step: build
-`lib/services/api_service.dart` + `auth_service.dart` using the `http`
-package already in `pubspec.yaml`, wire it into `AuthState.logIn()` and
-the Explore/Booking screens, replacing the mock lists.
+Everything below is wired to real endpoints in `VetStat/Endpoints/**`
+via `lib/services/` — no mock data involved:
+
+| Area | Endpoints |
+|---|---|
+| Auth | `LoginAuth/Post`, `Person/Add`, `ProfileEndpoint/GetUserInfo`, `LoginAuth/Delete` (sign-out invalidates the token server-side) |
+| Profile editing | `ProfileSettings/Get`, `ProfileSettings/Edit` |
+| Stations | `VetStationSearch`, `VetStation/GetAll`, `VetStation/Get` |
+| Staff & slots | `Employee/GetByVetStationId`, `TimeSlot/Get` |
+| Appointments | `Appointment/GetByCustomerId`, `Add`, `Cancel`, `Reschedule` |
+| Pets | `Animal/GetByOwnerId`, `PetsUpdateOrInsert/Save`, `Pets/SoftDelete` |
+| Reference data | `SpeciesGetAll/Get`, `BreedGetBySpecies/Get` |
+
+## What's still mocked, and why
+
+- **Services and prices** (`lib/l10n/service_catalog.dart`) — the backend
+  has no `Service` entity at all, and `Appointment` does not reference
+  one. This is a missing model server-side, not unfinished mobile work.
+- **Reviews** on the station detail screen — same reason, no `Review`
+  entity exists.
+- **Staff and time slots for guests** — `Employee` and `TimeSlot` are
+  `[Authorize]`. The booking screen therefore shows an illustrative list
+  to guests and switches to real data the moment the person signs in.
+- **"Past appointments"** stays empty — `GetByCustomerId` only returns
+  slots from today onward, and no past-appointments endpoint exists.
 
 Fonts (Inter, Italiana) are referenced in the theme but not bundled —
 see the commented-out `fonts:` section in `pubspec.yaml`.

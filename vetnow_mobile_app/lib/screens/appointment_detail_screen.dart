@@ -10,6 +10,11 @@ import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/premium_dialog.dart';
+import '../l10n/service_catalog.dart';
+import '../models/vet_service.dart';
+import '../services/vet_station_api_service.dart';
+import 'booking_screen.dart';
+import 'reschedule_screen.dart';
 import 'staff_profile_screen.dart';
 
 /// Full detail view for a single appointment — past or future. Reached
@@ -40,11 +45,7 @@ class AppointmentDetailScreen extends StatelessWidget {
             centerTitle: false,
             flexibleSpace: Container(
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.ink, AppColors.primaryDark],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppGradients.ink,
               ),
             ),
           ),
@@ -146,7 +147,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                           child: _PillActionButton(
                             label: l10n.reschedule,
                             icon: Icons.edit_calendar_outlined,
-                            onTap: () {}, // TODO: reschedule flow
+                            onTap: () => _openReschedule(context),
                             filled: false,
                           ),
                         ),
@@ -165,7 +166,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                     AppButton(
                       label: l10n.bookAgain,
                       icon: Icons.replay_outlined,
-                      onPressed: () {}, // TODO: relaunch booking with same service/staff
+                      onPressed: () => _bookAgain(context),
                     ),
                   ],
                 ],
@@ -175,6 +176,69 @@ class AppointmentDetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Opens the reschedule flow. On success we pop this screen with `true`
+  /// so the appointments list reloads — the stored appointment object is
+  /// now stale (its slot moved), and refetching is simpler and safer than
+  /// patching it in place.
+  Future<void> _openReschedule(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final moved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => RescheduleScreen(appointment: appointment)),
+    );
+
+    if (moved != true || !context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.rescheduleSuccess)),
+    );
+    Navigator.of(context).pop(true);
+  }
+
+  /// "Book again" after a completed visit: reopens booking for the same
+  /// clinic.
+  ///
+  /// The station is refetched by id rather than rebuilt from the
+  /// appointment — the appointment only carries a few display strings,
+  /// while booking needs the real record. Service and staff are not
+  /// carried over either: the backend appointment stores no service, and
+  /// the previous staff member may no longer work there, so both are
+  /// picked again from live data.
+  Future<void> _bookAgain(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: PawLoader(size: 36, color: Colors.white)),
+    );
+
+    VetStation? station;
+    try {
+      station = await VetStationApiService.getById(appointment.vetStationId);
+    } catch (_) {
+      station = null;
+    }
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop(); // close loading
+
+    if (station == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.networkError)));
+      return;
+    }
+
+    final services = ServiceKind.values.map((k) => ServiceCatalog.service(context, k)).toList();
+
+    final booked = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => BookingScreen(station: station!, services: services),
+      ),
+    );
+
+    if (booked == true && context.mounted) Navigator.of(context).pop(true);
   }
 
   void _confirmCancel(BuildContext context) async {

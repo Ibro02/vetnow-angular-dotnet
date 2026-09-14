@@ -156,7 +156,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get noUpcoming => 'Nema nadolazećih termina.';
 
   @override
-  String get noPast => 'Još nema prošlih termina.';
+  String get noPast => 'Povijest termina još nije dostupna.';
 
   @override
   String get noAppointmentsYet => 'Još nema termina';
@@ -638,4 +638,81 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get serviceGroomingDesc => 'Pranje, šišanje i njega noktiju';
+
+  @override
+  String get currentAppointment => 'Trenutni termin';
+
+  @override
+  String get noFreeSlotsThatDay =>
+      'Nema slobodnih termina za taj dan. Pokušaj s drugim datumom.';
+
+  @override
+  String get confirmReschedule => 'Potvrdi novi termin';
+
+  @override
+  String get rescheduleSuccess => 'Termin je pomaknut.';
+
+  @override
+  String get editProfile => 'Uredi profil';
+
+  @override
+  String get editProfileSubtitle => 'Ažuriraj svoje podatke i lozinku';
+
+  @override
+  String get profileUpdated => 'Profil je ažuriran.';
+
+  @override
+  String get sectionPersonalInfo => 'Osobni podaci';
+
+  @override
+  String get sectionContact => 'Kontakt';
+
+  @override
+  String get sectionLocation => 'Lokacija';
+
+  @override
+  String get sectionSecurity => 'Sigurnost';
+
+  @override
+  String get labelCity => 'Grad';
+
+  @override
+  String get labelCountry => 'Država';
+
+  @override
+  String get newPassword => 'Nova lozinka';
+
+  @override
+  String get newPasswordHint => 'Ostavi prazno ako je ne mijenjaš';
+
+  @override
+  String get callClinic => 'Nazovi kliniku';
+
+  @override
+  String get couldNotPlaceCall => 'Poziv nije moguće pokrenuti s ovog uređaja.';
+
+  @override
+  String get verifyAccountTitle => 'Potvrda računa';
+
+  @override
+  String get verifyAccountHeadline => 'Provjeri svoj email';
+
+  @override
+  String get verifyAccountBody =>
+      'Poslali smo ti kod za potvrdu. Upiši ga ispod kako bi aktivirao račun.';
+
+  @override
+  String verifyAccountBodyFor(String contact) {
+    return 'Poslali smo kod za potvrdu na $contact. Upiši ga ispod kako bi aktivirao račun.';
+  }
+
+  @override
+  String get verifyAccountAction => 'Potvrdi račun';
+
+  @override
+  String get verifyAccountResendHint =>
+      'Nisi dobio kod? Pokušaj se prijaviti ponovo — novi kod šaljemo pri svakoj prijavi.';
+
+  @override
+  String get filterAllStaff => 'Svi';
 }

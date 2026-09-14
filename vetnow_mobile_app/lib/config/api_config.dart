@@ -33,6 +33,19 @@ class ApiConfig {
   static const String register = '/api/Person/Add';
   static const String profile = '/api/ProfileEndpoint/GetUserInfo';
 
+  /// POST /Verification — confirms the emailed code for a new account.
+  /// Note the route has no `/api` prefix on this backend.
+  static const String verify = '/Verification';
+
+  /// DELETE /api/LoginAuth/Delete — invalidates the token server-side.
+  /// Without it, "log out" only forgot the token on the device while it
+  /// stayed valid on the backend.
+  static const String logout = '/api/LoginAuth/Delete';
+
+  // ─── Profile settings (editable account details) ────────
+  static const String profileSettingsGet = '/api/ProfileSettings/Get';
+  static const String profileSettingsEdit = '/api/ProfileSettings/Edit';
+
   // ─── VetStation (all AllowAnonymous — guest-browsable) ──
   static const String vetStationSearch = '/api/VetStationSearch';
   static const String vetStationGetAll = '/api/VetStation/GetAll';
@@ -41,6 +54,14 @@ class ApiConfig {
   // ─── Employee / TimeSlot (both [Authorize] on the backend —
   // not wired yet; see chat notes on the guest-first conflict) ──
   static const String employeeByStation = '/api/Employee/GetByVetStationId';
+
+  /// Role-filtered variants of the above. Same paginated envelope, but
+  /// the backend narrows by TPT subtype (Vet / Nurse / Barber) — which is
+  /// cheaper and more correct than pulling everyone and filtering by
+  /// RoleId on the device.
+  static const String employeeVetsByStation = '/api/Employee/GetVetsByVetStationId';
+  static const String employeeNursesByStation = '/api/Employee/GetNursesByVetStationId';
+  static const String employeeBarbersByStation = '/api/Employee/GetBarbersByVetStationId';
   static const String timeSlotGet = '/api/TimeSlot/Get';
 
   // ─── Animal / Pets ──────────────────────────────────────
@@ -56,4 +77,8 @@ class ApiConfig {
   static const String appointmentByCustomer = '/api/Appointment/GetByCustomerId';
   static const String appointmentAdd = '/api/Appointment/Add';
   static const String appointmentCancel = '/api/Appointment/Cancel';
+
+  /// PUT /api/Appointment/Reschedule — moves an existing appointment to
+  /// another free slot of the SAME employee (the backend enforces that).
+  static const String appointmentReschedule = '/api/Appointment/Reschedule';
 }

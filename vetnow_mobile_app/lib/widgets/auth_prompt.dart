@@ -32,11 +32,7 @@ class AuthPrompt extends StatelessWidget {
       children: [
         Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.ink, AppColors.primaryDark],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: AppGradients.ink,
           ),
           child: const VetHeroBackground(),
         ),
@@ -119,8 +115,8 @@ class AuthPrompt extends StatelessWidget {
                                           height: 20,
                                           width: 20,
                                           margin: const EdgeInsets.only(top: 1),
-                                          decoration: BoxDecoration(
-                                            gradient: const LinearGradient(colors: [AppColors.accent, AppColors.primary]),
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(colors: [AppColors.accent, AppColors.primary]),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(Icons.check, size: 13, color: Colors.white),

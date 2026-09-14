@@ -79,23 +79,31 @@ class _PetsScreenState extends State<PetsScreen> {
       _error = null;
     });
     try {
-      final species = await SpeciesApiService.getAll();
+      // These three requests don't depend on each other, so they go out
+      // together instead of one-after-another. Species names are only
+      // needed when mapping the response, not when asking for it — which
+      // is what previously forced them into a chain and made this screen
+      // wait for three round-trips instead of one.
+      //
+      // Visit counts are a bonus: a failure there must not empty the pets
+      // list, so that one future swallows its own error.
+      final results = await Future.wait([
+        SpeciesApiService.getAll(),
+        PetsApiService.getByOwnerRaw(ownerId: auth.userId!, token: auth.token!),
+        AppointmentApiService.getByCustomer(customerId: auth.userId!, token: auth.token!)
+            .catchError((_) => <RemoteAppointment>[]),
+      ]);
+
+      final species = results[0] as List<SpeciesOption>;
+      final rawPets = results[1] as List<Map<String, dynamic>>;
+      final appointments = results[2] as List<RemoteAppointment>;
+
       final speciesMap = {for (final s in species) s.id: s.name};
+      final pets = PetsApiService.mapPets(rawPets, speciesMap);
 
-      final pets = await PetsApiService.getByOwner(
-        ownerId: auth.userId!,
-        token: auth.token!,
-        speciesNames: speciesMap,
-      );
-
-      Map<int, int> counts = {};
-      try {
-        final appointments = await AppointmentApiService.getByCustomer(customerId: auth.userId!, token: auth.token!);
-        for (final a in appointments) {
-          counts[a.animalId] = (counts[a.animalId] ?? 0) + 1;
-        }
-      } catch (_) {
-        // Visit counts are a bonus, not critical — silently show 0s if this fails.
+      final Map<int, int> counts = {};
+      for (final a in appointments) {
+        counts[a.animalId] = (counts[a.animalId] ?? 0) + 1;
       }
 
       pets.sort((a, b) {
@@ -167,9 +175,14 @@ class _PetsScreenState extends State<PetsScreen> {
     }
   }
 
+  /// Reorder handler for [ReorderableListView.onReorderItem].
+  ///
+  /// Unlike the older `onReorder`, this callback already accounts for the
+  /// item being lifted out of the list, so the classic
+  /// `if (newIndex > oldIndex) newIndex -= 1` correction must NOT be
+  /// applied here — doing both would shift the item one slot short.
   void _onReorder(int oldIndex, int newIndex) {
     setState(() {
-      if (newIndex > oldIndex) newIndex -= 1;
       final item = _pets.removeAt(oldIndex);
       _pets.insert(newIndex, item);
     });
@@ -316,7 +329,7 @@ class _PetsScreenState extends State<PetsScreen> {
           child: ReorderableListView.builder(
             padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 100),
             itemCount: _pets.length,
-            onReorder: _onReorder,
+            onReorderItem: _onReorder,
             itemBuilder: (context, index) {
               final pet = _pets[index];
               return Padding(

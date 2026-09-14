@@ -24,21 +24,68 @@ class SectionHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const corners = BorderRadius.only(
+      bottomLeft: Radius.circular(AppRadius.xl2),
+      bottomRight: Radius.circular(AppRadius.xl2),
+    );
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s6, AppSpacing.pagePadding, AppSpacing.s6),
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.ink, AppColors.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(AppRadius.xl2),
-          bottomRight: Radius.circular(AppRadius.xl2),
+        gradient: AppGradients.ink,
+        borderRadius: corners,
+      ),
+      // ClipRRect so the decorative glows below can overflow their own
+      // bounds freely and still be cut to the hero's rounded corners.
+      child: ClipRRect(
+        borderRadius: corners,
+        child: Stack(
+          children: [
+            // Light source from the top-left — turns a flat gradient into
+            // a lit surface. This one change is most of what makes the
+            // hero read as "premium" rather than "colored box".
+            const Positioned.fill(
+              child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+            ),
+
+            // Warm accent bloom in the bottom-right, echoing the gold used
+            // for ratings and the member badge so the palette feels
+            // intentional across the screen.
+            Positioned(
+              right: -50,
+              bottom: -70,
+              child: Container(
+                width: 190,
+                height: 190,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.gold.withValues(alpha: 0.20),
+                      AppColors.gold.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePadding,
+                AppSpacing.s6,
+                AppSpacing.pagePadding,
+                AppSpacing.s6,
+              ),
+              child: _buildContent(),
+            ),
+          ],
         ),
       ),
-      child: Column(
+    );
+  }
+
+  Widget _buildContent() {
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -89,7 +136,6 @@ class SectionHero extends StatelessWidget {
             ],
           ),
         ],
-      ),
     );
   }
 }
@@ -105,12 +151,25 @@ class HeroChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s3, vertical: AppSpacing.s3),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        // Frosted-glass look: a light fill plus a brighter hairline edge.
+        // The border is what sells it — without it the chip dissolves
+        // into the gradient instead of sitting on top of it.
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white, size: 18),
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.white, size: 15),
+          ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

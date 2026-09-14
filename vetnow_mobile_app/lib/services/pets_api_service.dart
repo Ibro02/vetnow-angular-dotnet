@@ -8,14 +8,30 @@ class PetsApiService {
   /// GET /api/Animal/GetByOwnerId?id= — [Authorize]. Fine since Pets
   /// screens already sit behind our login gate.
   static Future<List<Pet>> getByOwner({required int ownerId, required String token, Map<int, String>? speciesNames}) async {
+    final raw = await getByOwnerRaw(ownerId: ownerId, token: token);
+    return mapPets(raw, speciesNames);
+  }
+
+  /// Same request, but returns the untouched JSON.
+  ///
+  /// Species names are only needed to *map* the response, never to make
+  /// it — so callers that also fetch the species list can fire both at
+  /// once and join them afterwards, instead of waiting for species first.
+  static Future<List<Map<String, dynamic>>> getByOwnerRaw({
+    required int ownerId,
+    required String token,
+  }) async {
     final result = await ApiClient.get(
       ApiConfig.animalByOwner,
       query: {'id': ownerId},
       token: token,
     );
     final list = result as List<dynamic>? ?? [];
-    return list.map((e) => _petFromAnimalJson(e as Map<String, dynamic>, speciesNames)).toList();
+    return list.cast<Map<String, dynamic>>();
   }
+
+  static List<Pet> mapPets(List<Map<String, dynamic>> raw, Map<int, String>? speciesNames) =>
+      raw.map((e) => _petFromAnimalJson(e, speciesNames)).toList();
 
   static Pet _petFromAnimalJson(Map<String, dynamic> json, Map<int, String>? speciesNames) {
     final speciesId = json['animalSpeciesId'] as int?;

@@ -80,11 +80,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.ink, AppColors.primaryDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: AppGradients.ink,
                 ),
                 child: Center(
                   child: Column(
@@ -174,7 +170,7 @@ class _InfoGrid extends StatelessWidget {
                   Container(
                     height: 32,
                     width: 32,
-                    decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                    decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                     child: Icon(rows[i].$1, color: AppColors.primary, size: 16),
                   ),
                   const SizedBox(width: 12),
@@ -209,7 +205,7 @@ class _EmptyVaccinations extends StatelessWidget {
           Container(
             height: 44,
             width: 44,
-            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
             child: const Icon(Icons.vaccines_outlined, color: AppColors.textMuted, size: 20),
           ),
           const SizedBox(height: AppSpacing.s3),

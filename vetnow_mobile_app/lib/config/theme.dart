@@ -96,35 +96,110 @@ class AppSpacing {
 class AppShadows {
   AppShadows._();
 
+  /// Resting card depth.
+  ///
+  /// Two layers on purpose: a tight contact shadow right under the edge
+  /// plus a wider ambient one. A single blur reads as a grey smudge —
+  /// this reads as a card actually sitting on the surface, which is what
+  /// makes the whole list feel crisp rather than flat.
   static const card = [
     BoxShadow(
-      color: Color(0x12000000),
-      blurRadius: 6,
+      color: Color(0x0D101828),
+      blurRadius: 2,
       offset: Offset(0, 1),
+    ),
+    BoxShadow(
+      color: Color(0x0F101828),
+      blurRadius: 12,
+      offset: Offset(0, 4),
+      spreadRadius: -2,
+    ),
+  ];
+
+  /// One step above [card] — for the element the eye should land on
+  /// first in a group (a featured clinic, the selected pet).
+  static const lifted = [
+    BoxShadow(
+      color: Color(0x0F101828),
+      blurRadius: 4,
+      offset: Offset(0, 2),
+    ),
+    BoxShadow(
+      color: Color(0x14101828),
+      blurRadius: 22,
+      offset: Offset(0, 10),
+      spreadRadius: -4,
     ),
   ];
 
   static const elevated = [
     BoxShadow(
-      color: Color(0x14000000),
-      blurRadius: 25,
-      offset: Offset(0, 10),
+      color: Color(0x14101828),
+      blurRadius: 28,
+      offset: Offset(0, 12),
+      spreadRadius: -6,
     ),
     BoxShadow(
-      color: Color(0x0A000000),
+      color: Color(0x0D101828),
       blurRadius: 10,
       offset: Offset(0, 4),
     ),
   ];
 
-  // Softer, colored glow used under the hero / CTA — the "premium" touch.
+  /// Colored glow under a hero / primary CTA — the "premium" touch.
+  /// Layered the same way: a tight saturated core and a wide soft halo,
+  /// so the color reads as light coming off the button.
   static List<BoxShadow> glow(Color color) => [
         BoxShadow(
-          color: color.withValues(alpha: 0.22),
-          blurRadius: 14,
-          offset: const Offset(0, 6),
+          color: color.withValues(alpha: 0.30),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: color.withValues(alpha: 0.18),
+          blurRadius: 24,
+          offset: const Offset(0, 10),
+          spreadRadius: -4,
         ),
       ];
+}
+
+/// Gradients used across the app. Defined once so a hero on Profile and a
+/// hero on Appointments are literally the same sweep, not two hand-mixed
+/// approximations that drift apart.
+class AppGradients {
+  AppGradients._();
+
+  /// The dark "serious vet" surface behind heroes and app bars.
+  static const ink = LinearGradient(
+    colors: [AppColors.ink, AppColors.primaryDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Brand sweep for primary actions and selected states.
+  static const brand = LinearGradient(
+    colors: [AppColors.primary, AppColors.accent],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Warm sweep for ratings, "premium" and member badges.
+  static const gold = LinearGradient(
+    colors: [Color(0xFFF0B857), AppColors.gold],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Soft top-left light for dark surfaces. Layered OVER [ink] it stops
+  /// the hero reading as a flat printed rectangle and gives it the sense
+  /// of a light source, which is most of the "expensive" feeling.
+  static const inkSheen = RadialGradient(
+    center: Alignment(-0.7, -1.1),
+    radius: 1.5,
+    colors: [Color(0x26FFFFFF), Color(0x00FFFFFF)],
+  );
 }
 
 /// Font family names. Register `Inter` (body) and `Italiana` (display)

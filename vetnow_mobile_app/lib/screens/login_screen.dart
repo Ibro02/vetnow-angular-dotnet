@@ -8,6 +8,7 @@ import '../widgets/app_button.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/vet_hero_background.dart';
 import 'register_screen.dart';
+import 'verify_account_screen.dart';
 
 /// Mirrors frontend/src/app/pages/login/login.component.html
 ///
@@ -55,7 +56,11 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (!mounted) return;
 
-      await AuthScope.of(context).loginWithToken(token, fallbackName: _usernameOrEmailController.text.trim());
+      await AuthScope.of(context).loginWithToken(
+        token,
+        fallbackName: _usernameOrEmailController.text.trim(),
+        remember: _keepMeSignedIn,
+      );
       if (!mounted) return;
 
       setState(() => _isLoading = false);
@@ -65,10 +70,33 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         Navigator.of(context).pop();
       }
-    } on NeedsVerificationException {
+    } on NeedsVerificationException catch (e) {
       if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      // The backend has just emailed a fresh code, so send the person
+      // straight to the code screen instead of leaving them on a form
+      // with an error they can do nothing about.
+      if (e.userId != null) {
+        final verified = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => VerifyAccountScreen(
+              userId: e.userId!,
+              emailOrUsername: _usernameOrEmailController.text.trim(),
+              remember: _keepMeSignedIn,
+            ),
+          ),
+        );
+
+        if (verified == true && mounted) {
+          // Session is live now — behave exactly as a normal sign-in.
+          Navigator.of(context).pop(widget.isBookingGate ? true : null);
+          return;
+        }
+        if (!mounted) return;
+      }
+
       setState(() {
-        _isLoading = false;
         _isError = true;
         _errorMessage = l10n.loginNeedsVerification;
       });
@@ -118,11 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.ink, AppColors.primaryDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppGradients.ink,
             ),
             child: const VetHeroBackground(showPulse: false, showFloatingHearts: true),
           ),

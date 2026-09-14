@@ -40,22 +40,37 @@ class LuxuryNavBar extends StatelessWidget {
       child: Container(
         height: 68,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.ink, AppColors.primaryDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: AppGradients.ink,
           borderRadius: BorderRadius.circular(AppRadius.full),
+          // Hairline of light along the top edge — the pill stops looking
+          // like a cut-out and starts looking like a raised object.
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           boxShadow: [
-            BoxShadow(color: AppColors.ink.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 12)),
-            BoxShadow(color: AppColors.primary.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: AppColors.ink.withValues(alpha: 0.38),
+              blurRadius: 30,
+              offset: const Offset(0, 14),
+              spreadRadius: -6,
+            ),
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.20),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: -4,
+            ),
           ],
         ),
+        clipBehavior: Clip.antiAlias,
         child: LayoutBuilder(
           builder: (context, constraints) {
             final slotWidth = constraints.maxWidth / items.length;
             return Stack(
               children: [
+                // Same top-left light as the heroes, so the nav bar and the
+                // hero above it look carved from one material.
+                const Positioned.fill(
+                  child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+                ),
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 320),
                   curve: Curves.easeOutCubic,
@@ -66,12 +81,21 @@ class LuxuryNavBar extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.white.withValues(alpha: 0.16), Colors.white.withValues(alpha: 0.08)],
+                        colors: [Colors.white.withValues(alpha: 0.18), Colors.white.withValues(alpha: 0.07)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(AppRadius.full),
-                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.35), width: 1),
+                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.38), width: 1),
+                      // Faint warm halo so the active tab glows rather than
+                      // merely being outlined.
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.gold.withValues(alpha: 0.18),
+                          blurRadius: 14,
+                          spreadRadius: -3,
+                        ),
+                      ],
                     ),
                   ),
                 ),

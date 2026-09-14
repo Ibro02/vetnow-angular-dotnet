@@ -58,7 +58,7 @@
   "statusCompleted": "Završeno",
   "statusCancelled": "Otkazano",
   "noUpcoming": "Nema nadolazećih termina.",
-  "noPast": "Još nema prošlih termina.",
+  "noPast": "Historija termina još nije dostupna.",
   "noAppointmentsYet": "Još nema termina",
 
   "profileTitle": "Profil",
@@ -234,5 +234,32 @@
   "serviceDentalName": "Čišćenje zuba",
   "serviceDentalDesc": "Skidanje kamenca i poliranje",
   "serviceGroomingName": "Šišanje i njega",
-  "serviceGroomingDesc": "Pranje, šišanje i njega noktiju"
+  "serviceGroomingDesc": "Pranje, šišanje i njega noktiju",
+  "currentAppointment": "Trenutni termin",
+  "noFreeSlotsThatDay": "Nema slobodnih termina za taj dan. Probaj drugi datum.",
+  "confirmReschedule": "Potvrdi novi termin",
+  "rescheduleSuccess": "Termin je pomjeren.",
+  "editProfile": "Uredi profil",
+  "editProfileSubtitle": "Ažuriraj svoje podatke i lozinku",
+  "profileUpdated": "Profil je ažuriran.",
+  "sectionPersonalInfo": "Lični podaci",
+  "sectionContact": "Kontakt",
+  "sectionLocation": "Lokacija",
+  "sectionSecurity": "Sigurnost",
+  "labelCity": "Grad",
+  "labelCountry": "Država",
+  "newPassword": "Nova lozinka",
+  "newPasswordHint": "Ostavi prazno ako je ne mijenjaš",
+  "callClinic": "Pozovi kliniku",
+  "couldNotPlaceCall": "Poziv nije moguće pokrenuti sa ovog uređaja.",
+  "verifyAccountTitle": "Potvrda naloga",
+  "verifyAccountHeadline": "Provjeri svoj email",
+  "verifyAccountBody": "Poslali smo ti kod za potvrdu. Upiši ga ispod da aktiviraš nalog.",
+  "verifyAccountBodyFor": "Poslali smo kod za potvrdu na {contact}. Upiši ga ispod da aktiviraš nalog.",
+  "verifyAccountAction": "Potvrdi nalog",
+  "verifyAccountResendHint": "Nisi dobio kod? Pokušaj se prijaviti ponovo — šaljemo novi kod pri svakoj prijavi.",
+  "@verifyAccountBodyFor": {
+    "placeholders": { "contact": { "type": "String" } }
+  },
+  "filterAllStaff": "Svi"
 }

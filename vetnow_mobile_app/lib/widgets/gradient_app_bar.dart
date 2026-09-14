@@ -22,11 +22,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       flexibleSpace: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.ink, AppColors.primaryDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: AppGradients.ink,
         ),
       ),
     );

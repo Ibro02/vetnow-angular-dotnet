@@ -124,7 +124,13 @@ class _GradientButton extends StatelessWidget {
             gradient: disabled ? null : LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
             color: disabled ? AppColors.border : null,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            boxShadow: disabled ? null : [BoxShadow(color: glowColor.withValues(alpha: 0.32), blurRadius: 16, offset: const Offset(0, 7))],
+            // A brighter hairline along the top edge reads as a highlight
+            // catching the light, which is what separates a "button with a
+            // gradient" from a button that looks physically raised.
+            border: disabled
+                ? null
+                : Border.all(color: Colors.white.withValues(alpha: 0.22), width: 0.8),
+            boxShadow: disabled ? null : AppShadows.glow(glowColor),
           ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 14),

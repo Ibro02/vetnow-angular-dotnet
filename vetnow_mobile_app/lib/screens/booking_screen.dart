@@ -95,12 +95,19 @@ class _BookingScreenState extends State<BookingScreen> {
 
     setState(() => _loadingReal = true);
     try {
-      final staff = await EmployeeApiService.getByStation(
-        stationId: widget.station.id,
-        token: auth.token!,
-        context: context,
-      );
-      final pets = await PetsApiService.getByOwner(ownerId: auth.userId!, token: auth.token!);
+      // Staff and pets are unrelated lookups — requested together so the
+      // switch into "real mode" costs one round-trip, not two.
+      final results = await Future.wait([
+        EmployeeApiService.getByStation(
+          stationId: widget.station.id,
+          token: auth.token!,
+          context: context,
+        ),
+        PetsApiService.getByOwner(ownerId: auth.userId!, token: auth.token!),
+      ]);
+
+      final staff = results[0] as List<StaffMember>;
+      final pets = results[1] as List<Pet>;
       if (!mounted) return;
       setState(() {
         _realStaff = staff;

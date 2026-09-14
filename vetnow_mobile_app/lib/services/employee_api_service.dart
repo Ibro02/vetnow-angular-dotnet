@@ -4,8 +4,39 @@ import '../models/staff_member.dart';
 import '../config/api_config.dart';
 import 'api_client.dart';
 
+/// Which kind of staff to ask the backend for.
+///
+/// The backend models these as real TPT subtypes (Vet / Nurse / Barber),
+/// each with its own endpoint, so filtering happens in SQL rather than by
+/// pulling the whole team and sifting through RoleId on the phone.
+enum StaffRoleFilter { all, vets, nurses, groomers }
+
 class EmployeeApiService {
   EmployeeApiService._();
+
+  /// GET the station's staff, optionally narrowed to one role.
+  ///
+  /// All four endpoints answer with the same paginated envelope and the
+  /// same employee DTO, so one parser covers them.
+  static Future<List<StaffMember>> getByStationFiltered({
+    required int stationId,
+    required String token,
+    required BuildContext context,
+    StaffRoleFilter filter = StaffRoleFilter.all,
+  }) async {
+    final path = switch (filter) {
+      StaffRoleFilter.all => ApiConfig.employeeByStation,
+      StaffRoleFilter.vets => ApiConfig.employeeVetsByStation,
+      StaffRoleFilter.nurses => ApiConfig.employeeNursesByStation,
+      StaffRoleFilter.groomers => ApiConfig.employeeBarbersByStation,
+    };
+
+    final result = await ApiClient.get(path, query: {'id': stationId}, token: token);
+    if (!context.mounted) return [];
+
+    final items = (result as Map<String, dynamic>)['dataItems'] as List<dynamic>? ?? [];
+    return items.map((e) => _fromJson(e as Map<String, dynamic>, context)).toList();
+  }
 
   /// GET /api/Employee/GetByVetStationId?id= — [Authorize]. Real staff
   /// for a station. Role name is derived from RoleId using the fixed

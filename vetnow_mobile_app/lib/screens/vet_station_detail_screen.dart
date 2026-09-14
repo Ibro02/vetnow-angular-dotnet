@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/service_catalog.dart';
@@ -52,15 +53,34 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
     }
   }
 
+  /// Which staff role the person is currently looking at. Narrowing is
+  /// done by the backend (separate endpoint per TPT subtype), so changing
+  /// this refetches rather than filtering the list already on screen.
+  StaffRoleFilter _roleFilter = StaffRoleFilter.all;
+
+  String _roleFilterLabel(StaffRoleFilter f, AppLocalizations l10n) => switch (f) {
+        StaffRoleFilter.all => l10n.filterAllStaff,
+        StaffRoleFilter.vets => ServiceCatalog.roleVeterinarian(context),
+        StaffRoleFilter.nurses => ServiceCatalog.roleNurse(context),
+        StaffRoleFilter.groomers => ServiceCatalog.roleGroomer(context),
+      };
+
+  void _applyRoleFilter(StaffRoleFilter f) {
+    if (f == _roleFilter) return;
+    setState(() => _roleFilter = f);
+    _loadRealStaff();
+  }
+
   Future<void> _loadRealStaff() async {
     final auth = AuthScope.of(context);
     if (auth.token == null) return;
     setState(() => _loadingReal = true);
     try {
-      final staff = await EmployeeApiService.getByStation(
+      final staff = await EmployeeApiService.getByStationFiltered(
         stationId: widget.station.id,
         token: auth.token!,
         context: context,
+        filter: _roleFilter,
       );
       if (!mounted) return;
       setState(() {
@@ -130,6 +150,32 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
     return list;
   }
 
+  /// Opens the phone dialer with the clinic's number.
+  ///
+  /// The number is stripped of spaces, dashes and brackets — `tel:` will
+  /// not resolve otherwise. A device with no dialer (an emulator, a
+  /// tablet) simply cannot handle the scheme; that is a normal outcome
+  /// here and gets a message, not a crash.
+  Future<void> _callStation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final raw = widget.station.contactNumber.replaceAll(RegExp(r'[\s\-()]'), '');
+
+    bool launched = false;
+    if (raw.isNotEmpty) {
+      try {
+        launched = await launchUrl(Uri(scheme: 'tel', path: raw));
+      } catch (_) {
+        launched = false;
+      }
+    }
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.couldNotPlaceCall)),
+      );
+    }
+  }
+
   /// All services across every staff member, deduplicated by name, for
   /// people who'd rather pick "what" before "who". Always sourced from
   /// the mock catalog (see note above) regardless of whether real
@@ -167,11 +213,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppColors.ink, AppColors.primaryDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: AppGradients.ink,
                     ),
                     child: const Center(child: Icon(Icons.pets, color: Colors.white, size: 52)),
                   ),
@@ -278,6 +320,29 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                           ),
                         ],
                       ),
+                      // Role filter. Only shown once real staff are loaded —
+                      // the illustrative guest list isn't something the
+                      // backend can narrow, so offering a filter over it
+                      // would be a control that quietly does nothing.
+                      if (_realStaff != null) ...[
+                        const SizedBox(height: AppSpacing.s3),
+                        SizedBox(
+                          height: 34,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              for (final f in StaffRoleFilter.values) ...[
+                                _RoleChip(
+                                  label: _roleFilterLabel(f, l10n),
+                                  selected: _roleFilter == f,
+                                  onTap: () => _applyRoleFilter(f),
+                                ),
+                                const SizedBox(width: AppSpacing.s2),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.s3),
                       if (_loadingReal)
                         const Padding(
@@ -366,7 +431,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       label: l10n.call,
                       icon: Icons.call,
                       variant: AppButtonVariant.secondary,
-                      onPressed: () {}, // TODO: launch tel: url with station.contactNumber
+                      onPressed: () => _callStation(context),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s3),
@@ -664,6 +729,43 @@ class _ReviewCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(review.comment, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4)),
         ],
+      ),
+    );
+  }
+}
+
+/// Pill used for the staff role filter. Deliberately lighter than the
+/// booking slot chips — this narrows a list, it doesn't commit to
+/// anything, so it shouldn't shout as loudly as a selectable time.
+class _RoleChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _RoleChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s2),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.full),
+          border: Border.all(color: selected ? Colors.transparent : AppColors.border),
+          boxShadow: selected ? AppShadows.glow(AppColors.primary) : AppShadows.card,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: selected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
       ),
     );
   }

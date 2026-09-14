@@ -44,11 +44,7 @@ class StaffProfileScreen extends StatelessWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppColors.ink, AppColors.primaryDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: AppGradients.ink,
                     ),
                     child: Stack(
                       children: [
@@ -136,7 +132,7 @@ class StaffProfileScreen extends StatelessWidget {
                           Container(
                             height: 30,
                             width: 30,
-                            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
                             child: const Icon(Icons.home_work_outlined, size: 14, color: AppColors.textSecondary),
                           ),
                           const SizedBox(width: 10),

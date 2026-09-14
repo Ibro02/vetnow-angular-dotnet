@@ -379,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @noPast.
   ///
   /// In bs, this message translates to:
-  /// **'Još nema prošlih termina.'**
+  /// **'Historija termina još nije dostupna.'**
   String get noPast;
 
   /// No description provided for @noAppointmentsYet.
@@ -1293,6 +1293,150 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Pranje, šišanje i njega noktiju'**
   String get serviceGroomingDesc;
+
+  /// No description provided for @currentAppointment.
+  ///
+  /// In bs, this message translates to:
+  /// **'Trenutni termin'**
+  String get currentAppointment;
+
+  /// No description provided for @noFreeSlotsThatDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema slobodnih termina za taj dan. Probaj drugi datum.'**
+  String get noFreeSlotsThatDay;
+
+  /// No description provided for @confirmReschedule.
+  ///
+  /// In bs, this message translates to:
+  /// **'Potvrdi novi termin'**
+  String get confirmReschedule;
+
+  /// No description provided for @rescheduleSuccess.
+  ///
+  /// In bs, this message translates to:
+  /// **'Termin je pomjeren.'**
+  String get rescheduleSuccess;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In bs, this message translates to:
+  /// **'Uredi profil'**
+  String get editProfile;
+
+  /// No description provided for @editProfileSubtitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ažuriraj svoje podatke i lozinku'**
+  String get editProfileSubtitle;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In bs, this message translates to:
+  /// **'Profil je ažuriran.'**
+  String get profileUpdated;
+
+  /// No description provided for @sectionPersonalInfo.
+  ///
+  /// In bs, this message translates to:
+  /// **'Lični podaci'**
+  String get sectionPersonalInfo;
+
+  /// No description provided for @sectionContact.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kontakt'**
+  String get sectionContact;
+
+  /// No description provided for @sectionLocation.
+  ///
+  /// In bs, this message translates to:
+  /// **'Lokacija'**
+  String get sectionLocation;
+
+  /// No description provided for @sectionSecurity.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sigurnost'**
+  String get sectionSecurity;
+
+  /// No description provided for @labelCity.
+  ///
+  /// In bs, this message translates to:
+  /// **'Grad'**
+  String get labelCity;
+
+  /// No description provided for @labelCountry.
+  ///
+  /// In bs, this message translates to:
+  /// **'Država'**
+  String get labelCountry;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nova lozinka'**
+  String get newPassword;
+
+  /// No description provided for @newPasswordHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ostavi prazno ako je ne mijenjaš'**
+  String get newPasswordHint;
+
+  /// No description provided for @callClinic.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pozovi kliniku'**
+  String get callClinic;
+
+  /// No description provided for @couldNotPlaceCall.
+  ///
+  /// In bs, this message translates to:
+  /// **'Poziv nije moguće pokrenuti sa ovog uređaja.'**
+  String get couldNotPlaceCall;
+
+  /// No description provided for @verifyAccountTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Potvrda naloga'**
+  String get verifyAccountTitle;
+
+  /// No description provided for @verifyAccountHeadline.
+  ///
+  /// In bs, this message translates to:
+  /// **'Provjeri svoj email'**
+  String get verifyAccountHeadline;
+
+  /// No description provided for @verifyAccountBody.
+  ///
+  /// In bs, this message translates to:
+  /// **'Poslali smo ti kod za potvrdu. Upiši ga ispod da aktiviraš nalog.'**
+  String get verifyAccountBody;
+
+  /// No description provided for @verifyAccountBodyFor.
+  ///
+  /// In bs, this message translates to:
+  /// **'Poslali smo kod za potvrdu na {contact}. Upiši ga ispod da aktiviraš nalog.'**
+  String verifyAccountBodyFor(String contact);
+
+  /// No description provided for @verifyAccountAction.
+  ///
+  /// In bs, this message translates to:
+  /// **'Potvrdi nalog'**
+  String get verifyAccountAction;
+
+  /// No description provided for @verifyAccountResendHint.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nisi dobio kod? Pokušaj se prijaviti ponovo — šaljemo novi kod pri svakoj prijavi.'**
+  String get verifyAccountResendHint;
+
+  /// No description provided for @filterAllStaff.
+  ///
+  /// In bs, this message translates to:
+  /// **'Svi'**
+  String get filterAllStaff;
 }
 
 class _AppLocalizationsDelegate

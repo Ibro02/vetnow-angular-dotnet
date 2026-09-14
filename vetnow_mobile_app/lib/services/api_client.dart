@@ -9,7 +9,15 @@ import '../config/api_config.dart';
 class ApiException implements Exception {
   final int statusCode;
   final String message;
-  ApiException(this.statusCode, this.message);
+
+  /// Decoded error body, when it was JSON. Some endpoints answer with a
+  /// structured payload rather than a sentence — the login endpoint, for
+  /// one, returns `{userId, needsVerification}` on 401, and the caller
+  /// needs that id to continue into the verification flow. Null when the
+  /// body was plain text or empty.
+  final dynamic body;
+
+  ApiException(this.statusCode, this.message, {this.body});
 
   @override
   String toString() => message;
@@ -51,9 +59,12 @@ class ApiClient {
     // Try to pull a readable message out of the error body — the
     // backend usually returns either plain text or {"message": "..."}.
     String message = 'Request failed (${res.statusCode}).';
+    dynamic decodedBody;
+
     if (res.body.isNotEmpty) {
       try {
         final decoded = jsonDecode(res.body);
+        decodedBody = decoded;
         if (decoded is String) {
           message = decoded;
         } else if (decoded is Map && decoded['message'] is String) {
@@ -65,7 +76,7 @@ class ApiClient {
         message = res.body;
       }
     }
-    throw ApiException(res.statusCode, message);
+    throw ApiException(res.statusCode, message, body: decodedBody);
   }
 
   static Future<dynamic> get(String path, {Map<String, dynamic>? query, String? token}) async {
@@ -75,6 +86,11 @@ class ApiClient {
 
   static Future<dynamic> post(String path, {Object? body, String? token}) async {
     final res = await http.post(_uri(path), headers: _headers(token), body: body == null ? null : jsonEncode(body));
+    return _decode(res);
+  }
+
+  static Future<dynamic> put(String path, {Object? body, String? token}) async {
+    final res = await http.put(_uri(path), headers: _headers(token), body: body == null ? null : jsonEncode(body));
     return _decode(res);
   }
 

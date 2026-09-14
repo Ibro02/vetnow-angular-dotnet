@@ -36,7 +36,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool _amenityInOffice = false;
   bool _amenityOnField = false;
 
-  bool get _hasActiveAmenityFilters => _amenityParking || _amenityWifi || _amenityWheelchair || _amenityInOffice || _amenityOnField;
+  bool get _hasActiveAmenityFilters =>
+      _amenityParking || _amenityWifi || _amenityWheelchair || _amenityInOffice || _amenityOnField;
 
   static const _cities = ['Sarajevo', 'Mostar', 'Banja Luka', 'Tuzla', 'Zenica'];
 
@@ -183,7 +184,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: const _Hero()),
+        const SliverToBoxAdapter(child: _Hero()),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -223,9 +224,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             filled: true,
                             fillColor: AppColors.surface,
                             contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
-                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(AppRadius.full),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
                           ),
                         ),
                       ),
@@ -246,7 +251,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           children: [
                             const Icon(Icons.location_on, size: 16, color: AppColors.primary),
                             const SizedBox(width: 4),
-                            Text(_selectedCity, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
+                            Text(_selectedCity,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
                             const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
                           ],
                         ),
@@ -302,7 +309,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.tune, size: 16, color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
+                            child: Icon(Icons.tune,
+                                size: 16, color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
                           ),
                           if (_hasActiveAmenityFilters)
                             Positioned(
@@ -368,11 +376,7 @@ class _Hero extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.ink, AppColors.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppGradients.ink,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(AppRadius.xl2),
           bottomRight: Radius.circular(AppRadius.xl2),
@@ -389,91 +393,91 @@ class _Hero extends StatelessWidget {
               AppSpacing.s8,
             ),
             child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    height: 34,
-                    width: 34,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.14),
-                      shape: BoxShape.circle,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          height: 34,
+                          width: 34,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.14),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.pets, color: Colors.white, size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'VetNow',
+                          style: TextStyle(
+                            fontFamily: AppFonts.display,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Icon(Icons.pets, color: Colors.white, size: 18),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'VetNow',
-                    style: TextStyle(
-                      fontFamily: AppFonts.display,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                          onTap: () => showLanguagePicker(context),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          child: Container(
+                            height: 34,
+                            width: 34,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.14),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          height: 34,
+                          width: 34,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.14),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
+                        ),
+                      ],
                     ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s6),
+                Text(
+                  AppLocalizations.of(context)!.exploreHeroTitle,
+                  style: const TextStyle(
+                    fontFamily: AppFonts.display,
+                    fontSize: 28,
+                    height: 1.2,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  InkWell(
-                    onTap: () => showLanguagePicker(context),
-                    borderRadius: BorderRadius.circular(AppRadius.full),
-                    child: Container(
-                      height: 34,
-                      width: 34,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    height: 34,
-                    width: 34,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.14),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.s6),
-          Text(
-            AppLocalizations.of(context)!.exploreHeroTitle,
-            style: const TextStyle(
-              fontFamily: AppFonts.display,
-              fontSize: 28,
-              height: 1.2,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+                ),
+                const SizedBox(height: AppSpacing.s2),
+                Text(
+                  AppLocalizations.of(context)!.exploreHeroSubtitle,
+                  style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.75), height: 1.4),
+                ),
+                const SizedBox(height: AppSpacing.s5),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _TrustPill(icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
+                    _TrustPill(icon: Icons.bolt_rounded, label: AppLocalizations.of(context)!.trustFewTaps),
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.s2),
-          Text(
-            AppLocalizations.of(context)!.exploreHeroSubtitle,
-            style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.75), height: 1.4),
-          ),
-          const SizedBox(height: AppSpacing.s5),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _TrustPill(icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
-              _TrustPill(icon: Icons.bolt_rounded, label: AppLocalizations.of(context)!.trustFewTaps),
-            ],
-          ),
-        ],
-      ),
           ),
         ],
       ),
@@ -568,97 +572,124 @@ class _StationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return HoverCard(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.borderLight),
-          ),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: 104,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.primaryLight, AppColors.primary],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+      child: DecoratedBox(
+        // Shadow lives outside the ClipRRect — clipping it would cut the
+        // blur off at the card edge and leave the list looking flat.
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          boxShadow: AppShadows.card,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: 104,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [AppColors.primaryLight, AppColors.primary],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                           ),
                         ),
-                        child: const Icon(Icons.pets, color: Colors.white, size: 30),
-                      ),
-                      if (!station.openNow)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
+                        // Same top-left light as every other branded surface,
+                        // so the thumbnail is lit rather than flat-filled.
+                        const Positioned.fill(
+                          child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+                        ),
+                        Center(
                           child: Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(vertical: 3),
-                            color: Colors.black54,
-                            child: const Text('Closed', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.18),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+                            ),
+                            child: const Icon(Icons.pets, color: Colors.white, size: 21),
                           ),
                         ),
-                    ],
+                        if (!station.openNow)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              color: Colors.black54,
+                              child: const Text('Closed',
+                                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.s3),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            station.name,
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5, color: AppColors.text),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.s3),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  station.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w700, fontSize: 14.5, color: AppColors.text),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 5),
+                          if (station.verifiedPartner) ...[
+                            const VerifiedBadge(compact: true),
+                            const SizedBox(height: 6),
+                          ],
+                          Row(
+                            children: [
+                              RatingBadge(rating: station.rating, reviewCount: station.reviewCount, dense: true),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
+                              const SizedBox(width: 2),
+                              Text('${station.distanceKm.toStringAsFixed(1)} km',
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 5,
+                            runSpacing: 5,
+                            children: [
+                              if (station.parking) const _MiniTag(icon: Icons.local_parking_outlined),
+                              if (station.wifi) const _MiniTag(icon: Icons.wifi),
+                              if (station.wheelchair) const _MiniTag(icon: Icons.accessible_outlined),
+                              if (station.onField) const _MiniTag(icon: Icons.home_work_outlined),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 5),
-                    if (station.verifiedPartner) ...[
-                      const VerifiedBadge(compact: true),
-                      const SizedBox(height: 6),
-                    ],
-                    Row(
-                      children: [
-                        RatingBadge(rating: station.rating, reviewCount: station.reviewCount, dense: true),
-                        const SizedBox(width: 8),
-                        Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
-                        const SizedBox(width: 2),
-                        Text('${station.distanceKm.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 5,
-                      runSpacing: 5,
-                      children: [
-                        if (station.parking) const _MiniTag(icon: Icons.local_parking_outlined),
-                        if (station.wifi) const _MiniTag(icon: Icons.wifi),
-                        if (station.wheelchair) const _MiniTag(icon: Icons.accessible_outlined),
-                        if (station.onField) const _MiniTag(icon: Icons.home_work_outlined),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        ),
+          ),
         ),
       ),
     );
@@ -708,7 +739,7 @@ class _ErrorState extends StatelessWidget {
           Container(
             height: 64,
             width: 64,
-            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
             child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
           ),
           const SizedBox(height: AppSpacing.s4),
@@ -739,7 +770,7 @@ class _EmptyState extends StatelessWidget {
           Container(
             height: 64,
             width: 64,
-            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
             child: const Icon(Icons.search_off, size: 28, color: AppColors.textMuted),
           ),
           const SizedBox(height: AppSpacing.s4),
@@ -791,7 +822,8 @@ class _CityPickerSheet extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(AppLocalizations.of(context)!.chooseCity, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.text)),
+              Text(AppLocalizations.of(context)!.chooseCity,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.text)),
               InkWell(
                 onTap: () => Navigator.of(context).pop(),
                 borderRadius: BorderRadius.circular(AppRadius.full),
@@ -816,9 +848,7 @@ class _CityPickerSheet extends StatelessWidget {
                   duration: const Duration(milliseconds: 150),
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
                   decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark])
-                        : null,
+                    gradient: isSelected ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]) : null,
                     color: isSelected ? null : AppColors.bgSoft,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(color: isSelected ? Colors.transparent : AppColors.borderLight),
@@ -901,7 +931,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+        borderRadius:
+            BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -918,7 +949,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.filterClinics, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text)),
+              Text(l10n.filterClinics,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text)),
               InkWell(
                 onTap: () => Navigator.of(context).pop(),
                 borderRadius: BorderRadius.circular(AppRadius.full),
@@ -945,7 +977,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: selected ? AppColors.primary50 : AppColors.bgSoft,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: selected ? AppColors.primary : AppColors.borderLight, width: selected ? 1.5 : 1),
+                    border: Border.all(
+                        color: selected ? AppColors.primary : AppColors.borderLight, width: selected ? 1.5 : 1),
                   ),
                   child: Row(
                     children: [
@@ -960,7 +993,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.s3),
                       Expanded(
-                        child: Text(opt.$3, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
+                        child: Text(opt.$3,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                       ),
                       Icon(
                         selected ? Icons.check_circle_rounded : Icons.radio_button_off,
@@ -984,7 +1018,8 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                   ),
-                  child: Text(l10n.resetFilters, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+                  child: Text(l10n.resetFilters,
+                      style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
                 ),
               ),
               const SizedBox(width: AppSpacing.s3),

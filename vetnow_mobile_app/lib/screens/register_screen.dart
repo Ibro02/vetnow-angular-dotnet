@@ -100,11 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: [
           Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.ink, AppColors.primaryDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppGradients.ink,
             ),
             child: const VetHeroBackground(showPulse: false, showFloatingHearts: true),
           ),

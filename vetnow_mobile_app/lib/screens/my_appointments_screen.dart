@@ -219,7 +219,7 @@ class _AppointmentList extends StatelessWidget {
               Container(
                 height: 64,
                 width: 64,
-                decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
                 child: const Icon(Icons.event_busy_outlined, size: 28, color: AppColors.textMuted),
               ),
               const SizedBox(height: AppSpacing.s4),

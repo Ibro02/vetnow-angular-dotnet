@@ -156,7 +156,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get noUpcoming => 'Nema budućih termina.';
 
   @override
-  String get noPast => 'Još nema prošlih termina.';
+  String get noPast => 'Istorija termina još nije dostupna.';
 
   @override
   String get noAppointmentsYet => 'Još nema termina';
@@ -637,4 +637,82 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get serviceGroomingDesc => 'Pranje, šišanje i nega noktiju';
+
+  @override
+  String get currentAppointment => 'Trenutni termin';
+
+  @override
+  String get noFreeSlotsThatDay =>
+      'Nema slobodnih termina za taj dan. Probaj drugi datum.';
+
+  @override
+  String get confirmReschedule => 'Potvrdi novi termin';
+
+  @override
+  String get rescheduleSuccess => 'Termin je pomeren.';
+
+  @override
+  String get editProfile => 'Uredi profil';
+
+  @override
+  String get editProfileSubtitle => 'Ažuriraj svoje podatke i lozinku';
+
+  @override
+  String get profileUpdated => 'Profil je ažuriran.';
+
+  @override
+  String get sectionPersonalInfo => 'Lični podaci';
+
+  @override
+  String get sectionContact => 'Kontakt';
+
+  @override
+  String get sectionLocation => 'Lokacija';
+
+  @override
+  String get sectionSecurity => 'Bezbednost';
+
+  @override
+  String get labelCity => 'Grad';
+
+  @override
+  String get labelCountry => 'Država';
+
+  @override
+  String get newPassword => 'Nova lozinka';
+
+  @override
+  String get newPasswordHint => 'Ostavi prazno ako je ne menjaš';
+
+  @override
+  String get callClinic => 'Pozovi kliniku';
+
+  @override
+  String get couldNotPlaceCall =>
+      'Poziv nije moguće pokrenuti sa ovog uređaja.';
+
+  @override
+  String get verifyAccountTitle => 'Potvrda naloga';
+
+  @override
+  String get verifyAccountHeadline => 'Proveri svoj email';
+
+  @override
+  String get verifyAccountBody =>
+      'Poslali smo ti kod za potvrdu. Upiši ga ispod da aktiviraš nalog.';
+
+  @override
+  String verifyAccountBodyFor(String contact) {
+    return 'Poslali smo kod za potvrdu na $contact. Upiši ga ispod da aktiviraš nalog.';
+  }
+
+  @override
+  String get verifyAccountAction => 'Potvrdi nalog';
+
+  @override
+  String get verifyAccountResendHint =>
+      'Nisi dobio kod? Pokušaj da se prijaviš ponovo — novi kod šaljemo pri svakoj prijavi.';
+
+  @override
+  String get filterAllStaff => 'Svi';
 }

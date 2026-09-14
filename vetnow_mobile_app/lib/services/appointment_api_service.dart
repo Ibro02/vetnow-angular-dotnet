@@ -95,4 +95,28 @@ class AppointmentApiService {
   static Future<void> cancel({required int appointmentId, required String token}) async {
     await ApiClient.delete(ApiConfig.appointmentCancel, query: {'appointmentId': appointmentId}, token: token);
   }
+
+  /// PUT /api/Appointment/Reschedule — [Authorize].
+  ///
+  /// The backend only accepts a slot that belongs to the SAME employee as
+  /// the original appointment, and refuses one that is already taken. It
+  /// frees the old slot and books the new one in a single operation, so
+  /// there is no window where the person holds two slots or none.
+  ///
+  /// A 409 here is a real conflict the user should see (someone booked
+  /// that slot first), not a bug.
+  static Future<void> reschedule({
+    required int appointmentId,
+    required int newTimeSlotId,
+    required String token,
+  }) async {
+    await ApiClient.put(
+      ApiConfig.appointmentReschedule,
+      token: token,
+      body: {
+        'appointmentId': appointmentId,
+        'newTimeSlotId': newTimeSlotId,
+      },
+    );
+  }
 }

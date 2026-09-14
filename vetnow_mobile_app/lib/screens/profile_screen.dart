@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
-import '../services/api_client.dart';
 import '../services/pets_api_service.dart';
 import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/paw_loader.dart';
+import 'edit_profile_screen.dart';
 import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/gradient_app_bar.dart';
@@ -56,13 +56,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     try {
-      final species = await SpeciesApiService.getAll();
+      // Fired together rather than chained — the species list is only
+      // needed to map the pets response, not to request it.
+      final results = await Future.wait([
+        SpeciesApiService.getAll(),
+        PetsApiService.getByOwnerRaw(ownerId: auth.userId!, token: auth.token!),
+      ]);
+
+      final species = results[0] as List<SpeciesOption>;
       final speciesMap = {for (final s in species) s.id: s.name};
-      final pets = await PetsApiService.getByOwner(
-        ownerId: auth.userId!,
-        token: auth.token!,
-        speciesNames: speciesMap,
-      );
+      final pets = PetsApiService.mapPets(results[1] as List<Map<String, dynamic>>, speciesMap);
       if (!mounted) return;
       setState(() {
         _pets = pets;
@@ -127,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: AppSpacing.s8),
                       Text(l10n.account, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                       const SizedBox(height: AppSpacing.s3),
-                      const _SettingsGroup(),
+                      _SettingsGroup(onProfileChanged: () => setState(() {})),
                       const SizedBox(height: AppSpacing.s8),
                       _LogoutButton(),
                     ],
@@ -329,15 +332,35 @@ class _PetsRow extends StatelessWidget {
 }
 
 class _SettingsGroup extends StatelessWidget {
-  const _SettingsGroup();
+  /// Called after the person saves a profile edit, so the header above
+  /// can refresh with the new name.
+  final VoidCallback onProfileChanged;
+
+  const _SettingsGroup({required this.onProfileChanged});
+
+  /// Both "personal info" and "password & security" open the same edit
+  /// screen — it is one form with a personal section and a security
+  /// section, and splitting it into two screens would mean two saves.
+  Future<void> _openEditProfile(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+    );
+
+    if (saved != true || !context.mounted) return;
+    onProfileChanged();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.profileUpdated)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     final items = <(IconData, String, Color, VoidCallback)>[
-      (Icons.person_outline, l10n.personalInfo, AppColors.primary, () {}),
-      (Icons.lock_outline, l10n.passwordSecurity, AppColors.info, () {}),
+      (Icons.person_outline, l10n.personalInfo, AppColors.primary, () => _openEditProfile(context)),
+      (Icons.lock_outline, l10n.passwordSecurity, AppColors.info, () => _openEditProfile(context)),
       (Icons.notifications_outlined, l10n.notifications, AppColors.gold, () {}),
       (Icons.translate_rounded, l10n.language, AppColors.accent, () => showLanguagePicker(context)),
       (Icons.help_outline, l10n.helpSupport, AppColors.secondary, () {}),
@@ -443,7 +466,9 @@ class _LogoutButton extends StatelessWidget {
       isDangerous: true,
     );
     if (confirmed && context.mounted) {
-      AuthScope.of(context).logOut();
+      // Local state clears immediately; the server-side token invalidation
+      // runs inside logOut() and never blocks the UI.
+      await AuthScope.of(context).logOut();
     }
   }
 }
