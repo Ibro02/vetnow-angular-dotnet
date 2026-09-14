@@ -40,6 +40,13 @@ public static class SeedingExtensions
 
         // 9. Appointments (TimeSlot, Appointment) - depends on Employee, Person, VetStation, Animal, Availability
         await app.SeedAppointmentsAsync();
+
+        // 10. Reviews - depends on Appointment (only past visits can be reviewed)
+        await app.SeedReviewsAsync();
+
+        // Password hardening is deliberately NOT part of this method: it has to
+        // run in every environment, not only where demo data is seeded.
+        // Program.cs calls SeedPasswordSecurityAsync() separately for that reason.
     }
 
     public static async Task SeedRolesAsync(this WebApplication app)
@@ -111,6 +118,27 @@ public static class SeedingExtensions
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
         var seeder = new AppointmentSeeder(context);
+        await seeder.SeedAsync();
+    }
+
+    public static async Task SeedReviewsAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var seeder = new ReviewSeeder(context);
+        await seeder.SeedAsync();
+    }
+
+    /// <summary>
+    /// Rewrites any plain-text password left in the database as a BCrypt hash.
+    /// Runs in every environment (not just where demo data is seeded) and is
+    /// idempotent, so it is safe to run on every startup.
+    /// </summary>
+    public static async Task SeedPasswordSecurityAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var seeder = new PasswordSecuritySeeder(context);
         await seeder.SeedAsync();
     }
 }

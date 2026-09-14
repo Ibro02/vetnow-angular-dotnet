@@ -17,18 +17,16 @@ public static class PasswordHasher
     /// <summary>
     /// Verifies a plain-text password against a BCrypt hash.
     /// Returns false gracefully if the stored hash is null/empty
-    /// (e.g. Google OAuth users who have no password).
+    /// (e.g. Google OAuth users who have no password), and also if it is not a
+    /// BCrypt hash at all — nothing in this system may authenticate against a
+    /// plain-text value. Legacy rows are rewritten as hashes at startup by
+    /// PasswordSecuritySeeder, so a non-hash here means corrupt data, not a
+    /// login that should be allowed through.
     /// </summary>
     public static bool Verify(string plainTextPassword, string? storedHash)
     {
-        if (string.IsNullOrEmpty(storedHash))
+        if (string.IsNullOrEmpty(storedHash) || !storedHash.StartsWith("$2"))
             return false;
-
-        // If the stored value is NOT a BCrypt hash (i.e. legacy plain-text),
-        // fall back to direct comparison so existing users can still log in.
-        // Once all passwords are migrated, remove this fallback.
-        if (!storedHash.StartsWith("$2"))
-            return plainTextPassword == storedHash;
 
         return BCrypt.Net.BCrypt.Verify(plainTextPassword, storedHash);
     }

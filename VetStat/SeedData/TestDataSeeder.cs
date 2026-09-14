@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers.Services;
 using VetStat.Models;
 
 namespace VetStat.SeedData;
@@ -56,7 +57,7 @@ public class TestDataSeeder
                 Phone = "+387 63 100 100",
                 RoleId = adminRole.Id,
                 Username = "seedadmin",
-                Password = "Admin1234!",
+                Password = PasswordHasher.Hash("Admin1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Marsala Tita 1",
@@ -80,7 +81,7 @@ public class TestDataSeeder
                 Phone = "+387 63 200 200",
                 RoleId = userRole.Id,
                 Username = "seeduser",
-                Password = "User1234!",
+                Password = PasswordHasher.Hash("User1234!"),
                 City = "Mostar",
                 Country = "Bosnia and Herzegovina",
                 Address = "Bulevar Narodne Revolucije 5",
@@ -207,7 +208,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestVet1", LastName = "Veterinar",
                     Email = "testvet1@vetstation.com", Phone = "+387 63 301 001",
-                    RoleId = vetRole.Id, Username = "testvet1", Password = "Test1234!",
+                    RoleId = vetRole.Id, Username = "testvet1", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Sarajevo", Country = "Bosnia and Herzegovina", Address = "Zmaja od Bosne 1",
                     BirthDate = new DateTime(1980, 3, 10), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[0].Id, DateOfEmployment = new DateTime(2019, 1, 10),
@@ -217,7 +218,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestVet2", LastName = "Doktor",
                     Email = "testvet2@vetstation.com", Phone = "+387 63 301 002",
-                    RoleId = vetRole.Id, Username = "testvet2", Password = "Test1234!",
+                    RoleId = vetRole.Id, Username = "testvet2", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Mostar", Country = "Bosnia and Herzegovina", Address = "Ante Starcevica 5",
                     BirthDate = new DateTime(1983, 7, 22), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[1].Id, DateOfEmployment = new DateTime(2020, 5, 15),
@@ -227,7 +228,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestVet3", LastName = "Lijecnik",
                     Email = "testvet3@vetstation.com", Phone = "+387 63 301 003",
-                    RoleId = vetRole.Id, Username = "testvet3", Password = "Test1234!",
+                    RoleId = vetRole.Id, Username = "testvet3", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Tuzla", Country = "Bosnia and Herzegovina", Address = "Hasana Kikica 12",
                     BirthDate = new DateTime(1986, 11, 5), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[2].Id, DateOfEmployment = new DateTime(2021, 9, 1),
@@ -251,7 +252,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestNurse1", LastName = "Sestra",
                     Email = "testnurse1@vetstation.com", Phone = "+387 63 302 001",
-                    RoleId = nurseRole.Id, Username = "testnurse1", Password = "Test1234!",
+                    RoleId = nurseRole.Id, Username = "testnurse1", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Sarajevo", Country = "Bosnia and Herzegovina", Address = "Branilaca Sarajeva 3",
                     BirthDate = new DateTime(1990, 2, 14), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[0].Id, DateOfEmployment = new DateTime(2021, 3, 1),
@@ -261,7 +262,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestNurse2", LastName = "Medicinska",
                     Email = "testnurse2@vetstation.com", Phone = "+387 63 302 002",
-                    RoleId = nurseRole.Id, Username = "testnurse2", Password = "Test1234!",
+                    RoleId = nurseRole.Id, Username = "testnurse2", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Mostar", Country = "Bosnia and Herzegovina", Address = "Muje Pasica 8",
                     BirthDate = new DateTime(1992, 8, 30), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[1].Id, DateOfEmployment = new DateTime(2022, 1, 15),
@@ -271,7 +272,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestNurse3", LastName = "Pomocnica",
                     Email = "testnurse3@vetstation.com", Phone = "+387 63 302 003",
-                    RoleId = nurseRole.Id, Username = "testnurse3", Password = "Test1234!",
+                    RoleId = nurseRole.Id, Username = "testnurse3", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Tuzla", Country = "Bosnia and Herzegovina", Address = "Rudarska 15",
                     BirthDate = new DateTime(1995, 5, 18), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[2].Id, DateOfEmployment = new DateTime(2023, 6, 1),
@@ -295,7 +296,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestBarber1", LastName = "Frizer",
                     Email = "testbarber1@vetstation.com", Phone = "+387 63 303 001",
-                    RoleId = barberRole.Id, Username = "testbarber1", Password = "Test1234!",
+                    RoleId = barberRole.Id, Username = "testbarber1", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Sarajevo", Country = "Bosnia and Herzegovina", Address = "Kosevo 20",
                     BirthDate = new DateTime(1994, 4, 10), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[0].Id, DateOfEmployment = new DateTime(2022, 4, 1),
@@ -305,7 +306,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestBarber2", LastName = "Groomer",
                     Email = "testbarber2@vetstation.com", Phone = "+387 63 303 002",
-                    RoleId = barberRole.Id, Username = "testbarber2", Password = "Test1234!",
+                    RoleId = barberRole.Id, Username = "testbarber2", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Mostar", Country = "Bosnia and Herzegovina", Address = "Santic 11",
                     BirthDate = new DateTime(1996, 9, 25), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[1].Id, DateOfEmployment = new DateTime(2023, 2, 15),
@@ -315,7 +316,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestBarber3", LastName = "Stilist",
                     Email = "testbarber3@vetstation.com", Phone = "+387 63 303 003",
-                    RoleId = barberRole.Id, Username = "testbarber3", Password = "Test1234!",
+                    RoleId = barberRole.Id, Username = "testbarber3", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Tuzla", Country = "Bosnia and Herzegovina", Address = "Solni Trg 2",
                     BirthDate = new DateTime(1997, 12, 3), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[2].Id, DateOfEmployment = new DateTime(2023, 8, 10),
@@ -339,7 +340,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestChief1", LastName = "Glavni",
                     Email = "testchief1@vetstation.com", Phone = "+387 63 304 001",
-                    RoleId = mainVetRole.Id, Username = "testchief1", Password = "Test1234!",
+                    RoleId = mainVetRole.Id, Username = "testchief1", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Sarajevo", Country = "Bosnia and Herzegovina", Address = "Titova 30",
                     BirthDate = new DateTime(1975, 6, 1), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[0].Id, DateOfEmployment = new DateTime(2015, 1, 1),
@@ -350,7 +351,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestChief2", LastName = "Sefica",
                     Email = "testchief2@vetstation.com", Phone = "+387 63 304 002",
-                    RoleId = mainVetRole.Id, Username = "testchief2", Password = "Test1234!",
+                    RoleId = mainVetRole.Id, Username = "testchief2", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Mostar", Country = "Bosnia and Herzegovina", Address = "Branice 14",
                     BirthDate = new DateTime(1978, 10, 15), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[1].Id, DateOfEmployment = new DateTime(2016, 6, 1),
@@ -361,7 +362,7 @@ public class TestDataSeeder
                 {
                     FirstName = "TestChief3", LastName = "Direktor",
                     Email = "testchief3@vetstation.com", Phone = "+387 63 304 003",
-                    RoleId = mainVetRole.Id, Username = "testchief3", Password = "Test1234!",
+                    RoleId = mainVetRole.Id, Username = "testchief3", Password = PasswordHasher.Hash("Test1234!"),
                     City = "Tuzla", Country = "Bosnia and Herzegovina", Address = "Univerzitetska 6",
                     BirthDate = new DateTime(1976, 3, 22), ProfileCreationDate = DateTime.UtcNow, Verified = true,
                     VetStationId = stations[2].Id, DateOfEmployment = new DateTime(2014, 9, 1),

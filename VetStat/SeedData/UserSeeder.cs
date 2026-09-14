@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers.Services;
 using VetStat.Models;
 
 namespace VetStat.SeedData;
@@ -40,7 +41,7 @@ public class UserSeeder
                 Phone = "+387 61 000 001",
                 RoleId = 6, // Admin
                 Username = "admin",
-                Password = "Admin1234!",
+                Password = PasswordHasher.Hash("Admin1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Marsala Tita 1",
@@ -57,7 +58,7 @@ public class UserSeeder
                 Phone = "+387 61 000 002",
                 RoleId = 1, // User
                 Username = "user",
-                Password = "User1234!",
+                Password = PasswordHasher.Hash("User1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Ferhadija 15",
@@ -74,7 +75,7 @@ public class UserSeeder
                 Phone = "+387 61 111 111",
                 RoleId = userRole.Id,
                 Username = "amir",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Titova 10",
@@ -91,7 +92,7 @@ public class UserSeeder
                 Phone = "+387 61 222 222",
                 RoleId = userRole.Id,
                 Username = "lejla",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Mostar",
                 Country = "Bosnia and Herzegovina",
                 Address = "Brace Fejica 5",
@@ -108,7 +109,7 @@ public class UserSeeder
                 Phone = "+387 61 333 333",
                 RoleId = userRole.Id,
                 Username = "dino",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Tuzla",
                 Country = "Bosnia and Herzegovina",
                 Address = "Turalibegova 20",
@@ -125,7 +126,7 @@ public class UserSeeder
                 Phone = "+387 61 444 444",
                 RoleId = userRole.Id,
                 Username = "amina",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Zenica",
                 Country = "Bosnia and Herzegovina",
                 Address = "Kamberovic Polje 3",
@@ -142,7 +143,7 @@ public class UserSeeder
                 Phone = "+387 61 555 555",
                 RoleId = userRole.Id,
                 Username = "emir",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Banja Luka",
                 Country = "Bosnia and Herzegovina",
                 Address = "Kralja Petra 7",
@@ -163,7 +164,7 @@ public class UserSeeder
             var admin = new Admin
             {
                 Username = "admin",
-                Password = "Admin1234!"
+                Password = PasswordHasher.Hash("Admin1234!")
             };
             _context.Admin.Add(admin);
             await _context.SaveChangesAsync();

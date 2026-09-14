@@ -86,6 +86,19 @@ if (app.Environment.IsDevelopment())
 
 }
 
+// Runs in every environment, not just development: the plain-text fallback in
+// PasswordHasher.Verify has been removed, so any account still stored in plain
+// text has to be hashed before the first login attempt reaches it. Idempotent —
+// rows that already hold a BCrypt hash are skipped.
+try
+{
+    await app.SeedPasswordSecurityAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error hardening passwords: {ex.Message}");
+}
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors(
