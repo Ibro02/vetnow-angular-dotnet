@@ -1,0 +1,166 @@
+import 'package:flutter/material.dart';
+import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
+import 'app_button.dart';
+
+/// What a screen shows when a request failed.
+///
+/// Every screen but Explore used to handle this by printing a line of
+/// grey text and leaving the person stuck: no retry, and nothing to do
+/// but back out and come in again. Worse, Appointments passed the error
+/// through as its *empty-state* text, so a dropped connection and an
+/// empty calendar looked identical.
+///
+/// The two are not the same thing and must not look the same: one means
+/// "you have nothing booked", the other means "we could not ask".
+class ErrorStateView extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  /// The server's own wording when it sent one. A network failure has no
+  /// message worth showing, so that case falls back to the generic line.
+  final String? message;
+
+  /// Fills the viewport and stays pull-to-refreshable. Off for a slot
+  /// inside an already-scrolling page.
+  final bool scrollable;
+
+  const ErrorStateView({
+    super.key,
+    required this.onRetry,
+    this.message,
+    this.scrollable = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // 'network' is the sentinel the screens use for "no server", which is
+    // not a sentence anyone should read.
+    final text = (message == null || message == 'network') ? l10n.networkError : message!;
+
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 64,
+          width: 64,
+          decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+          child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: AppSpacing.s4),
+        Text(
+          l10n.somethingWentWrong,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.45),
+        ),
+        const SizedBox(height: AppSpacing.s5),
+        AppButton(
+          label: l10n.retry,
+          icon: Icons.refresh,
+          fullWidth: false,
+          variant: AppButtonVariant.secondary,
+          onPressed: onRetry,
+        ),
+      ],
+    );
+
+    if (!scrollable) {
+      // Tighter than the full-screen version on purpose: inside a page
+      // that already has a header above it, the old 64pt of air pushed
+      // the retry button below the fold — the one control on the screen,
+      // reachable only by scrolling.
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.pagePadding,
+          AppSpacing.s8,
+          AppSpacing.pagePadding,
+          AppSpacing.s6,
+        ),
+        child: content,
+      );
+    }
+
+    return ListView(
+      // Always scrollable so a pull-to-refresh still works here — this is
+      // exactly the screen someone tugs at when the network comes back.
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      children: [
+        const SizedBox(height: AppSpacing.s16),
+        content,
+      ],
+    );
+  }
+}
+
+/// What a screen shows when the request worked and there is simply
+/// nothing there yet.
+class EmptyStateView extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  /// Optional second line — room for "book your first visit" rather than
+  /// leaving someone at a dead end.
+  final String? hint;
+
+  final bool scrollable;
+
+  const EmptyStateView({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.hint,
+    this.scrollable = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 64,
+          width: 64,
+          decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+          child: Icon(icon, size: 28, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: AppSpacing.s4),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.45),
+        ),
+        if (hint != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            hint!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5, height: 1.45),
+          ),
+        ],
+      ],
+    );
+
+    if (!scrollable) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.pagePadding),
+        child: content,
+      );
+    }
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      children: [
+        const SizedBox(height: AppSpacing.s16),
+        content,
+      ],
+    );
+  }
+}

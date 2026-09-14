@@ -10,6 +10,7 @@ import '../widgets/hover_card.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/state_views.dart';
 import 'appointment_detail_screen.dart';
 
 /// Premium tabbed appointments view: Upcoming / Past, each rendered as
@@ -203,13 +204,29 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
                         child: SkeletonList(count: 3, itemBuilder: () => const AppointmentCardSkeleton()),
                       )
-                    : TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _AppointmentList(appointments: _upcoming, emptyText: _error ?? l10n.noUpcoming, onChanged: _load),
-                          _AppointmentList(appointments: _past, emptyText: l10n.noPast, onChanged: _load),
-                        ],
-                      ),
+                    : _error != null
+                        // A failed request is not an empty calendar. It used
+                        // to be passed through as the empty-state text, so
+                        // "you have nothing booked" and "we couldn't ask"
+                        // read identically — and neither offered a way out.
+                        ? ErrorStateView(message: _error, onRetry: _load)
+                        : TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _AppointmentList(
+                                appointments: _upcoming,
+                                emptyText: l10n.noUpcoming,
+                                emptyIcon: Icons.event_busy_outlined,
+                                onChanged: _load,
+                              ),
+                              _AppointmentList(
+                                appointments: _past,
+                                emptyText: l10n.noPast,
+                                emptyIcon: Icons.history_rounded,
+                                onChanged: _load,
+                              ),
+                            ],
+                          ),
               ),
             ],
           );
@@ -227,8 +244,15 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
 class _AppointmentList extends StatelessWidget {
   final List<Appointment> appointments;
   final String emptyText;
+  final IconData emptyIcon;
   final VoidCallback onChanged;
-  const _AppointmentList({required this.appointments, required this.emptyText, required this.onChanged});
+
+  const _AppointmentList({
+    required this.appointments,
+    required this.emptyText,
+    required this.emptyIcon,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -238,31 +262,9 @@ class _AppointmentList extends StatelessWidget {
       onRefresh: () async => onChanged(),
       color: AppColors.primary,
       backgroundColor: AppColors.surface,
-      child: appointments.isEmpty ? _empty(context) : _list(),
-    );
-  }
-
-  Widget _empty(BuildContext context) {
-    return ListView(
-      // A plain Center can't be pulled; a scrollable that is always
-      // scrollable can.
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppSpacing.pagePadding),
-      children: [
-        const SizedBox(height: AppSpacing.s16),
-        Column(
-          children: [
-            Container(
-              height: 64,
-              width: 64,
-              decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-              child: const Icon(Icons.event_busy_outlined, size: 28, color: AppColors.textMuted),
-            ),
-            const SizedBox(height: AppSpacing.s4),
-            Text(emptyText, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textMuted)),
-          ],
-        ),
-      ],
+      child: appointments.isEmpty
+          ? EmptyStateView(icon: emptyIcon, text: emptyText)
+          : _list(),
     );
   }
 

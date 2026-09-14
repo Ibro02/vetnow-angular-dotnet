@@ -45,7 +45,18 @@ class AppButton extends StatelessWidget {
                 Icon(icon, size: 18),
                 const SizedBox(width: 8),
               ],
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+              // Flexible, not a bare Text: with the system font turned up
+              // the label outgrew the button and overflowed by nearly 200
+              // pixels on a narrow phone. Someone running large text is
+              // exactly the person who will never report that.
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
+                ),
+              ),
             ],
           );
 

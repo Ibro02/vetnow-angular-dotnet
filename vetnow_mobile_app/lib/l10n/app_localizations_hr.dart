@@ -605,6 +605,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get favourites => 'Omiljeni';
 
   @override
+  String get addToFavourites => 'Dodaj u omiljene';
+
+  @override
+  String get removeFromFavourites => 'Ukloni iz omiljenih';
+
+  @override
   String get mostVisited => 'Najčešće dolazi';
 
   @override

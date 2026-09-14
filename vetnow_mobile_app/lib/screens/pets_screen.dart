@@ -15,6 +15,7 @@ import '../widgets/pet_avatar.dart';
 import '../widgets/action_sheet.dart';
 import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
+import '../widgets/state_views.dart';
 import 'add_pet_screen.dart';
 import 'pet_detail_screen.dart';
 
@@ -308,14 +309,10 @@ class _PetsScreenState extends State<PetsScreen> {
                       ),
                     ),
                   Expanded(
+                    // A failed load offered a line of grey text and no way
+                    // out — you had to leave the screen and come back.
                     child: _error != null && _pets.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.pagePadding),
-                              child:
-                                  Text(l10n.networkError, style: const TextStyle(color: AppColors.textMuted)),
-                            ),
-                          )
+                        ? ErrorStateView(message: _error, onRetry: _load)
                         : _pets.isEmpty
                             ? _EmptyPetsState(l10n: l10n)
                             : (_viewMode == _ViewMode.list
@@ -820,17 +817,25 @@ class _PetGridCard extends StatelessWidget {
                     Positioned(
                       top: 6,
                       right: 6,
-                      child: InkWell(
-                        onTap: onToggleFavourite,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
-                          child: Icon(
-                            pet.isFavourite ? Icons.star_rounded : Icons.star_border_rounded,
-                            color: pet.isFavourite ? AppColors.gold : Colors.white,
-                            size: 17,
+                      // Icon-only, so it needs a spoken label — and one that
+                      // says what the tap will do, not what the star is.
+                      child: Semantics(
+                        button: true,
+                        label: pet.isFavourite
+                            ? AppLocalizations.of(context)!.removeFromFavourites
+                            : AppLocalizations.of(context)!.addToFavourites,
+                        child: InkWell(
+                          onTap: onToggleFavourite,
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
+                            child: Icon(
+                              pet.isFavourite ? Icons.star_rounded : Icons.star_border_rounded,
+                              color: pet.isFavourite ? AppColors.gold : Colors.white,
+                              size: 17,
+                            ),
                           ),
                         ),
                       ),

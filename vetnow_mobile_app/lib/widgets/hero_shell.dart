@@ -181,6 +181,11 @@ class GlassSurface extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  /// What a screen reader announces. An icon-only button without one is
+  /// silent to anyone who cannot see it, which is most of what these are
+  /// used for — the bell, the language switch.
+  final String? semanticLabel;
+
   const GlassSurface({
     super.key,
     required this.child,
@@ -188,6 +193,7 @@ class GlassSurface extends StatelessWidget {
     this.borderRadius,
     this.circle = false,
     this.onTap,
+    this.semanticLabel,
   });
 
   @override
@@ -216,12 +222,16 @@ class GlassSurface extends StatelessWidget {
 
     if (onTap == null) return surface;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: surface,
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: surface,
+        ),
       ),
     );
   }

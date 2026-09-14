@@ -1120,6 +1120,18 @@ abstract class AppLocalizations {
   /// **'Omiljeni'**
   String get favourites;
 
+  /// No description provided for @addToFavourites.
+  ///
+  /// In bs, this message translates to:
+  /// **'Dodaj u omiljene'**
+  String get addToFavourites;
+
+  /// No description provided for @removeFromFavourites.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ukloni iz omiljenih'**
+  String get removeFromFavourites;
+
   /// No description provided for @mostVisited.
   ///
   /// In bs, this message translates to:

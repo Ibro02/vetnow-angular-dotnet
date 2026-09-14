@@ -7,6 +7,7 @@ import '../services/api_client.dart';
 import '../services/vet_station_api_service.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/state_views.dart';
 import '../widgets/verified_badge.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/app_button.dart';
@@ -346,50 +347,58 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.s5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        // With no city selected the "… in {city}" phrasing would
-                        // read as a lie, so fall back to a plain count.
-                        _selectedCity == null
-                            ? l10n.clinicsFound(stations.length)
-                            : l10n.clinicsInCity(stations.length, _selectedCity!),
-                        style:
-                            const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
-                      ),
-                      InkWell(
-                        onTap: _openAmenitiesFilterSheet,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(Icons.tune,
-                                  size: 16,
-                                  color: _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
-                            ),
-                            if (_hasActiveAmenityFilters)
-                              Positioned(
-                                right: -1,
-                                top: -1,
-                                child: Container(
-                                  height: 9,
-                                  width: 9,
-                                  decoration:
-                                      const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                                ),
-                              ),
-                          ],
+                  // Hidden while the request is failing: "0 clinics found"
+                  // above an error message claims a result we never got.
+                  if (_loadError == null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          // With no city selected the "… in {city}" phrasing would
+                          // read as a lie, so fall back to a plain count.
+                          _selectedCity == null
+                              ? l10n.clinicsFound(stations.length)
+                              : l10n.clinicsInCity(stations.length, _selectedCity!),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
                         ),
-                      ),
-                    ],
-                  ),
+                        Semantics(
+                          button: true,
+                          label: l10n.filterClinics,
+                          child: InkWell(
+                            onTap: _openAmenitiesFilterSheet,
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: _hasActiveAmenityFilters ? AppColors.primary50 : AppColors.bgMuted,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.tune,
+                                      size: 16,
+                                      color:
+                                          _hasActiveAmenityFilters ? AppColors.primary : AppColors.textMuted),
+                                ),
+                                if (_hasActiveAmenityFilters)
+                                  Positioned(
+                                    right: -1,
+                                    top: -1,
+                                    child: Container(
+                                      height: 9,
+                                      width: 9,
+                                      decoration: const BoxDecoration(
+                                          color: AppColors.accent, shape: BoxShape.circle),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: AppSpacing.s3),
                 ],
               ),
@@ -398,9 +407,30 @@ class _ExploreScreenState extends State<ExploreScreen> {
           if (_isLoading)
             const SliverToBoxAdapter(child: _LoadingState())
           else if (_loadError != null)
-            SliverToBoxAdapter(child: _ErrorState(onRetry: _loadStations))
+            SliverToBoxAdapter(
+              child: Padding(
+                // Clears the floating nav bar — the retry button was
+                // rendering underneath it, which made the one control on
+                // the screen untappable.
+                padding: const EdgeInsets.only(bottom: 110),
+                child: ErrorStateView(
+                  message: _loadError,
+                  onRetry: _loadStations,
+                  scrollable: false,
+                ),
+              ),
+            )
           else if (stations.isEmpty)
-            const SliverToBoxAdapter(child: _EmptyState())
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 110),
+                child: EmptyStateView(
+                  icon: Icons.search_off,
+                  text: l10n.noClinicsMatch,
+                  scrollable: false,
+                ),
+              ),
+            )
           else
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(
@@ -474,6 +504,7 @@ class _Hero extends StatelessWidget {
                     GlassSurface(
                       circle: true,
                       padding: const EdgeInsets.all(9),
+                      semanticLabel: l10n.language,
                       onTap: () => showLanguagePicker(context),
                       child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
                     ),
@@ -483,6 +514,7 @@ class _Hero extends StatelessWidget {
                     GlassSurface(
                       circle: true,
                       padding: const EdgeInsets.all(9),
+                      semanticLabel: l10n.notifications,
                       onTap: () {
                         Haptics.select();
                         Navigator.of(context).push(
@@ -596,7 +628,6 @@ class _BrandMark extends StatelessWidget {
     );
   }
 }
-
 
 class _TrustPill extends StatelessWidget {
   final IconData icon;
@@ -837,67 +868,6 @@ class _LoadingState extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, AppSpacing.s10),
       child: SkeletonList(count: 4, itemBuilder: () => const ClinicCardSkeleton()),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final VoidCallback onRetry;
-  const _ErrorState({required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16, horizontal: AppSpacing.pagePadding),
-      child: Column(
-        children: [
-          Container(
-            height: 64,
-            width: 64,
-            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-            child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: AppSpacing.s4),
-          Text(l10n.networkError,
-              textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: AppSpacing.s5),
-          AppButton(
-            label: l10n.retry,
-            icon: Icons.refresh,
-            fullWidth: false,
-            variant: AppButtonVariant.secondary,
-            onPressed: onRetry,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16, horizontal: AppSpacing.pagePadding),
-      child: Column(
-        children: [
-          Container(
-            height: 64,
-            width: 64,
-            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-            child: const Icon(Icons.search_off, size: 28, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: AppSpacing.s4),
-          Text(
-            AppLocalizations.of(context)!.noClinicsMatch,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textSecondary),
-          ),
-        ],
-      ),
     );
   }
 }

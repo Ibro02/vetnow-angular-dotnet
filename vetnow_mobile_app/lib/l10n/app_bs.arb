@@ -258,6 +258,8 @@
   "saveChanges": "Sačuvaj izmjene",
   "editPet": "Uredi ljubimca",
   "favourites": "Omiljeni",
+  "addToFavourites": "Dodaj u omiljene",
+  "removeFromFavourites": "Ukloni iz omiljenih",
   "mostVisited": "Najčešće dolazi",
   "visits": "termina",
   "dragToReorderHint": "Drži i prevuci ikonicu da promijeniš redoslijed.",
