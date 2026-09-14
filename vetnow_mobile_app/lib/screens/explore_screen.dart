@@ -12,6 +12,7 @@ import '../widgets/hover_card.dart';
 import '../widgets/app_button.dart';
 import '../widgets/clinic_avatar.dart';
 import '../widgets/entrance.dart';
+import '../widgets/hero_shell.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/vet_hero_background.dart';
 import 'notifications_screen.dart';
@@ -434,136 +435,250 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 }
 
-/// Premium hero: deep-ink gradient, brand mark, city selector.
-/// This is the "serious but sweet" moment — confident dark surface,
-/// a paw mark, and a friendly one-liner underneath.
+/// The front door of the app, and the first thing anyone sees.
+///
+/// Built in layers, deepest first: the ink gradient, the drifting paw
+/// texture, a sheen from the top-left, then a vignette that darkens the
+/// corners so the middle reads as lit. The whole panel is cut with a
+/// shallow concave sweep along the bottom and finished with a gold
+/// hairline, so it presents as a surface rather than as a coloured box.
 class _Hero extends StatelessWidget {
   const _Hero();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: const BoxDecoration(
-        gradient: AppGradients.ink,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(AppRadius.xl2),
-          bottomRight: Radius.circular(AppRadius.xl2),
-        ),
-      ),
-      child: Stack(
-        children: [
-          const Positioned.fill(child: VetHeroBackground()),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.pagePadding,
-              AppSpacing.s5,
-              AppSpacing.pagePadding,
-              AppSpacing.s8,
+    final l10n = AppLocalizations.of(context)!;
+
+    return Stack(
+      children: [
+        // The shadow has to sit outside the clip: clipped, it would be cut
+        // off at the very edge it is supposed to be falling from.
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.xl2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.ink.withValues(alpha: 0.22),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+        ),
+        ClipPath(
+          clipper: const HeroSweepClipper(),
+          child: DecoratedBox(
+            decoration: const BoxDecoration(gradient: AppGradients.ink),
+            child: Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          height: 34,
-                          width: 34,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            shape: BoxShape.circle,
+                const Positioned.fill(child: VetHeroBackground()),
+                // The same top-left light every branded surface in the app
+                // carries, so the header belongs to the same family.
+                const Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
+                  ),
+                ),
+                const Positioned.fill(child: HeroVignette()),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.pagePadding,
+                    AppSpacing.s5,
+                    AppSpacing.pagePadding,
+                    AppSpacing.s10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const _BrandMark(),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GlassSurface(
+                                circle: true,
+                                padding: const EdgeInsets.all(9),
+                                onTap: () => showLanguagePicker(context),
+                                child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
+                              ),
+                              const SizedBox(width: 8),
+                              // The bell used to be a decorative circle with
+                              // no tap target at all.
+                              GlassSurface(
+                                circle: true,
+                                padding: const EdgeInsets.all(9),
+                                onTap: () {
+                                  Haptics.select();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                                  );
+                                },
+                                child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
+                              ),
+                            ],
                           ),
-                          child: const Icon(Icons.pets, color: Colors.white, size: 18),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'VetNow',
-                          style: TextStyle(
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.s8),
+                      // A vertical fade across the headline. Flat white on a
+                      // dark panel reads as a label; letting the lower half
+                      // sit back a little gives the type some depth.
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.white, Color(0xD6FFFFFF)],
+                        ).createShader(bounds),
+                        child: Text(
+                          l10n.exploreHeroTitle,
+                          style: const TextStyle(
                             fontFamily: AppFonts.display,
-                            fontSize: 18,
+                            fontSize: 29,
+                            height: 1.18,
+                            letterSpacing: -0.4,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                          onTap: () => showLanguagePicker(context),
+                      ),
+                      const SizedBox(height: AppSpacing.s3),
+                      // A short gold rule under the headline — the one warm
+                      // mark on a cool panel, and the thing that makes the
+                      // block read as composed rather than stacked.
+                      Container(
+                        height: 3,
+                        width: 44,
+                        decoration: BoxDecoration(
+                          gradient: AppGradients.gold,
                           borderRadius: BorderRadius.circular(AppRadius.full),
-                          child: Container(
-                            height: 34,
-                            width: 34,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.14),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
-                          ),
                         ),
-                        const SizedBox(width: 8),
-                        // The bell used to be a decorative circle with no tap
-                        // target at all.
-                        InkWell(
-                          onTap: () {
-                            Haptics.select();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(AppRadius.full),
-                          child: Container(
-                            height: 34,
-                            width: 34,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.14),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 17),
-                          ),
+                      ),
+                      const SizedBox(height: AppSpacing.s3),
+                      Text(
+                        l10n.exploreHeroSubtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withValues(alpha: 0.72),
+                          height: 1.45,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.s6),
-                Text(
-                  AppLocalizations.of(context)!.exploreHeroTitle,
-                  style: const TextStyle(
-                    fontFamily: AppFonts.display,
-                    fontSize: 28,
-                    height: 1.2,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                      ),
+                      const SizedBox(height: AppSpacing.s5),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _TrustPill(icon: Icons.verified_rounded, label: l10n.trustNoAccount),
+                          _TrustPill(icon: Icons.bolt_rounded, label: l10n.trustFewTaps),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.s2),
-                Text(
-                  AppLocalizations.of(context)!.exploreHeroSubtitle,
-                  style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.75), height: 1.4),
-                ),
-                const SizedBox(height: AppSpacing.s5),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _TrustPill(
-                        icon: Icons.verified_rounded, label: AppLocalizations.of(context)!.trustNoAccount),
-                    _TrustPill(icon: Icons.bolt_rounded, label: AppLocalizations.of(context)!.trustFewTaps),
-                  ],
-                ),
+                // A gold hairline tracing the swept edge, bright in the
+                // middle and vanishing at the corners.
+                const Positioned.fill(child: IgnorePointer(child: _HeroEdgeLight())),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
+}
+
+/// The app mark: a paw on the brand gradient, ringed in white — the same
+/// lockup as the launcher icon, so the thing on the home screen and the
+/// thing at the top of the app read as one brand.
+class _BrandMark extends StatelessWidget {
+  const _BrandMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          height: 36,
+          width: 36,
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.28), width: 1.2),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: AppGradients.brand,
+              shape: BoxShape.circle,
+              boxShadow: AppShadows.glow(AppColors.accent),
+            ),
+            child: const Icon(Icons.pets, color: Colors.white, size: 17),
+          ),
+        ),
+        const SizedBox(width: 9),
+        const Text(
+          'VetNow',
+          style: TextStyle(
+            fontFamily: AppFonts.display,
+            fontSize: 19,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Traces the hero's swept bottom edge in gold, fading out towards the
+/// corners so it reads as light catching a rim rather than as a border.
+class _HeroEdgeLight extends StatelessWidget {
+  const _HeroEdgeLight();
+
+  @override
+  Widget build(BuildContext context) => CustomPaint(painter: _EdgeLightPainter());
+}
+
+class _EdgeLightPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // The same curve HeroSweepClipper cuts, stroked instead of cut — and
+    // lifted a hair inside it. Drawn exactly on the boundary, the clip
+    // eats the outer half of the stroke and the rest is invisible.
+    const inset = 1.2;
+    final h = size.height - inset;
+
+    final path = Path()
+      ..moveTo(0, h - AppRadius.xl2)
+      ..quadraticBezierTo(0, h, AppRadius.xl2, h)
+      ..cubicTo(
+        size.width * 0.28, h - 26,
+        size.width * 0.72, h - 26,
+        size.width - AppRadius.xl2, h,
+      )
+      ..quadraticBezierTo(size.width, h, size.width, h - AppRadius.xl2);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..shader = const LinearGradient(
+          colors: [Color(0x00E8A73C), Color(0xCCE8A73C), Color(0x00E8A73C)],
+          stops: [0.10, 0.5, 0.90],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _EdgeLightPainter oldDelegate) => false;
 }
 
 class _TrustPill extends StatelessWidget {
@@ -573,20 +688,17 @@ class _TrustPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassSurface(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 13, color: AppColors.gold),
           const SizedBox(width: 6),
-          Text(label,
-              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white),
+          ),
         ],
       ),
     );
