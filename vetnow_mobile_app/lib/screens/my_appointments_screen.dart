@@ -15,11 +15,9 @@ import 'appointment_detail_screen.dart';
 /// Premium tabbed appointments view: Upcoming / Past, each rendered as
 /// a rich card. Tapping a card opens AppointmentDetailScreen.
 ///
-/// Backed by GET /api/Appointment/GetByCustomerId (real, [Authorize] —
-/// fine since this screen already sits behind our login gate). That
-/// endpoint only returns appointments with SlotDateTime >= today, so
-/// everything it returns lands in Upcoming; the backend has no "past
-/// appointments" endpoint yet, so Past stays empty until one exists.
+/// Backed by GET /api/Appointment/GetByCustomerId with `includePast`, so one
+/// request fills both tabs. The split is done here, by comparing each slot to
+/// the current time.
 ///
 /// Note: the backend has no service price/duration/description data
 /// at all yet, so those fields show as blank/zero on real appointments
@@ -39,8 +37,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
   bool _isLoading = true;
   String? _error;
   List<Appointment> _upcoming = [];
-
-  final List<Appointment> _past = const [];
+  List<Appointment> _past = [];
 
   @override
   void initState() {
@@ -72,10 +69,31 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
       _error = null;
     });
     try {
-      final remote = await AppointmentApiService.getByCustomer(customerId: auth.userId!, token: auth.token!);
+      final remote = await AppointmentApiService.getByCustomer(
+        customerId: auth.userId!,
+        token: auth.token!,
+        includePast: true,
+      );
       if (!mounted) return;
+
+      // Split by the actual appointment time, not by date: a visit at 08:30
+      // this morning belongs under "past visits" by the afternoon, and used
+      // to sit in "upcoming" all day.
+      final now = DateTime.now();
+      final upcoming = <Appointment>[];
+      final past = <Appointment>[];
+      for (final r in remote) {
+        final appointment = _toAppointment(r, now);
+        (appointment.dateTime.isBefore(now) ? past : upcoming).add(appointment);
+      }
+
+      upcoming.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+      // Most recent visit first — the one someone is most likely to look up.
+      past.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
       setState(() {
-        _upcoming = remote.map(_toAppointment).toList()..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+        _upcoming = upcoming;
+        _past = past;
         _isLoading = false;
       });
     } on ApiException catch (e) {
@@ -93,7 +111,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
     }
   }
 
-  Appointment _toAppointment(RemoteAppointment r) {
+  Appointment _toAppointment(RemoteAppointment r, DateTime now) {
     final staffName = [r.employeeFirstName, r.employeeLastName].where((s) => s != null && s.isNotEmpty).join(' ');
     return Appointment(
       id: r.id,
@@ -110,7 +128,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
       priceKm: 0,
       durationMinutes: 0,
       dateTime: r.slotDateTime,
-      status: AppointmentStatus.upcoming,
+      status: r.slotDateTime.isBefore(now)
+          ? AppointmentStatus.completed
+          : AppointmentStatus.upcoming,
     );
   }
 

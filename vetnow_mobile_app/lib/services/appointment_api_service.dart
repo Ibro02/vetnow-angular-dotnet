@@ -5,10 +5,9 @@ import 'api_client.dart';
 /// mirrors AppointmentGetByCustomerIdEndpoint's anonymous projection
 /// exactly (it's a joined view, not the raw Appointment entity).
 ///
-/// Note: this endpoint only returns appointments with
-/// SlotDateTime >= today — the backend has no "past appointments"
-/// endpoint yet, so the Past tab stays empty for real accounts until
-/// one exists.
+/// Past visits come back too when `includePast` is set; without it the
+/// endpoint returns only what is still ahead, which is what the web
+/// dashboard expects.
 class RemoteAppointment {
   final int id;
   final int employeeId;
@@ -57,10 +56,19 @@ class RemoteAppointment {
 class AppointmentApiService {
   AppointmentApiService._();
 
-  static Future<List<RemoteAppointment>> getByCustomer({required int customerId, required String token}) async {
+  /// [includePast] also returns visits that already happened, so the screen
+  /// can fill its "past visits" tab from the same single request.
+  static Future<List<RemoteAppointment>> getByCustomer({
+    required int customerId,
+    required String token,
+    bool includePast = false,
+  }) async {
     final result = await ApiClient.get(
       ApiConfig.appointmentByCustomer,
-      query: {'customerId': customerId},
+      query: {
+        'customerId': customerId,
+        if (includePast) 'includePast': true,
+      },
       token: token,
     );
     final list = result as List<dynamic>? ?? [];
