@@ -7,6 +7,7 @@ import '../models/vet_station.dart';
 import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
 import '../state/auth_state.dart';
+import '../widgets/person_avatar.dart';
 import '../widgets/app_button.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/premium_dialog.dart';
@@ -99,16 +100,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         child: Row(
                           children: [
-                            Container(
-                              height: 44,
-                              width: 44,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
-                                shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(color: AppColors.primaryDark.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-                              ),
-                              child: const Icon(Icons.person, color: Colors.white, size: 20),
-                            ),
+                            PersonAvatar(name: appointment.staffName, size: 44),
                             const SizedBox(width: AppSpacing.s3),
                             Expanded(
                               child: Column(

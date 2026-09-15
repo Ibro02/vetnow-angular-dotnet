@@ -16,6 +16,7 @@ import '../widgets/app_button.dart';
 import '../widgets/clinic_avatar.dart';
 import '../widgets/opening_hours_card.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/person_avatar.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
 import '../widgets/verified_badge.dart';
@@ -429,6 +430,23 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                         ),
                       ),
                       const Positioned.fill(child: HeroVignette()),
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 88,
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0x000F2E2C), Color(0x590F2E2C)],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       // Each clinic's gradient is a different brightness, so
                       // the white back arrow can't rely on any one of them for
                       // contrast. A short scrim at the very top guarantees it.
@@ -844,16 +862,10 @@ class _StaffCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              height: 52,
-              width: 52,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]),
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: AppColors.primaryDark.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: const Icon(Icons.person, color: Colors.white, size: 24),
-            ),
+            // Three vets used to wear the same glyph on the same
+            // gradient, which made a team of three read as one person
+            // listed three times.
+            PersonAvatar(name: staff.name, size: 52),
             const SizedBox(width: AppSpacing.s3),
             Expanded(
               child: Column(

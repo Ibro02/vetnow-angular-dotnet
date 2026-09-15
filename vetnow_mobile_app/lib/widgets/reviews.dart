@@ -9,6 +9,7 @@ import '../models/review.dart';
 import '../services/api_client.dart';
 import '../services/review_api_service.dart';
 import 'app_button.dart';
+import 'person_avatar.dart';
 import 'skeleton.dart';
 
 /// Day.month.year, the way a date is written locally.
@@ -277,11 +278,9 @@ class ReviewCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: AppColors.primary50,
-                      child: const Icon(Icons.person, size: 13, color: AppColors.primary),
-                    ),
+                    // Coloured from the name, so a column of reviews
+                    // looks like several people rather than one.
+                    PersonAvatar(name: review.authorName, size: 24),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(

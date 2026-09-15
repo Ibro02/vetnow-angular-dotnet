@@ -66,10 +66,14 @@ class ErrorStateView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 64,
-            width: 64,
-            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-            child: Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
+            height: 72,
+            width: 72,
+            decoration: BoxDecoration(
+              color: AppColors.danger.withValues(alpha: 0.09),
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.danger.withValues(alpha: 0.20)),
+            ),
+            child: const Icon(Icons.cloud_off_outlined, size: 30, color: AppColors.danger),
           ),
           const SizedBox(height: AppSpacing.s4),
           // No header flag on the title: the live region above merges the
@@ -153,10 +157,14 @@ class EmptyStateView extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          height: 64,
-          width: 64,
-          decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-          child: Icon(icon, size: 28, color: AppColors.textMuted),
+          height: 72,
+          width: 72,
+          decoration: BoxDecoration(
+            color: AppColors.primary50,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
+          ),
+          child: Icon(icon, size: 30, color: AppColors.primary),
         ),
         const SizedBox(height: AppSpacing.s4),
         Text(

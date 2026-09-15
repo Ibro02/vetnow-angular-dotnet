@@ -11,6 +11,7 @@ import '../widgets/hero_shell.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
+import '../widgets/person_avatar.dart';
 import '../widgets/section_title.dart';
 import 'booking_screen.dart';
 
@@ -83,12 +84,12 @@ class StaffProfileScreen extends StatelessWidget {
                                   border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 2),
                                   boxShadow: AppShadows.glow(AppColors.accent),
                                 ),
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(colors: [AppColors.accent, AppColors.gold]),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.person, color: Colors.white, size: 44),
+                                // 86, not 96: the ring around it takes 3pt
+                                // of padding and a 2pt border on each side.
+                                child: PersonAvatar(
+                                  name: staff.name,
+                                  size: 86,
+                                  colors: const [AppColors.accent, AppColors.gold],
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.s3),

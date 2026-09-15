@@ -16,6 +16,7 @@ import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/language_picker.dart';
+import '../widgets/person_avatar.dart';
 import '../widgets/section_title.dart';
 import 'diagnostics_screen.dart';
 import 'add_pet_screen.dart';
@@ -191,12 +192,13 @@ class _ProfileHero extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
         ),
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [AppColors.accent, AppColors.gold]),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.person, color: Colors.white, size: 26),
+        // Your own initials rather than a stock silhouette. Keeps the
+        // page's accent-to-gold pairing: whose profile this is is not in
+        // question, so the colour is free to match the header.
+        child: PersonAvatar(
+          name: auth.displayName ?? '',
+          size: 47,
+          colors: const [AppColors.accent, AppColors.gold],
         ),
       ),
       chips: [
