@@ -36,7 +36,11 @@ class StaffProfileScreen extends StatelessWidget {
           CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 260,
+                // Scales with the text: the header holds a 96pt portrait
+                // above a name, a role and a rating, and at a larger size
+                // that column no longer fits a fixed 260.
+                expandedHeight:
+                    MediaQuery.textScalerOf(context).scale(260).clamp(260.0, 360.0),
                 pinned: true,
                 backgroundColor: AppColors.ink,
                 elevation: 0,

@@ -191,7 +191,17 @@ class _InfoGrid extends StatelessWidget {
                   Expanded(
                       child: Text(rows[i].$2,
                           style: TextStyle(fontSize: 12.5, color: AppColors.textMuted))),
-                  Text(rows[i].$3, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  const SizedBox(width: AppSpacing.s3),
+                  // The value can be a breed name, which is longer than
+                  // the label beside it on every row that has one.
+                  Flexible(
+                    child: Text(
+                      rows[i].$3,
+                      textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -219,10 +229,14 @@ class _EmptyVaccinations extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            height: 44,
-            width: 44,
-            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-            child: Icon(Icons.vaccines_outlined, color: AppColors.textMuted, size: 20),
+            height: 52,
+            width: 52,
+            decoration: BoxDecoration(
+              color: AppColors.primary50,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
+            ),
+            child: const Icon(Icons.vaccines_outlined, color: AppColors.primary, size: 22),
           ),
           const SizedBox(height: AppSpacing.s3),
           Text(

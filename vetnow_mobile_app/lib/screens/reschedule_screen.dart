@@ -302,8 +302,10 @@ class _DayStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaler = MediaQuery.textScalerOf(context);
+
     return SizedBox(
-      height: 84,
+      height: scaler.scale(84).clamp(84.0, 130.0),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(
@@ -323,7 +325,7 @@ class _DayStrip extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
-              width: 58,
+              width: scaler.scale(58).clamp(58.0, 92.0),
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
@@ -417,20 +419,45 @@ class _EmptyNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.s8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 38, color: AppColors.textMuted),
-            const SizedBox(height: AppSpacing.s3),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.4),
+    // Centred when it fits, scrollable when it does not.
+    //
+    // Plain Center overflowed at a larger text size, because this sits in
+    // whatever vertical room is left under the day strip. A plain scroll
+    // view fixed that and pinned the note to the top of an otherwise
+    // empty half-screen, which looked worse than the bug. The minHeight
+    // is what gets both.
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.s8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary50,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    child: Icon(icon, size: 26, color: AppColors.primary),
+                  ),
+                  const SizedBox(height: AppSpacing.s4),
+                  Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.4),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

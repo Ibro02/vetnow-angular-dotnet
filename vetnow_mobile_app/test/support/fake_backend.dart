@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 
 import 'package:vetnow_mobile/config/theme.dart';
 import 'package:vetnow_mobile/l10n/app_localizations.dart';
+import 'package:vetnow_mobile/models/appointment.dart';
+import 'package:vetnow_mobile/models/pet.dart';
+import 'package:vetnow_mobile/models/staff_member.dart';
 import 'package:vetnow_mobile/services/api_client.dart';
 import 'package:vetnow_mobile/services/deep_links.dart';
 import 'package:vetnow_mobile/state/auth_state.dart';
@@ -281,3 +284,57 @@ Map<String, dynamic> stations() => {
         },
       ],
     };
+
+// ─── Fixtures for the screens that take a model, not an id ───────────
+//
+// Six screens were invisible to both suites simply because they need a
+// Pet or an Appointment handed to them, and there was nothing to hand.
+
+Pet samplePet({
+  int id = 11,
+  String name = 'Rex',
+  bool favourite = true,
+}) =>
+    Pet(
+      id: id,
+      name: name,
+      species: 'Pas',
+      speciesId: 1,
+      breed: 'Njemački ovčar',
+      birthDate: DateTime(2021, 4, 2),
+      weightKg: 32.5,
+      microchipNumber: '941000012345678',
+      isFavourite: favourite,
+    );
+
+Appointment sampleAppointment({
+  int id = 101,
+  int inDays = 3,
+  AppointmentStatus status = AppointmentStatus.upcoming,
+}) =>
+    Appointment(
+      id: id,
+      employeeId: 5,
+      vetStationId: 1,
+      clinicName: 'Happy Paws Vet Clinic',
+      clinicAddress: 'Ferhadija 15, Sarajevo',
+      clinicPhone: '+387 33 123 456',
+      staffName: 'Dr. Amina Hodžić',
+      staffRole: 'Veterinar',
+      petName: 'Rex',
+      serviceName: 'Opći pregled',
+      serviceDescription: 'Kompletan fizički pregled',
+      priceKm: 30,
+      durationMinutes: 30,
+      dateTime: DateTime.now().add(Duration(days: inDays)),
+      status: status,
+    );
+
+StaffMember sampleStaff() => const StaffMember(
+      id: 5,
+      name: 'Dr. Amina Hodžić',
+      role: 'Veterinar',
+      bio: 'Specijalista za male životinje s petnaest godina prakse.',
+      rating: 4.9,
+      reviewCount: 86,
+    );

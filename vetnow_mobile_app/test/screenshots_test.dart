@@ -20,7 +20,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:vetnow_mobile/models/vet_service.dart';
 import 'package:vetnow_mobile/models/vet_station.dart';
+import 'package:vetnow_mobile/screens/appointment_detail_screen.dart';
 import 'package:vetnow_mobile/screens/booking_screen.dart';
+import 'package:vetnow_mobile/screens/edit_profile_screen.dart';
+import 'package:vetnow_mobile/screens/pet_detail_screen.dart';
+import 'package:vetnow_mobile/screens/reschedule_screen.dart';
+import 'package:vetnow_mobile/screens/staff_profile_screen.dart';
+import 'package:vetnow_mobile/screens/verify_account_screen.dart';
 import 'package:vetnow_mobile/screens/add_pet_screen.dart';
 import 'package:vetnow_mobile/screens/diagnostics_screen.dart';
 import 'package:vetnow_mobile/screens/login_screen.dart';
@@ -106,6 +112,14 @@ void main() {
     'register': () => const RegisterScreen(),
     'clinic': () => VetStationDetailScreen(station: _clinic()),
     'booking': () => BookingScreen(station: _clinic(), services: _services),
+    'pet-detail': () => PetDetailScreen(pet: samplePet()),
+    'appointment-detail': () =>
+        AppointmentDetailScreen(appointment: sampleAppointment()),
+    'reschedule': () => RescheduleScreen(appointment: sampleAppointment()),
+    'staff-profile': () =>
+        StaffProfileScreen(staff: sampleStaff(), station: _clinic()),
+    'edit-profile': () => const EditProfileScreen(),
+    'verify-account': () => const VerifyAccountScreen(userId: 42),
   };
 
   for (final entry in screens.entries) {

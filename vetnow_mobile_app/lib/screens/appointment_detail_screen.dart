@@ -42,7 +42,9 @@ class AppointmentDetailScreen extends StatelessWidget {
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             iconTheme: const IconThemeData(color: Colors.white),
-            title: Text(l10n.appointmentDetails, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+            title: Text(l10n.appointmentDetails,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
             centerTitle: false,
             flexibleSpace: Container(
               decoration: const BoxDecoration(
@@ -52,7 +54,8 @@ class AppointmentDetailScreen extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s5, AppSpacing.pagePadding, AppSpacing.s10),
+              padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.pagePadding, AppSpacing.s5, AppSpacing.pagePadding, AppSpacing.s10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -62,11 +65,24 @@ class AppointmentDetailScreen extends StatelessWidget {
                     title: l10n.sectionAppointment,
                     icon: Icons.event_note_outlined,
                     children: [
-                      _DetailRow(icon: Icons.medical_services_outlined, label: l10n.labelService, value: a.serviceName),
-                      _DetailRow(icon: Icons.notes_outlined, label: l10n.labelDetails, value: a.serviceDescription),
-                      _DetailRow(icon: Icons.schedule, label: l10n.labelDuration, value: '${a.durationMinutes} min'),
+                      _DetailRow(
+                          icon: Icons.medical_services_outlined,
+                          label: l10n.labelService,
+                          value: a.serviceName),
+                      _DetailRow(
+                          icon: Icons.notes_outlined,
+                          label: l10n.labelDetails,
+                          value: a.serviceDescription),
+                      _DetailRow(
+                          icon: Icons.schedule,
+                          label: l10n.labelDuration,
+                          value: '${a.durationMinutes} min'),
                       _DetailRow(icon: Icons.pets, label: l10n.labelPet, value: a.petName),
-                      _DetailRow(icon: Icons.payments_outlined, label: l10n.labelPrice, value: '${a.priceKm.toStringAsFixed(0)} KM', isLast: true),
+                      _DetailRow(
+                          icon: Icons.payments_outlined,
+                          label: l10n.labelPrice,
+                          value: '${a.priceKm.toStringAsFixed(0)} KM',
+                          isLast: true),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.s5),
@@ -106,15 +122,20 @@ class AppointmentDetailScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(a.staffName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
-                                  Text(a.staffRole, style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                                  Text(a.staffName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w800, fontSize: 14)),
+                                  Text(a.staffRole,
+                                      style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                                 ],
                               ),
                             ),
                             Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                              child: const Icon(Icons.chevron_right, color: AppColors.primaryDark, size: 16),
+                              decoration:
+                                  BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                              child: const Icon(Icons.chevron_right,
+                                  color: AppColors.primaryDark, size: 16),
                             ),
                           ],
                         ),
@@ -126,9 +147,19 @@ class AppointmentDetailScreen extends StatelessWidget {
                     title: l10n.sectionClinic,
                     icon: Icons.storefront_outlined,
                     children: [
-                      _DetailRow(icon: Icons.storefront_outlined, label: l10n.labelName, value: a.clinicName),
-                      _DetailRow(icon: Icons.location_on_outlined, label: l10n.labelAddress, value: a.clinicAddress),
-                      _DetailRow(icon: Icons.call_outlined, label: l10n.labelPhone, value: a.clinicPhone, isLast: true),
+                      _DetailRow(
+                          icon: Icons.storefront_outlined,
+                          label: l10n.labelName,
+                          value: a.clinicName),
+                      _DetailRow(
+                          icon: Icons.location_on_outlined,
+                          label: l10n.labelAddress,
+                          value: a.clinicAddress),
+                      _DetailRow(
+                          icon: Icons.call_outlined,
+                          label: l10n.labelPhone,
+                          value: a.clinicPhone,
+                          isLast: true),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.s8),
@@ -280,7 +311,20 @@ class AppointmentDetailScreen extends StatelessWidget {
 
   static String _formatDate(DateTime d) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return '${days[d.weekday - 1]}, ${d.day} ${months[d.month - 1]} ${d.year}';
   }
 
@@ -302,16 +346,29 @@ class _StatusHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final (gradient, icon, label) = switch (status) {
-      AppointmentStatus.upcoming => (<Color>[AppColors.ink, AppColors.primaryDark], Icons.event_available, l10n.upcoming),
-      AppointmentStatus.completed => (<Color>[AppColors.success, AppColors.primaryDark], Icons.check_circle, l10n.statusCompleted),
-      AppointmentStatus.cancelled => (<Color>[AppColors.danger, AppColors.dangerHover], Icons.cancel_outlined, l10n.statusCancelled),
+      AppointmentStatus.upcoming => (
+          <Color>[AppColors.ink, AppColors.primaryDark],
+          Icons.event_available,
+          l10n.upcoming
+        ),
+      AppointmentStatus.completed => (
+          <Color>[AppColors.success, AppColors.primaryDark],
+          Icons.check_circle,
+          l10n.statusCompleted
+        ),
+      AppointmentStatus.cancelled => (
+          <Color>[AppColors.danger, AppColors.dangerHover],
+          Icons.cancel_outlined,
+          l10n.statusCancelled
+        ),
     };
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.s6),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: gradient, begin: Alignment.topLeft, end: Alignment.bottomRight),
+        gradient:
+            LinearGradient(colors: gradient, begin: Alignment.topLeft, end: Alignment.bottomRight),
         borderRadius: BorderRadius.circular(AppRadius.xl2),
         boxShadow: AppShadows.glow(gradient.first),
       ),
@@ -323,17 +380,23 @@ class _StatusHero extends StatelessWidget {
             children: [
               Icon(icon, color: Colors.white, size: 16),
               const SizedBox(width: 6),
-              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+              Text(label,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
             ],
           ),
           const SizedBox(height: AppSpacing.s4),
-          Text(dateLabel, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 22)),
+          Text(dateLabel,
+              style:
+                  const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 22)),
           const SizedBox(height: 2),
           Row(
             children: [
               const Icon(Icons.access_time, color: Colors.white70, size: 14),
               const SizedBox(width: 6),
-              Text(timeLabel, style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
+              Text(timeLabel,
+                  style: const TextStyle(
+                      color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
             ],
           ),
         ],
@@ -359,7 +422,9 @@ class _SectionCard extends StatelessWidget {
               Icon(icon, size: 14, color: AppColors.textMuted),
               const SizedBox(width: 6),
             ],
-            Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
+            Text(title,
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
           ],
         ),
         const SizedBox(height: AppSpacing.s3),
@@ -399,12 +464,21 @@ class _PillActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          gradient: filled ? const LinearGradient(colors: [AppColors.danger, AppColors.dangerHover]) : null,
+          gradient: filled
+              ? const LinearGradient(colors: [AppColors.danger, AppColors.dangerHover])
+              : null,
           color: filled ? null : AppColors.primary50,
           borderRadius: BorderRadius.circular(AppRadius.full),
-          border: filled ? null : Border.all(color: AppColors.primary.withValues(alpha: 0.35), width: 1.5),
+          border: filled
+              ? null
+              : Border.all(color: AppColors.primary.withValues(alpha: 0.35), width: 1.5),
           boxShadow: filled
-              ? [BoxShadow(color: AppColors.danger.withValues(alpha: 0.25), blurRadius: 14, offset: const Offset(0, 6))]
+              ? [
+                  BoxShadow(
+                      color: AppColors.danger.withValues(alpha: 0.25),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6))
+                ]
               : null,
         ),
         child: Row(
@@ -412,12 +486,17 @@ class _PillActionButton extends StatelessWidget {
           children: [
             Icon(icon, size: 16, color: filled ? Colors.white : AppColors.primaryDark),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: filled ? Colors.white : AppColors.primaryDark,
+            // "Cancel appointment" and "Move appointment" are phrases,
+            // and two of these sit side by side on one row.
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: filled ? Colors.white : AppColors.primaryDark,
+                ),
               ),
             ),
           ],
@@ -433,7 +512,8 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final bool isLast;
 
-  const _DetailRow({required this.icon, required this.label, required this.value, this.isLast = false});
+  const _DetailRow(
+      {required this.icon, required this.label, required this.value, this.isLast = false});
 
   @override
   Widget build(BuildContext context) {
@@ -454,7 +534,9 @@ class _DetailRow extends StatelessWidget {
             child: Text(label, style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
           ),
           Expanded(
-            child: Text(value, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text)),
+            child: Text(value,
+                style:
+                    TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text)),
           ),
         ],
       ),
