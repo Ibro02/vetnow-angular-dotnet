@@ -17,6 +17,7 @@ import '../widgets/section_hero.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/section_title.dart';
+import 'diagnostics_screen.dart';
 import 'add_pet_screen.dart';
 import 'pet_detail_screen.dart';
 import 'pets_screen.dart';
@@ -375,7 +376,17 @@ class _SettingsGroup extends StatelessWidget {
       ),
       (Icons.translate_rounded, l10n.language, AppColors.accent, () => showLanguagePicker(context)),
       (Icons.contrast_rounded, l10n.appearance, AppColors.ink, () => showThemePicker(context)),
-      (Icons.help_outline, l10n.helpSupport, AppColors.secondary, () {}),
+      // Was a row that did nothing when tapped. It now opens the one
+      // screen that can answer "which version is this and what went
+      // wrong" without anyone having to ask.
+      (
+        Icons.help_outline,
+        l10n.helpSupport,
+        AppColors.secondary,
+        () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DiagnosticsScreen()),
+            ),
+      ),
     ];
 
     return Container(

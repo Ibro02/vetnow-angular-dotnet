@@ -6,6 +6,7 @@ import '../models/vet_station.dart';
 import '../services/api_client.dart';
 import '../services/clinic_cache.dart';
 import '../services/vet_station_api_service.dart';
+import '../state/resume_refresh.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/theme_picker.dart';
@@ -37,7 +38,14 @@ class ExploreScreen extends StatefulWidget {
 /// sends — so it reordered nothing while looking like it did.
 enum _SortFilter { recommended, topRated, mostReviewed }
 
-class _ExploreScreenState extends State<ExploreScreen> {
+class _ExploreScreenState extends State<ExploreScreen>
+    with WidgetsBindingObserver, ResumeRefresh<ExploreScreen> {
+  // Opening hours and "open now" are the reason: a list that says a
+  // clinic is open, rendered at four in the afternoon and read at eight
+  // in the evening, is simply wrong.
+  @override
+  Future<void> onResumeRefresh() => _loadStations();
+
   final _searchController = TextEditingController();
 
   /// `null` means "all cities". The picker used to default to a hard-coded

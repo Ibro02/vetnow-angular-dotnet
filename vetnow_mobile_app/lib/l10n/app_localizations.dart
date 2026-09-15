@@ -1809,6 +1809,96 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'{count, plural, one{{count} zvjezdica} few{{count} zvjezdice} other{{count} zvjezdica}}'**
   String a11yRateStars(int count);
+
+  /// No description provided for @diagnosticsTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pomoć i dijagnostika'**
+  String get diagnosticsTitle;
+
+  /// No description provided for @diagnosticsAbout.
+  ///
+  /// In bs, this message translates to:
+  /// **'O aplikaciji'**
+  String get diagnosticsAbout;
+
+  /// No description provided for @diagnosticsVersion.
+  ///
+  /// In bs, this message translates to:
+  /// **'Verzija'**
+  String get diagnosticsVersion;
+
+  /// No description provided for @diagnosticsBackend.
+  ///
+  /// In bs, this message translates to:
+  /// **'Server'**
+  String get diagnosticsBackend;
+
+  /// No description provided for @diagnosticsReports.
+  ///
+  /// In bs, this message translates to:
+  /// **'Zapisi o greškama'**
+  String get diagnosticsReports;
+
+  /// No description provided for @diagnosticsEmpty.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema zabilježenih grešaka. To je dobra vijest.'**
+  String get diagnosticsEmpty;
+
+  /// No description provided for @diagnosticsExplainer.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ako nešto krene po zlu, aplikacija to zabilježi ovdje — samo na tvom telefonu, ništa se ne šalje. Kopiraj i pošalji nam kad prijavljuješ problem.'**
+  String get diagnosticsExplainer;
+
+  /// No description provided for @diagnosticsCopy.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kopiraj izvještaj'**
+  String get diagnosticsCopy;
+
+  /// No description provided for @diagnosticsCopied.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kopirano'**
+  String get diagnosticsCopied;
+
+  /// No description provided for @diagnosticsClear.
+  ///
+  /// In bs, this message translates to:
+  /// **'Obriši zapise'**
+  String get diagnosticsClear;
+
+  /// No description provided for @diagnosticsCleared.
+  ///
+  /// In bs, this message translates to:
+  /// **'Zapisi obrisani'**
+  String get diagnosticsCleared;
+
+  /// No description provided for @diagnosticsFatal.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pad'**
+  String get diagnosticsFatal;
+
+  /// No description provided for @diagnosticsHandled.
+  ///
+  /// In bs, this message translates to:
+  /// **'Greška'**
+  String get diagnosticsHandled;
+
+  /// No description provided for @configWarningTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ovaj build nije spreman za objavu'**
+  String get configWarningTitle;
+
+  /// No description provided for @configWarningBody.
+  ///
+  /// In bs, this message translates to:
+  /// **'Aplikacija je podešena da priča sa serverom koji postoji samo na računaru na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovo napravi build sa --dart-define=API_BASE_URL=https://…'**
+  String get configWarningBody;
 }
 
 class _AppLocalizationsDelegate

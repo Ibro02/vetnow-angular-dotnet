@@ -6,6 +6,7 @@ import '../models/review.dart';
 import '../services/appointment_api_service.dart';
 import '../services/pets_api_service.dart';
 import '../services/review_api_service.dart';
+import '../state/resume_refresh.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/gradient_app_bar.dart';
@@ -30,7 +31,11 @@ class NotificationsScreen extends StatefulWidget {
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen>
+    with WidgetsBindingObserver, ResumeRefresh<NotificationsScreen> {
+  @override
+  Future<void> onResumeRefresh() => _load();
+
   bool _loading = true;
   bool _started = false;
 

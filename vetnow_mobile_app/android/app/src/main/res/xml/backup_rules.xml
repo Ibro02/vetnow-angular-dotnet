@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 and below (android:fullBackupContent).
+
+  Auto Backup copies app data to the user's Google Drive. That is fine
+  for a remembered theme or language, and wrong for the session token:
+  restored onto a different device it would hand that device a live
+  logged-in session. Secure storage and the clinic cache are excluded —
+  the cache because a day-old copy of someone else's clinic list is just
+  stale data taking up space in a restore.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+    <exclude domain="sharedpref" path="vetnow.cache.clinics.xml" />
+</full-backup-content>

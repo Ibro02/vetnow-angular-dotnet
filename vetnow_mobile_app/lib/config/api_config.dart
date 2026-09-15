@@ -24,6 +24,31 @@ class ApiConfig {
     defaultValue: 'http://localhost:5157',
   );
 
+  /// Hosts that only exist on the machine the app was built on.
+  static const _developmentHosts = {'localhost', '127.0.0.1', '10.0.2.2', '::1'};
+
+  /// True when [baseUrl] points somewhere a phone in someone's hand can
+  /// actually reach.
+  ///
+  /// The default above is a development address, which is right for
+  /// `flutter run` and catastrophic in a release: the app installs, opens,
+  /// and every screen fails with "check your connection" — the one message
+  /// that sends people to their router instead of to us. Shipping that is
+  /// a single forgotten flag away, so the app checks rather than trusts:
+  ///
+  ///   flutter build appbundle --release \
+  ///     --dart-define=API_BASE_URL=https://api.vetnow.ba
+  static bool get isProductionReady {
+    final uri = Uri.tryParse(baseUrl);
+    if (uri == null || !uri.hasScheme || uri.host.isEmpty) return false;
+    if (_developmentHosts.contains(uri.host.toLowerCase())) return false;
+    // Plain HTTP would put the session token on the wire in the clear,
+    // and the release network policy blocks it anyway — better to say so
+    // here than to let every request fail with a vague socket error.
+    if (uri.scheme != 'https') return false;
+    return true;
+  }
+
   /// Header name the backend expects for the auth token
   /// (see AuthService.IsLogged() legacy header fallback).
   static const String authHeaderName = 'my-auth-token';

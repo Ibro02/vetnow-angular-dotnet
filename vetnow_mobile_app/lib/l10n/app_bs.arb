@@ -383,5 +383,20 @@
   "a11yRateStars": "{count, plural, one{{count} zvjezdica} few{{count} zvjezdice} other{{count} zvjezdica}}",
   "@a11yRateStars": {
     "placeholders": { "count": { "type": "int" } }
-  }
+  },
+  "diagnosticsTitle": "Pomoć i dijagnostika",
+  "diagnosticsAbout": "O aplikaciji",
+  "diagnosticsVersion": "Verzija",
+  "diagnosticsBackend": "Server",
+  "diagnosticsReports": "Zapisi o greškama",
+  "diagnosticsEmpty": "Nema zabilježenih grešaka. To je dobra vijest.",
+  "diagnosticsExplainer": "Ako nešto krene po zlu, aplikacija to zabilježi ovdje — samo na tvom telefonu, ništa se ne šalje. Kopiraj i pošalji nam kad prijavljuješ problem.",
+  "diagnosticsCopy": "Kopiraj izvještaj",
+  "diagnosticsCopied": "Kopirano",
+  "diagnosticsClear": "Obriši zapise",
+  "diagnosticsCleared": "Zapisi obrisani",
+  "diagnosticsFatal": "Pad",
+  "diagnosticsHandled": "Greška",
+  "configWarningTitle": "Ovaj build nije spreman za objavu",
+  "configWarningBody": "Aplikacija je podešena da priča sa serverom koji postoji samo na računaru na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovo napravi build sa --dart-define=API_BASE_URL=https://…"
 }

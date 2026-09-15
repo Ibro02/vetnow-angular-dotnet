@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../config/app_info.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import 'app_button.dart';
@@ -37,7 +39,22 @@ class ErrorStateView extends StatelessWidget {
 
     // 'network' is the sentinel the screens use for "no server", which is
     // not a sentence anyone should read.
-    final text = (message == null || message == 'network') ? l10n.networkError : message!;
+    final noServer = message == null || message == 'network';
+
+    // A release built without --dart-define=API_BASE_URL talks to the
+    // machine it was compiled on, so on a phone *every* request fails and
+    // every screen says "check your connection" — which sends people to
+    // their router over a mistake in the build command. When we can tell
+    // that is what happened, say that instead.
+    //
+    // Release only: in development, pointing at localhost is correct, and
+    // a dev server that is simply not running should read as exactly
+    // that.
+    final misconfigured = kReleaseMode && !AppInfo.pointsAtRealBackend;
+
+    final text = noServer
+        ? (misconfigured ? l10n.configWarningBody : l10n.networkError)
+        : message!;
 
     // A live region because this replaces a loading placeholder without
     // any navigation happening: without it the screen silently swaps

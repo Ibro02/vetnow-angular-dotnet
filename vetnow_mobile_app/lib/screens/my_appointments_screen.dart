@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/appointment.dart';
 import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
+import '../state/resume_refresh.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
@@ -32,7 +33,13 @@ class MyAppointmentsScreen extends StatefulWidget {
   State<MyAppointmentsScreen> createState() => _MyAppointmentsScreenState();
 }
 
-class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with SingleTickerProviderStateMixin {
+class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver, ResumeRefresh<MyAppointmentsScreen> {
+  // A visit cancelled or moved from the web should not still read as
+  // booked because this screen was left open since yesterday.
+  @override
+  Future<void> onResumeRefresh() => _load();
+
   late final TabController _tabController;
   bool _loaded = false;
   bool _isLoading = true;

@@ -976,4 +976,52 @@ class AppLocalizationsHr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diagnosticsTitle => 'Pomoć i dijagnostika';
+
+  @override
+  String get diagnosticsAbout => 'O aplikaciji';
+
+  @override
+  String get diagnosticsVersion => 'Verzija';
+
+  @override
+  String get diagnosticsBackend => 'Poslužitelj';
+
+  @override
+  String get diagnosticsReports => 'Zapisi o greškama';
+
+  @override
+  String get diagnosticsEmpty =>
+      'Nema zabilježenih grešaka. To je dobra vijest.';
+
+  @override
+  String get diagnosticsExplainer =>
+      'Ako nešto krene po zlu, aplikacija to zabilježi ovdje — samo na tvom telefonu, ništa se ne šalje. Kopiraj i pošalji nam kad prijavljuješ problem.';
+
+  @override
+  String get diagnosticsCopy => 'Kopiraj izvještaj';
+
+  @override
+  String get diagnosticsCopied => 'Kopirano';
+
+  @override
+  String get diagnosticsClear => 'Obriši zapise';
+
+  @override
+  String get diagnosticsCleared => 'Zapisi obrisani';
+
+  @override
+  String get diagnosticsFatal => 'Pad';
+
+  @override
+  String get diagnosticsHandled => 'Greška';
+
+  @override
+  String get configWarningTitle => 'Ovaj build nije spreman za objavu';
+
+  @override
+  String get configWarningBody =>
+      'Aplikacija je podešena da razgovara s poslužiteljem koji postoji samo na računalu na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovno napravi build s --dart-define=API_BASE_URL=https://…';
 }

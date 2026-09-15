@@ -1,16 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'config/theme.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/root_shell.dart';
+import 'services/crash_log.dart';
 import 'state/auth_state.dart';
 import 'state/locale_state.dart';
 import 'state/theme_state.dart';
 import 'widgets/paw_loader.dart';
 
 void main() {
-  runApp(const VetNowApp());
+  // Before anything else, so a failure during the very first frame is
+  // recorded rather than lost.
+  CrashLog.install();
+
+  // runZonedGuarded catches what the other two channels cannot: an error
+  // thrown inside a callback that no one awaited, in code that ran
+  // outside the framework's own error zone.
+  runZonedGuarded(
+    () => runApp(const VetNowApp()),
+    (error, stack) => CrashLog.record(error, stack, context: 'zone', fatal: true),
+  );
 }
+
 
 class VetNowApp extends StatefulWidget {
   const VetNowApp({super.key});
