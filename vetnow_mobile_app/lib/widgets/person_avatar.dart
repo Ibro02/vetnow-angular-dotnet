@@ -57,8 +57,7 @@ class PersonAvatar extends StatelessWidget {
     return hash;
   }
 
-  List<Color> get _gradient =>
-      colors ?? _palettes[_seed % _palettes.length];
+  List<Color> get _gradient => colors ?? _palettes[_seed % _palettes.length];
 
   /// The name with titles and punctuation-only fragments removed.
   ///
@@ -88,49 +87,56 @@ class PersonAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final initials = _initials;
 
-    return Container(
-      height: size,
-      width: size,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: _gradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: _gradient.last.withValues(alpha: 0.30),
-            blurRadius: size * 0.2,
-            offset: Offset(0, size * 0.07),
+    // Excluded: the initials are an abbreviation of the name written
+    // immediately beside them, so a screen reader was announcing
+    // "A H, Dr. Amina Hodzic"  14 two letters of noise before every name
+    // in the list. The clinic and pet avatars are excluded for the same
+    // reason.
+    return ExcludeSemantics(
+      child: Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: _gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // The same top-left light as every other branded surface, so
-          // the disc is lit rather than flat-filled.
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: AppGradients.inkSheen,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: _gradient.last.withValues(alpha: 0.30),
+              blurRadius: size * 0.2,
+              offset: Offset(0, size * 0.07),
             ),
-          ),
-          Center(
-            child: initials.isEmpty
-                ? Icon(Icons.person, color: Colors.white, size: size * 0.46)
-                : Text(
-                    initials,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: size * 0.36,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.4,
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // The same top-left light as every other branded surface, so
+            // the disc is lit rather than flat-filled.
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppGradients.inkSheen,
+              ),
+            ),
+            Center(
+              child: initials.isEmpty
+                  ? Icon(Icons.person, color: Colors.white, size: size * 0.46)
+                  : Text(
+                      initials,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size * 0.36,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.4,
+                      ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

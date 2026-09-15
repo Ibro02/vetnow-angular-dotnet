@@ -7,6 +7,7 @@
 // otherwise defeat it.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:vetnow_mobile/config/theme.dart';
@@ -140,6 +141,44 @@ void main() {
       final gradient = (box.decoration! as BoxDecoration).gradient! as LinearGradient;
 
       expect(gradient.colors, [AppColors.accent, AppColors.gold]);
+    });
+  });
+
+  group('what a screen reader hears', () {
+    testWidgets('the initials are not read out before the name',
+        (tester) async {
+      // "A H, Dr. Amina Hodzic" — two letters of noise before every name
+      // in a list. The initials abbreviate the text sitting next to
+      // them; there is nothing in them to announce.
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PersonAvatar(name: 'Dr. Amina Hodzic'),
+                Text('Dr. Amina Hodzic'),
+              ],
+            ),
+          ),
+        ),
+      ));
+
+      final labels = <String>[];
+      void walk(SemanticsNode node) {
+        if (node.label.isNotEmpty) labels.add(node.label);
+        node.visitChildren((child) {
+          walk(child);
+          return true;
+        });
+      }
+
+      walk(tester.getSemantics(find.byType(MaterialApp)));
+      expect(labels, ['Dr. Amina Hodzic']);
+
+      handle.dispose();
     });
   });
 

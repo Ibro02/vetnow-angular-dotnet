@@ -387,7 +387,11 @@ class _SettingsGroup extends StatelessWidget {
             ),
       ),
       (Icons.translate_rounded, l10n.language, AppColors.accent, () => showLanguagePicker(context)),
-      (Icons.contrast_rounded, l10n.appearance, AppColors.ink, () => showThemePicker(context)),
+      // Not AppColors.ink: these are white glyphs on a coloured disc, and
+      // ink on the dark theme's card is the one row in the list you
+      // cannot see. Which is a particular shame for the row that changes
+      // the theme.
+      (Icons.contrast_rounded, l10n.appearance, AppColors.primaryDark, () => showThemePicker(context)),
       // Was a row that did nothing when tapped. It now opens the one
       // screen that can answer "which version is this and what went
       // wrong" without anyone having to ask.
