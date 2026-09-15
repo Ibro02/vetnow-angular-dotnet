@@ -16,25 +16,36 @@ class PawLoader extends StatefulWidget {
 class _PawLoaderState extends State<PawLoader> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
+  /// Built once, not per build.
+  ///
+  /// A CurvedAnimation registers itself as a listener on its parent,
+  /// so creating one inside build() adds another listener on every
+  /// frame and never removes any of them. This loader runs during
+  /// every request in the app, which is the worst possible place to
+  /// leak one listener per frame.
+  late final CurvedAnimation _curve;
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 750))..repeat(reverse: true);
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 750))
+      ..repeat(reverse: true);
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
 
   @override
   void dispose() {
+    _curve.dispose();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final curve = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     return AnimatedBuilder(
-      animation: curve,
+      animation: _curve,
       builder: (context, child) {
-        final t = curve.value; // 0..1
+        final t = _curve.value; // 0..1
         return Transform.scale(
           scale: 0.78 + (0.22 * t),
           child: Opacity(

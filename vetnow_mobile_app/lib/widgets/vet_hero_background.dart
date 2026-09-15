@@ -45,15 +45,28 @@ class _VetHeroBackgroundState extends State<VetHeroBackground> with SingleTicker
     // first thing actually worth hearing.
     return ExcludeSemantics(
       child: IgnorePointer(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) => CustomPaint(
-            painter: _VetPainter(
-              _controller.value,
-              showPulse: widget.showPulse,
-              showFloatingHearts: widget.showFloatingHearts,
+        // The one thing on this screen that repaints every single
+        // frame, for as long as it is open. Without a boundary it has
+        // no layer of its own, so every frame of the drifting paws
+        // also repaints the hero gradient, the sheen, the vignette,
+        // the headline and the glass buttons on top of it — which is
+        // exactly the cost that turns into dropped frames on a
+        // mid-range phone while someone is scrolling.
+        child: RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) => CustomPaint(
+              painter: _VetPainter(
+                _controller.value,
+                showPulse: widget.showPulse,
+                showFloatingHearts: widget.showFloatingHearts,
+              ),
+              // Repainted constantly and never worth caching, which
+              // is what these two flags tell the engine.
+              isComplex: false,
+              willChange: true,
+              size: Size.infinite,
             ),
-            size: Size.infinite,
           ),
         ),
       ),

@@ -36,30 +36,35 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return ShaderMask(
-          blendMode: BlendMode.srcATop,
-          shaderCallback: (bounds) {
-            // Sweep from off-screen left to off-screen right so the
-            // highlight enters and leaves rather than fading in place.
-            final travel = _controller.value * 3 - 1;
-            return LinearGradient(
-              begin: Alignment(travel - 0.6, -0.2),
-              end: Alignment(travel + 0.6, 0.2),
-              colors: const [
-                Color(0x00FFFFFF),
-                Color(0xB3FFFFFF),
-                Color(0x00FFFFFF),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ).createShader(bounds);
-          },
-          child: child,
-        );
-      },
-      child: widget.child,
+    // Its own layer: the sweep runs at sixty frames a second over a
+    // whole list of placeholders, and without this the page behind
+    // them is repainted along with it.
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return ShaderMask(
+            blendMode: BlendMode.srcATop,
+            shaderCallback: (bounds) {
+              // Sweep from off-screen left to off-screen right so the
+              // highlight enters and leaves rather than fading in place.
+              final travel = _controller.value * 3 - 1;
+              return LinearGradient(
+                begin: Alignment(travel - 0.6, -0.2),
+                end: Alignment(travel + 0.6, 0.2),
+                colors: const [
+                  Color(0x00FFFFFF),
+                  Color(0xB3FFFFFF),
+                  Color(0x00FFFFFF),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ).createShader(bounds);
+            },
+            child: child,
+          );
+        },
+        child: widget.child,
+      ),
     );
   }
 }
