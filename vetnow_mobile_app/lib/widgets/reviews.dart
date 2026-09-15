@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../config/app_info.dart';
 import '../config/haptics.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -186,6 +189,74 @@ class ReviewCard extends StatelessWidget {
   final Review review;
   const ReviewCard({super.key, required this.review});
 
+  /// Hands the report to the person's own mail app, pre-filled.
+  ///
+  /// Not a server call, because there is no endpoint to report to. That
+  /// is a smaller thing than it sounds: Play's requirement is that a
+  /// reader has a way to flag content and that someone reads it, and a
+  /// mail draft satisfies both. It also fails honestly — if no mail app
+  /// answers, the address goes on the clipboard rather than the tap
+  /// doing nothing at all.
+  Future<void> _report(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.reportReviewTitle),
+        content: Text(l10n.reportReviewBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.reportReviewSend),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final body = StringBuffer()
+      ..writeln('Prijava recenzije')
+      ..writeln()
+      ..writeln('Autor: ${review.authorName}')
+      ..writeln('Ocjena: ${review.rating}')
+      ..writeln('Datum: ${review.createdAt?.toIso8601String() ?? '-'}')
+      ..writeln()
+      ..writeln(review.comment)
+      ..writeln()
+      ..writeln('---')
+      ..writeln('Razlog prijave:');
+
+    final uri = Uri(
+      scheme: 'mailto',
+      path: AppInfo.supportEmail,
+      queryParameters: {
+        'subject': '${l10n.reportReview}: ${review.authorName}',
+        'body': body.toString(),
+      },
+    );
+
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      opened = false;
+    }
+
+    if (opened || !context.mounted) return;
+
+    await Clipboard.setData(const ClipboardData(text: AppInfo.supportEmail));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.reportReviewFailed)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -228,6 +299,24 @@ class ReviewCard extends StatelessWidget {
                   formatReviewDate(review.createdAt!),
                   style: TextStyle(fontSize: 10.5, color: AppColors.textMuted),
                 ),
+              // Deliberately quiet: reporting is rare, and a prominent
+              // flag on every review invites use as a disagree button.
+              Semantics(
+                button: true,
+                label: AppLocalizations.of(context)!.reportReview,
+                child: InkWell(
+                  onTap: () => _report(context),
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 6, top: 2, bottom: 2),
+                    child: Icon(
+                      Icons.flag_outlined,
+                      size: 14,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),

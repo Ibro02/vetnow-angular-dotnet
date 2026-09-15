@@ -395,5 +395,10 @@
   "diagnosticsFatal": "Pad",
   "diagnosticsHandled": "Greška",
   "configWarningTitle": "Ovaj build nije spreman za objavu",
-  "configWarningBody": "Aplikacija je podešena da razgovara s poslužiteljem koji postoji samo na računalu na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovno napravi build s --dart-define=API_BASE_URL=https://…"
+  "configWarningBody": "Aplikacija je podešena da razgovara s poslužiteljem koji postoji samo na računalu na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovno napravi build s --dart-define=API_BASE_URL=https://…",
+  "reportReview": "Prijavi recenziju",
+  "reportReviewTitle": "Prijaviti ovu recenziju?",
+  "reportReviewBody": "Otvorićemo e-mail s detaljima recenzije da ga pošalješ. Pregledamo svaku prijavu i uklanjamo sadržaj koji krši pravila.",
+  "reportReviewSend": "Otvori e-mail",
+  "reportReviewFailed": "Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana."
 }

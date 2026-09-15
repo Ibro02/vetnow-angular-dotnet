@@ -1023,4 +1023,21 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get configWarningBody =>
       'Aplikacija je podešena da priča sa serverom koji postoji samo na računaru na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovo napravi build sa --dart-define=API_BASE_URL=https://…';
+
+  @override
+  String get reportReview => 'Prijavi recenziju';
+
+  @override
+  String get reportReviewTitle => 'Prijaviti ovu recenziju?';
+
+  @override
+  String get reportReviewBody =>
+      'Otvorićemo e-mail s detaljima recenzije da ga pošalješ. Pregledamo svaku prijavu i uklanjamo sadržaj koji krši pravila.';
+
+  @override
+  String get reportReviewSend => 'Otvori e-mail';
+
+  @override
+  String get reportReviewFailed =>
+      'Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.';
 }

@@ -28,4 +28,12 @@ class AppInfo {
 
   /// Whether this build could work outside the machine it was made on.
   static bool get pointsAtRealBackend => ApiConfig.isProductionReady;
+
+  /// Where reports of abusive content go.
+  ///
+  /// Play's content policy requires a way to flag user-generated content,
+  /// and reviews are user-generated. This has to be a real, monitored
+  /// inbox before the app is submitted — an address nobody reads fails
+  /// review just as surely as no address at all.
+  static const String supportEmail = 'podrska@vetnow.ba';
 }

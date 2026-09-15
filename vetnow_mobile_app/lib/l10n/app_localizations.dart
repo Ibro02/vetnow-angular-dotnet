@@ -1899,6 +1899,36 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Aplikacija je podešena da priča sa serverom koji postoji samo na računaru na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovo napravi build sa --dart-define=API_BASE_URL=https://…'**
   String get configWarningBody;
+
+  /// No description provided for @reportReview.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prijavi recenziju'**
+  String get reportReview;
+
+  /// No description provided for @reportReviewTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prijaviti ovu recenziju?'**
+  String get reportReviewTitle;
+
+  /// No description provided for @reportReviewBody.
+  ///
+  /// In bs, this message translates to:
+  /// **'Otvorićemo e-mail s detaljima recenzije da ga pošalješ. Pregledamo svaku prijavu i uklanjamo sadržaj koji krši pravila.'**
+  String get reportReviewBody;
+
+  /// No description provided for @reportReviewSend.
+  ///
+  /// In bs, this message translates to:
+  /// **'Otvori e-mail'**
+  String get reportReviewSend;
+
+  /// No description provided for @reportReviewFailed.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.'**
+  String get reportReviewFailed;
 }
 
 class _AppLocalizationsDelegate
