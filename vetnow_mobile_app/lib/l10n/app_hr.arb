@@ -1,7 +1,6 @@
 {
   "@@locale": "hr",
 
-  "appTitle": "VetNow",
 
   "navExplore": "Istraži",
   "navAppointments": "Termini",
@@ -12,8 +11,6 @@
   "searchHint": "Pretraži klinike…",
   "filterRecommended": "Preporučeno",
   "filterTopRated": "Najbolje ocijenjeno",
-  "filterNearest": "Najbliže",
-  "filterOpenNow": "Otvoreno sada",
   "clinicsInCity": "{count, plural, one{{count} klinika u {city}} few{{count} klinike u {city}} other{{count} klinika u {city}}}",
   "@clinicsInCity": {
     "placeholders": {
@@ -31,7 +28,6 @@
   "rateVisitHint": "Bio si ovdje — kako je prošlo?",
   "reviewCommentHint": "Napiši par riječi (nije obavezno)",
   "submitReview": "Pošalji recenziju",
-  "reviewThanks": "Hvala na recenziji!",
   "reviewsCount": "{count, plural, one{{count} recenzija} few{{count} recenzije} other{{count} recenzija}}",
   "@reviewsCount": {
     "placeholders": {
@@ -87,12 +83,6 @@
   "closedNowLabel": "Trenutno zatvoreno",
   "openingHours": "Radno vrijeme",
   "noScheduleYet": "Radno vrijeme još nije uneseno.",
-  "staffOnDuty": "{count} u smjeni",
-  "@staffOnDuty": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "notificationsEmpty": "Sve je čisto — nema ničega novog.",
   "notificationsUpcoming": "Nadolazeći termini",
   "notificationsAwaitingReview": "Čekaju tvoju ocjenu",
@@ -209,7 +199,6 @@
   "addPetFirst": "Dodaj ljubimca da nastaviš",
   "noSlotsToday": "Nema slobodnih termina danas kod ovog zaposlenika.",
   "bookingFailed": "Rezervacija nije uspjela — termin je možda upravo zauzet. Pokušaj ponovno.",
-  "signInToSeeRealAvailability": "Prijavljen/a si — sad biraš iz stvarno dostupnog osoblja i termina.",
   "anyAvailable": "Bilo tko dostupan",
   "confirmBooking": "Potvrdi rezervaciju",
   "selectServiceAndTime": "Odaberi uslugu i vrijeme",
@@ -237,17 +226,10 @@
   "whatIsVerifiedPartner": "Što znači Verificirani partner?",
   "verifiedPartnerExplanation": "Licenca ove klinike provjerena je u registru Veterinarske komore, a njezino osoblje i usluge prikazane ovdje pregledao je VetNow tim.",
   "gotIt": "Razumijem",
-  "ourTeam": "Naš tim",
   "meetTheTeam": "Upoznaj tim",
-  "openHoursToday": "Otvoreno sada · Pon–Sub, 08:00–18:00",
-  "closedOpensTomorrow": "Zatvoreno sada · Otvara se pon u 08:00",
-  "workingHoursLabel": "Radno vrijeme",
-  "workingHoursValue": "Pon–Sub, 08:00–18:00",
-  "sortByRating": "Sortiraj po ocjeni",
   "allServices": "Sve usluge",
   "reviews": "Recenzije",
   "openNow": "Otvoreno sada",
-  "closedNow": "Zatvoreno sada",
 
   "language": "Jezik",
   "appearance": "Izgled",
@@ -268,7 +250,6 @@
   "removeFromFavourites": "Ukloni iz omiljenih",
   "mostVisited": "Najčešće dolazi",
   "visits": "termina",
-  "dragToReorderHint": "Drži i povuci ikonicu za promjenu redoslijeda.",
   "markFavourite": "Označi kao omiljenog",
   "unmarkFavourite": "Ukloni iz omiljenih",
   "petsDashboardSubtitle": "Tvoji ljubimci, na jednom mjestu",
@@ -315,7 +296,6 @@
   "labelPhone": "Telefon",
   "servicesWithSpecialist": "Usluge kod ovog specijalista",
   "noServicesListed": "Još nema navedenih usluga.",
-  "reviewsForSpecialist": "Recenzije za ovog specijalista",
 
   "amenityInOffice": "Pregledi u ordinaciji",
   "amenityInOfficeDesc": "Ova klinika prima ljubimce izravno u svojoj ordinaciji.",
@@ -336,7 +316,6 @@
   "roleVeterinarian": "Veterinar",
   "roleNurse": "Medicinska sestra",
   "roleGroomer": "Njegovatelj/ica",
-  "roleMainVet": "Glavni veterinar",
   "roleNoPreference": "Bez preferencije",
 
   "serviceVaccinationName": "Cijepljenje",
@@ -362,7 +341,6 @@
   "labelCountry": "Država",
   "newPassword": "Nova lozinka",
   "newPasswordHint": "Ostavi prazno ako je ne mijenjaš",
-  "callClinic": "Nazovi kliniku",
   "couldNotPlaceCall": "Poziv nije moguće pokrenuti s ovog uređaja.",
   "verifyAccountTitle": "Potvrda računa",
   "verifyAccountHeadline": "Provjeri svoj email",
@@ -373,7 +351,6 @@
   "filterAllStaff": "Svi",
   "a11yLoading": "Učitavanje",
   "a11yBack": "Natrag",
-  "a11yCloseSheet": "Zatvori",
   "a11yClearSearch": "Obriši pretragu",
   "a11yShowPassword": "Prikaži lozinku",
   "a11yHidePassword": "Sakrij lozinku",

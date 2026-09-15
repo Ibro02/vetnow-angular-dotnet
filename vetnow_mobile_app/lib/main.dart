@@ -30,10 +30,13 @@ class VetNowApp extends StatefulWidget {
   const VetNowApp({super.key});
 
   @override
-  State<VetNowApp> createState() => _VetNowAppState();
+  State<VetNowApp> createState() => VetNowAppState();
 }
 
-class _VetNowAppState extends State<VetNowApp> {
+/// Public so a test can reach [debugAuthState] with a type rather than
+/// through a dynamic cast  14 the same reason FormState and friends are
+/// public in the framework.
+class VetNowAppState extends State<VetNowApp> {
   final _authState = AuthState();
   final _localeState = LocaleState();
   final _themeState = ThemeState();

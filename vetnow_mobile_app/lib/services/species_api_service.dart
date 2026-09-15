@@ -23,11 +23,15 @@ class SpeciesApiService {
   /// ({ totalCount, dataItems, currentPage, pageSize }); dataItems are
   /// raw Species entities. We only need id + name for the picker.
   static Future<List<SpeciesOption>> getAll() {
-    return _cached ??= _fetch().catchError((Object e) {
+    return _cached ??= _fetch().catchError((Object error, StackTrace stack) {
       // Never cache a failure — a network hiccup would otherwise poison
       // the list for the whole session.
       _cached = null;
-      throw e;
+      // throwWithStackTrace rather than `throw error`: a bare rethrow
+      // from inside catchError replaces the stack with this line, so
+      // every species failure looked like it started here instead of
+      // wherever the request actually failed.
+      Error.throwWithStackTrace(error, stack);
     });
   }
 
@@ -37,13 +41,39 @@ class SpeciesApiService {
 
   static Future<List<SpeciesOption>> _fetch() async {
     final result = await ApiClient.get(ApiConfig.speciesGetAll, query: {'pageSize': 100});
-    final items = (result as Map<String, dynamic>)['dataItems'] as List<dynamic>? ?? [];
-    return items
-        .map((e) => SpeciesOption(
-              id: e['id'] as int,
-              // Backend field is SpeciesName -> speciesName in camelCase JSON.
-              name: (e['speciesName'] ?? e['name'] ?? 'Unknown') as String,
-            ))
-        .toList();
+
+    // Every read below is defensive on purpose. This decodes whatever
+    // the server sent, and the previous version asserted the shape
+    // with casts: an envelope that was not a map, an id that arrived
+    // as a string, or one malformed row in an otherwise good list
+    // each threw a TypeError with nothing in it about species — and
+    // took out the whole picker rather than one entry in it.
+    final envelope = result is Map<String, dynamic> ? result : const {};
+    final items = envelope['dataItems'];
+    if (items is! List) return const [];
+
+    final options = <SpeciesOption>[];
+    for (final item in items) {
+      if (item is! Map) continue;
+
+      // The backend sends an int; a stringly-typed one still works.
+      final id = _asInt(item['id']);
+      if (id == null) continue;
+
+      // Backend field is SpeciesName -> speciesName in camelCase JSON.
+      final name = item['speciesName'] ?? item['name'];
+      options.add(SpeciesOption(
+        id: id,
+        name: name is String && name.trim().isNotEmpty ? name : 'Unknown',
+      ));
+    }
+    return options;
   }
+
+  static int? _asInt(Object? value) => switch (value) {
+        final int v => v,
+        final num v => v.toInt(),
+        final String v => int.tryParse(v),
+        _ => null,
+      };
 }

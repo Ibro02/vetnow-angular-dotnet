@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -232,11 +234,13 @@ class AppointmentDetailScreen extends StatelessWidget {
   Future<void> _bookAgain(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
 
-    showDialog(
+    // Not awaited: this dialog is dismissed by the code
+    // below it, not by whoever opened it.
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(child: PawLoader(size: 36, color: Colors.white)),
-    );
+    ));
 
     VetStation? station;
     try {
@@ -284,11 +288,13 @@ class AppointmentDetailScreen extends StatelessWidget {
       return;
     }
 
-    showDialog(
+    // Not awaited: this dialog is dismissed by the code
+    // below it, not by whoever opened it.
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(child: PawLoader(size: 36, color: Colors.white)),
-    );
+    ));
     try {
       await AppointmentApiService.cancel(appointmentId: appointment.id, token: auth.token!);
       if (!context.mounted) return;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -260,7 +262,7 @@ class _PetsScreenState extends State<PetsScreen> {
                   final added = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(builder: (_) => const AddPetScreen()),
                   );
-                  if (added == true) _load();
+                  if (added == true) unawaited(_load());
                 },
                 backgroundColor: Colors.transparent,
                 elevation: 0,
@@ -291,7 +293,8 @@ class _PetsScreenState extends State<PetsScreen> {
                     ),
                     chips: [
                       HeroChip(icon: Icons.pets, value: '${_pets.length}', label: l10n.myPets),
-                      HeroChip(icon: Icons.favorite, value: '$favouriteCount', label: l10n.favourites),
+                      HeroChip(
+                          icon: Icons.favorite, value: '$favouriteCount', label: l10n.favourites),
                       HeroChip(
                         icon: Icons.event_available,
                         value: mostVisited != null ? mostVisited.$1.name : '—',
@@ -329,8 +332,8 @@ class _PetsScreenState extends State<PetsScreen> {
     return Column(
       children: [
         Padding(
-          padding:
-              const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 0),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 0),
           child: Row(
             children: [
               Icon(Icons.swap_vert_rounded, size: 14, color: AppColors.textMuted),
@@ -344,8 +347,8 @@ class _PetsScreenState extends State<PetsScreen> {
         ),
         Expanded(
           child: ReorderableListView.builder(
-            padding:
-                const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 100),
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 100),
             itemCount: _pets.length,
             onReorderItem: _onReorder,
             itemBuilder: (context, index) {
@@ -363,13 +366,13 @@ class _PetsScreenState extends State<PetsScreen> {
                       final changed = await Navigator.of(context).push<bool>(
                         MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
                       );
-                      if (changed == true) _load();
+                      if (changed == true) unawaited(_load());
                     },
                     onEdit: () async {
                       final changed = await Navigator.of(context).push<bool>(
                         MaterialPageRoute(builder: (_) => AddPetScreen(existingPet: pet)),
                       );
-                      if (changed == true) _load();
+                      if (changed == true) unawaited(_load());
                     },
                     onDelete: () => _deletePet(pet),
                     onToggleFavourite: () => _toggleFavourite(pet),
@@ -390,8 +393,8 @@ class _PetsScreenState extends State<PetsScreen> {
     return Column(
       children: [
         Padding(
-          padding:
-              const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pagePadding, AppSpacing.s4, AppSpacing.pagePadding, 0),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surface,
@@ -425,9 +428,11 @@ class _PetsScreenState extends State<PetsScreen> {
                 fillColor: AppColors.surface,
                 contentPadding: const EdgeInsets.symmetric(vertical: 4),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderSide: BorderSide.none),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.full),
                     borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
@@ -470,7 +475,8 @@ class _PetsScreenState extends State<PetsScreen> {
               ? Center(
                   child: Text(l10n.noPetsMatchFilter, style: TextStyle(color: AppColors.textMuted)))
               : GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 100),
+                  padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 100),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: AppSpacing.s3,
@@ -494,13 +500,13 @@ class _PetsScreenState extends State<PetsScreen> {
                           final changed = await Navigator.of(context).push<bool>(
                             MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
                           );
-                          if (changed == true) _load();
+                          if (changed == true) unawaited(_load());
                         },
                         onEdit: () async {
                           final changed = await Navigator.of(context).push<bool>(
                             MaterialPageRoute(builder: (_) => AddPetScreen(existingPet: pet)),
                           );
-                          if (changed == true) _load();
+                          if (changed == true) unawaited(_load());
                         },
                         onDelete: () => _deletePet(pet),
                         onToggleFavourite: () => _toggleFavourite(pet),
@@ -524,13 +530,15 @@ class _ViewModeSwitch extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration:
-          BoxDecoration(color: AppColors.bgMuted, borderRadius: BorderRadius.circular(AppRadius.full)),
+      decoration: BoxDecoration(
+          color: AppColors.bgMuted, borderRadius: BorderRadius.circular(AppRadius.full)),
       child: Row(
         children: [
-          Expanded(child: _segment(context, _ViewMode.list, Icons.view_list_rounded, l10n.viewList)),
           Expanded(
-              child: _segment(context, _ViewMode.dashboard, Icons.grid_view_rounded, l10n.viewDashboard)),
+              child: _segment(context, _ViewMode.list, Icons.view_list_rounded, l10n.viewList)),
+          Expanded(
+              child: _segment(
+                  context, _ViewMode.dashboard, Icons.grid_view_rounded, l10n.viewDashboard)),
         ],
       ),
     );
@@ -579,7 +587,11 @@ class _FilterPill extends StatelessWidget {
   final IconData? icon;
   final Color? accentColor;
   const _FilterPill(
-      {required this.label, required this.selected, required this.onTap, this.icon, this.accentColor});
+      {required this.label,
+      required this.selected,
+      required this.onTap,
+      this.icon,
+      this.accentColor});
 
   @override
   Widget build(BuildContext context) {
@@ -592,7 +604,8 @@ class _FilterPill extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          gradient: selected ? LinearGradient(colors: [color, colorHover.withValues(alpha: 0.85)]) : null,
+          gradient:
+              selected ? LinearGradient(colors: [color, colorHover.withValues(alpha: 0.85)]) : null,
           color: selected ? null : AppColors.surface,
           borderRadius: BorderRadius.circular(AppRadius.full),
           border: Border.all(color: selected ? Colors.transparent : AppColors.border),
@@ -681,7 +694,8 @@ class _PetListCard extends StatelessWidget {
                         top: -2,
                         child: Container(
                           padding: const EdgeInsets.all(3),
-                          decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
+                          decoration:
+                              const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
                           child: const Icon(Icons.star_rounded, color: Colors.white, size: 11),
                         ),
                       ),
@@ -709,8 +723,8 @@ class _PetListCard extends StatelessWidget {
                                   color: color.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(AppRadius.full)),
                               child: Text(pet.species,
-                                  style:
-                                      TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
+                                  style: TextStyle(
+                                      fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
                             ),
                           Text(petAgeLabel(context, pet),
                               style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
@@ -838,7 +852,8 @@ class _PetGridCard extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.22), shape: BoxShape.circle),
+                                color: Colors.black.withValues(alpha: 0.22),
+                                shape: BoxShape.circle),
                             child: Icon(
                               pet.isFavourite ? Icons.star_rounded : Icons.star_border_rounded,
                               color: pet.isFavourite ? AppColors.gold : Colors.white,
@@ -882,8 +897,8 @@ class _PetGridCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.fromLTRB(AppSpacing.s3, AppSpacing.s2, AppSpacing.s3, AppSpacing.s2),
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.s3, AppSpacing.s2, AppSpacing.s3, AppSpacing.s2),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -899,7 +914,8 @@ class _PetGridCard extends StatelessWidget {
                             color: color.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(AppRadius.full)),
                         child: Text(pet.species,
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color)),
+                            style:
+                                TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color)),
                       ),
                     const SizedBox(height: 3),
                     Text(petAgeLabel(context, pet),

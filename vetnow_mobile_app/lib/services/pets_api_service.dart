@@ -1,6 +1,7 @@
 import '../config/api_config.dart';
 import '../models/pet.dart';
 import 'api_client.dart';
+import 'json_list.dart';
 
 class PetsApiService {
   PetsApiService._();
@@ -31,7 +32,11 @@ class PetsApiService {
   }
 
   static List<Pet> mapPets(List<Map<String, dynamic>> raw, Map<int, String>? speciesNames) =>
-      raw.map((e) => _petFromAnimalJson(e, speciesNames)).toList();
+      parseRows(
+        raw,
+        (row) => _petFromAnimalJson(row, speciesNames),
+        context: 'pets',
+      );
 
   static Pet _petFromAnimalJson(Map<String, dynamic> json, Map<int, String>? speciesNames) {
     final speciesId = json['animalSpeciesId'] as int?;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/haptics.dart';
 import '../config/theme.dart';
@@ -116,7 +118,7 @@ class _RescheduleScreenState extends State<RescheduleScreen> {
       // 409 = someone took that slot first. That is a real, explainable
       // conflict, so show the backend's own wording and reload the day.
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-      if (e.statusCode == 409) _loadSlots();
+      if (e.statusCode == 409) unawaited(_loadSlots());
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
@@ -318,7 +320,8 @@ class _DayStrip extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.s2),
         itemBuilder: (context, i) {
           final d = days[i];
-          final isSelected = d.year == selected.year && d.month == selected.month && d.day == selected.day;
+          final isSelected =
+              d.year == selected.year && d.month == selected.month && d.day == selected.day;
 
           return GestureDetector(
             onTap: () => onSelect(d),

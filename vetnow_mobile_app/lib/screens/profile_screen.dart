@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -107,11 +109,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: _ProfileHero(auth: auth, isLoadingPets: _isLoadingPets, petsCount: _pets.length),
+                child: _ProfileHero(
+                    auth: auth, isLoadingPets: _isLoadingPets, petsCount: _pets.length),
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s6, AppSpacing.pagePadding, 110),
+                  padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pagePadding, AppSpacing.s6, AppSpacing.pagePadding, 110),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -126,10 +130,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               final changed = await Navigator.of(context).push<bool>(
                                 MaterialPageRoute(builder: (_) => const PetsScreen()),
                               );
-                              if (changed == true) _refreshAfterAdd();
+                              if (changed == true) unawaited(_refreshAfterAdd());
                             },
-                            style: TextButton.styleFrom(foregroundColor: AppColors.primary, padding: EdgeInsets.zero),
-                            child: Text(l10n.viewAll, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                            style: TextButton.styleFrom(
+                                foregroundColor: AppColors.primary, padding: EdgeInsets.zero),
+                            child: Text(l10n.viewAll,
+                                style:
+                                    const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
                           ),
                         ],
                       ),
@@ -182,7 +189,9 @@ class _ProfileHero extends StatelessWidget {
           children: [
             const Icon(Icons.workspace_premium_rounded, size: 11, color: AppColors.gold),
             const SizedBox(width: 3),
-            Text(l10n.member, style: const TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w700)),
+            Text(l10n.member,
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w700)),
           ],
         ),
       ),
@@ -217,7 +226,13 @@ class _PetsRow extends StatelessWidget {
   final VoidCallback onAdded;
   const _PetsRow({required this.isLoading, required this.pets, required this.onAdded});
 
-  static const _palette = [AppColors.primary, AppColors.accent, AppColors.gold, AppColors.info, AppColors.secondary];
+  static const _palette = [
+    AppColors.primary,
+    AppColors.accent,
+    AppColors.gold,
+    AppColors.info,
+    AppColors.secondary
+  ];
   Color _colorFor(int i) => _palette[i % _palette.length];
 
   @override
@@ -229,8 +244,7 @@ class _PetsRow extends StatelessWidget {
     // card's contents grow and the row does not. Scaling it with the text
     // keeps the cards intact; the cap stops a 2x setting from handing one
     // row half the screen.
-    final rowHeight =
-        MediaQuery.textScalerOf(context).scale(130).clamp(130.0, 210.0);
+    final rowHeight = MediaQuery.textScalerOf(context).scale(130).clamp(130.0, 210.0);
 
     if (isLoading) {
       return SizedBox(
@@ -264,7 +278,11 @@ class _PetsRow extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: p.isFavourite ? AppColors.gold.withValues(alpha: 0.55) : AppColors.borderLight, width: p.isFavourite ? 1.5 : 1),
+                    border: Border.all(
+                        color: p.isFavourite
+                            ? AppColors.gold.withValues(alpha: 0.55)
+                            : AppColors.borderLight,
+                        width: p.isFavourite ? 1.5 : 1),
                   ),
                   child: Column(
                     children: [
@@ -275,9 +293,15 @@ class _PetsRow extends StatelessWidget {
                             height: 44,
                             width: 44,
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
+                              gradient:
+                                  LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
                               shape: BoxShape.circle,
-                              boxShadow: [BoxShadow(color: color.withValues(alpha: 0.32), blurRadius: 10, offset: const Offset(0, 4))],
+                              boxShadow: [
+                                BoxShadow(
+                                    color: color.withValues(alpha: 0.32),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4))
+                              ],
                             ),
                             child: const Icon(Icons.pets, color: Colors.white, size: 20),
                           ),
@@ -287,23 +311,34 @@ class _PetsRow extends StatelessWidget {
                               top: -3,
                               child: Container(
                                 padding: const EdgeInsets.all(2.5),
-                                decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
-                                child: const Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                                decoration: const BoxDecoration(
+                                    color: AppColors.gold, shape: BoxShape.circle),
+                                child:
+                                    const Icon(Icons.star_rounded, color: Colors.white, size: 10),
                               ),
                             ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(p.name, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+                      Text(p.name,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
                       const SizedBox(height: 3),
                       if (p.species.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                          decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppRadius.full)),
-                          child: Text(p.species, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: color)),
+                          decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(AppRadius.full)),
+                          child: Text(p.species,
+                              style: TextStyle(
+                                  fontSize: 9, fontWeight: FontWeight.w700, color: color)),
                         )
                       else
-                        Text(petAgeLabel(context, p), style: TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
+                        Text(petAgeLabel(context, p),
+                            style: TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
                     ],
                   ),
                 ),
@@ -323,7 +358,8 @@ class _PetsRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.primary50,
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), style: BorderStyle.solid),
+                border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.3), style: BorderStyle.solid),
               ),
               child: Center(
                 child: Column(
@@ -332,11 +368,16 @@ class _PetsRow extends StatelessWidget {
                     Container(
                       height: 36,
                       width: 36,
-                      decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                      decoration:
+                          const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
                       child: const Icon(Icons.add, color: Colors.white, size: 20),
                     ),
                     const SizedBox(height: 6),
-                    Text(l10n.addPet, style: const TextStyle(fontSize: 11, color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
+                    Text(l10n.addPet,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -391,7 +432,12 @@ class _SettingsGroup extends StatelessWidget {
       // ink on the dark theme's card is the one row in the list you
       // cannot see. Which is a particular shame for the row that changes
       // the theme.
-      (Icons.contrast_rounded, l10n.appearance, AppColors.primaryDark, () => showThemePicker(context)),
+      (
+        Icons.contrast_rounded,
+        l10n.appearance,
+        AppColors.primaryDark,
+        () => showThemePicker(context)
+      ),
       // Was a row that did nothing when tapped. It now opens the one
       // screen that can answer "which version is this and what went
       // wrong" without anyone having to ask.
@@ -422,21 +468,33 @@ class _SettingsGroup extends StatelessWidget {
                 bottom: i == items.length - 1 ? const Radius.circular(AppRadius.xl) : Radius.zero,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
                 child: Row(
                   children: [
                     Container(
                       height: 34,
                       width: 34,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [items[i].$3, items[i].$3.withValues(alpha: 0.7)]),
+                        gradient: LinearGradient(
+                            colors: [items[i].$3, items[i].$3.withValues(alpha: 0.7)]),
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: items[i].$3.withValues(alpha: 0.28), blurRadius: 8, offset: const Offset(0, 3))],
+                        boxShadow: [
+                          BoxShadow(
+                              color: items[i].$3.withValues(alpha: 0.28),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3))
+                        ],
                       ),
                       child: Icon(items[i].$1, size: 16, color: Colors.white),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(items[i].$2, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text))),
+                    Expanded(
+                        child: Text(items[i].$2,
+                            style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.text))),
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
@@ -479,7 +537,9 @@ class _LogoutButton extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(l10n.logOut, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.danger)),
+              child: Text(l10n.logOut,
+                  style: const TextStyle(
+                      fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.danger)),
             ),
             Container(
               padding: const EdgeInsets.all(4),

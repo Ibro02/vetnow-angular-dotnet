@@ -30,8 +30,10 @@ void main() {
   }
 
   AuthState authOf(WidgetTester tester) {
-    final state = tester.state(find.byType(VetNowApp)) as dynamic;
-    return state.debugAuthState as AuthState;
+    // Typed rather than cast through dynamic: a rename of debugAuthState
+    // would otherwise compile fine here and fail at runtime.
+    final state = tester.state<VetNowAppState>(find.byType(VetNowApp));
+    return state.debugAuthState;
   }
 
   testWidgets('boots into the guest shell once session restore settles', (WidgetTester tester) async {

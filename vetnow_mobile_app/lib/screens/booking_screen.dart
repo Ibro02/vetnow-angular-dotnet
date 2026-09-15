@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/haptics.dart';
 import '../config/theme.dart';
@@ -121,7 +123,7 @@ class _BookingScreenState extends State<BookingScreen> {
         _selectedSlot = null;
         _selectedRealSlotId = null;
       });
-      if (_selectedRealStaffId != null) _loadSlotsFor(_selectedRealStaffId!);
+      if (_selectedRealStaffId != null) unawaited(_loadSlotsFor(_selectedRealStaffId!));
     } catch (_) {
       if (!mounted) return;
       // Couldn't load real data (network hiccup) — stay in mock mode
@@ -211,7 +213,7 @@ class _BookingScreenState extends State<BookingScreen> {
         _bookingError = l10n.bookingFailed;
       });
       // The slot we tried is probably gone now — refresh the list.
-      if (_selectedRealStaffId != null) _loadSlotsFor(_selectedRealStaffId!);
+      if (_selectedRealStaffId != null) unawaited(_loadSlotsFor(_selectedRealStaffId!));
     } catch (_) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -240,7 +242,8 @@ class _BookingScreenState extends State<BookingScreen> {
             AppSpacing.s10,
           ),
           children: [
-            Text(widget.station.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            Text(widget.station.name,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             const SizedBox(height: AppSpacing.s6),
             _StepLabel(number: 1, label: l10n.chooseService),
             const SizedBox(height: AppSpacing.s3),
@@ -256,7 +259,6 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.s6),
-
             if (_loadingReal) ...[
               const Center(child: PawLoader(size: 28, color: AppColors.primary)),
               const SizedBox(height: AppSpacing.s6),
@@ -281,7 +283,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   final added = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(builder: (_) => const AddPetScreen()),
                   );
-                  if (added == true) _switchToRealMode();
+                  if (added == true) unawaited(_switchToRealMode());
                 })
               else
                 ..._myPets.map(
@@ -344,24 +346,29 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
               const SizedBox(height: AppSpacing.s6),
             ],
-
             if (_selectedService != null)
               _SummaryCard(
                 service: _selectedService!,
                 slotLabel: _usingReal
-                    ? _realSlots.where((s) => s.id == _selectedRealSlotId).map((s) => s.appointmentTime).firstOrNull
+                    ? _realSlots
+                        .where((s) => s.id == _selectedRealSlotId)
+                        .map((s) => s.appointmentTime)
+                        .firstOrNull
                     : _selectedSlot,
               ),
             if (_bookingError != null) ...[
               const SizedBox(height: AppSpacing.s4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(color: AppColors.dangerSoft, borderRadius: BorderRadius.circular(AppRadius.md)),
+                decoration: BoxDecoration(
+                    color: AppColors.dangerSoft, borderRadius: BorderRadius.circular(AppRadius.md)),
                 child: Row(
                   children: [
                     const Icon(Icons.error_outline, size: 16, color: AppColors.danger),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(_bookingError!, style: const TextStyle(fontSize: 12.5, color: AppColors.dangerHover))),
+                    Expanded(
+                        child: Text(_bookingError!,
+                            style: const TextStyle(fontSize: 12.5, color: AppColors.dangerHover))),
                   ],
                 ),
               ),
@@ -388,12 +395,27 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   List<StaffMember> _defaultMockStaff(BuildContext context) => [
-        StaffMember(id: 1, name: 'Dr. Amina Hodžić', role: ServiceCatalog.roleVeterinarian(context), rating: 4.9),
-        StaffMember(id: 2, name: 'Dr. Emir Kovač', role: ServiceCatalog.roleVeterinarian(context), rating: 4.8),
+        StaffMember(
+            id: 1,
+            name: 'Dr. Amina Hodžić',
+            role: ServiceCatalog.roleVeterinarian(context),
+            rating: 4.9),
+        StaffMember(
+            id: 2,
+            name: 'Dr. Emir Kovač',
+            role: ServiceCatalog.roleVeterinarian(context),
+            rating: 4.8),
       ];
 
   static const _mockSlots = [
-    '09:00', '09:30', '10:00', '11:00', '13:00', '14:30', '15:00', '16:30',
+    '09:00',
+    '09:30',
+    '10:00',
+    '11:00',
+    '13:00',
+    '14:30',
+    '15:00',
+    '16:30',
   ];
 }
 
@@ -526,7 +548,8 @@ class _NoPetsCard extends StatelessWidget {
         children: [
           Text(l10n.noPetsYet, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(height: AppSpacing.s3),
-          AppButton(label: l10n.addPetFirst, fullWidth: false, icon: Icons.add, onPressed: onAddPet),
+          AppButton(
+              label: l10n.addPetFirst, fullWidth: false, icon: Icons.add, onPressed: onAddPet),
         ],
       ),
     );
@@ -547,7 +570,9 @@ class _StepLabel extends StatelessWidget {
           width: 22,
           decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
           child: Center(
-            child: Text('$number', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+            child: Text('$number',
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
           ),
         ),
         const SizedBox(width: 8),
@@ -597,7 +622,8 @@ class _SelectableCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? accentColor.withValues(alpha: 0.08) : AppColors.surface,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: selected ? accentColor : AppColors.borderLight, width: selected ? 1.5 : 1),
+          border: Border.all(
+              color: selected ? accentColor : AppColors.borderLight, width: selected ? 1.5 : 1),
           boxShadow: selected ? AppShadows.card : null,
         ),
         child: Row(
@@ -622,7 +648,9 @@ class _SelectableCard extends StatelessWidget {
               ),
             ),
             if (trailing != null)
-              Text(trailing!, style: TextStyle(color: accentColor, fontWeight: FontWeight.w800, fontSize: 13.5)),
+              Text(trailing!,
+                  style:
+                      TextStyle(color: accentColor, fontWeight: FontWeight.w800, fontSize: 13.5)),
             const SizedBox(width: 4),
             Icon(
               selected ? Icons.check_circle_rounded : Icons.radio_button_off,
@@ -654,12 +682,18 @@ class _SummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.bookingSummary, style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(l10n.bookingSummary,
+              style: const TextStyle(
+                  color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
           const SizedBox(height: 6),
-          Text(service.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+          Text(service.name,
+              style:
+                  const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 2),
           Text(
-            slotLabel != null ? l10n.todayAtDuration(slotLabel!, service.durationMinutes) : l10n.pickTimeAbove,
+            slotLabel != null
+                ? l10n.todayAtDuration(slotLabel!, service.durationMinutes)
+                : l10n.pickTimeAbove,
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
           const Divider(color: Colors.white24, height: 20),
@@ -667,7 +701,9 @@ class _SummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.total, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-              Text('${service.priceKm.toStringAsFixed(0)} KM', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+              Text('${service.priceKm.toStringAsFixed(0)} KM',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
             ],
           ),
         ],

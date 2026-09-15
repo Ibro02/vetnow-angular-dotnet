@@ -9,9 +9,6 @@ class AppLocalizationsSr extends AppLocalizations {
   AppLocalizationsSr([String locale = 'sr']) : super(locale);
 
   @override
-  String get appTitle => 'VetNow';
-
-  @override
   String get navExplore => 'Istraži';
 
   @override
@@ -35,12 +32,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get filterTopRated => 'Najbolje ocenjeno';
-
-  @override
-  String get filterNearest => 'Najbliže';
-
-  @override
-  String get filterOpenNow => 'Otvoreno sada';
 
   @override
   String clinicsInCity(int count, String city) {
@@ -83,9 +74,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get submitReview => 'Pošalji recenziju';
-
-  @override
-  String get reviewThanks => 'Hvala na recenziji!';
 
   @override
   String reviewsCount(int count) {
@@ -198,11 +186,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get noScheduleYet => 'Radno vrijeme još nije uneseno.';
-
-  @override
-  String staffOnDuty(int count) {
-    return '$count u smjeni';
-  }
 
   @override
   String get notificationsEmpty => 'Sve je čisto — nema ničega novog.';
@@ -495,10 +478,6 @@ class AppLocalizationsSr extends AppLocalizations {
       'Rezervacija nije uspela — termin je možda upravo zauzet. Pokušaj ponovo.';
 
   @override
-  String get signInToSeeRealAvailability =>
-      'Prijavljen/a si — sad biraš iz stvarno dostupnog osoblja i termina.';
-
-  @override
   String get anyAvailable => 'Bilo ko dostupan';
 
   @override
@@ -549,25 +528,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get gotIt => 'Razumem';
 
   @override
-  String get ourTeam => 'Naš tim';
-
-  @override
   String get meetTheTeam => 'Upoznaj tim';
-
-  @override
-  String get openHoursToday => 'Otvoreno sada · Pon–Sub, 08:00–18:00';
-
-  @override
-  String get closedOpensTomorrow => 'Zatvoreno sada · Otvara se pon u 08:00';
-
-  @override
-  String get workingHoursLabel => 'Radno vreme';
-
-  @override
-  String get workingHoursValue => 'Pon–Sub, 08:00–18:00';
-
-  @override
-  String get sortByRating => 'Sortiraj po oceni';
 
   @override
   String get allServices => 'Sve usluge';
@@ -577,9 +538,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get openNow => 'Otvoreno sada';
-
-  @override
-  String get closedNow => 'Zatvoreno sada';
 
   @override
   String get language => 'Jezik';
@@ -634,10 +592,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get visits => 'termina';
-
-  @override
-  String get dragToReorderHint =>
-      'Drži i prevuci ikonicu da promeniš redosled.';
 
   @override
   String get markFavourite => 'Označi kao omiljenog';
@@ -779,9 +733,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get noServicesListed => 'Još nema navedenih usluga.';
 
   @override
-  String get reviewsForSpecialist => 'Recenzije za ovog specijalistu';
-
-  @override
   String get amenityInOffice => 'Pregledi u ordinaciji';
 
   @override
@@ -837,9 +788,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get roleGroomer => 'Negovatelj/ica';
-
-  @override
-  String get roleMainVet => 'Glavni veterinar';
 
   @override
   String get roleNoPreference => 'Bez preferencije';
@@ -916,9 +864,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get newPasswordHint => 'Ostavi prazno ako je ne menjaš';
 
   @override
-  String get callClinic => 'Pozovi kliniku';
-
-  @override
   String get couldNotPlaceCall =>
       'Poziv nije moguće pokrenuti sa ovog uređaja.';
 
@@ -952,9 +897,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get a11yBack => 'Nazad';
-
-  @override
-  String get a11yCloseSheet => 'Zatvori';
 
   @override
   String get a11yClearSearch => 'Obriši pretragu';

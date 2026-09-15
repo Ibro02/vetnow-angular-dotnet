@@ -100,12 +100,6 @@ abstract class AppLocalizations {
     Locale('sr')
   ];
 
-  /// No description provided for @appTitle.
-  ///
-  /// In bs, this message translates to:
-  /// **'VetNow'**
-  String get appTitle;
-
   /// No description provided for @navExplore.
   ///
   /// In bs, this message translates to:
@@ -153,18 +147,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Najbolje ocijenjeno'**
   String get filterTopRated;
-
-  /// No description provided for @filterNearest.
-  ///
-  /// In bs, this message translates to:
-  /// **'Najbliže'**
-  String get filterNearest;
-
-  /// No description provided for @filterOpenNow.
-  ///
-  /// In bs, this message translates to:
-  /// **'Otvoreno sada'**
-  String get filterOpenNow;
 
   /// No description provided for @clinicsInCity.
   ///
@@ -231,12 +213,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Pošalji recenziju'**
   String get submitReview;
-
-  /// No description provided for @reviewThanks.
-  ///
-  /// In bs, this message translates to:
-  /// **'Hvala na recenziji!'**
-  String get reviewThanks;
 
   /// No description provided for @reviewsCount.
   ///
@@ -381,12 +357,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Radno vrijeme još nije uneseno.'**
   String get noScheduleYet;
-
-  /// No description provided for @staffOnDuty.
-  ///
-  /// In bs, this message translates to:
-  /// **'{count} u smjeni'**
-  String staffOnDuty(int count);
 
   /// No description provided for @notificationsEmpty.
   ///
@@ -910,12 +880,6 @@ abstract class AppLocalizations {
   /// **'Rezervacija nije uspjela — termin je možda upravo zauzet. Pokušaj ponovo.'**
   String get bookingFailed;
 
-  /// No description provided for @signInToSeeRealAvailability.
-  ///
-  /// In bs, this message translates to:
-  /// **'Prijavljen/a si — sad biraš iz stvarno dostupnog osoblja i termina.'**
-  String get signInToSeeRealAvailability;
-
   /// No description provided for @anyAvailable.
   ///
   /// In bs, this message translates to:
@@ -1006,47 +970,11 @@ abstract class AppLocalizations {
   /// **'Razumijem'**
   String get gotIt;
 
-  /// No description provided for @ourTeam.
-  ///
-  /// In bs, this message translates to:
-  /// **'Naš tim'**
-  String get ourTeam;
-
   /// No description provided for @meetTheTeam.
   ///
   /// In bs, this message translates to:
   /// **'Upoznaj tim'**
   String get meetTheTeam;
-
-  /// No description provided for @openHoursToday.
-  ///
-  /// In bs, this message translates to:
-  /// **'Otvoreno sada · Pon–Sub, 08:00–18:00'**
-  String get openHoursToday;
-
-  /// No description provided for @closedOpensTomorrow.
-  ///
-  /// In bs, this message translates to:
-  /// **'Zatvoreno sada · Otvara se pon u 08:00'**
-  String get closedOpensTomorrow;
-
-  /// No description provided for @workingHoursLabel.
-  ///
-  /// In bs, this message translates to:
-  /// **'Radno vrijeme'**
-  String get workingHoursLabel;
-
-  /// No description provided for @workingHoursValue.
-  ///
-  /// In bs, this message translates to:
-  /// **'Pon–Sub, 08:00–18:00'**
-  String get workingHoursValue;
-
-  /// No description provided for @sortByRating.
-  ///
-  /// In bs, this message translates to:
-  /// **'Sortiraj po ocjeni'**
-  String get sortByRating;
 
   /// No description provided for @allServices.
   ///
@@ -1065,12 +993,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Otvoreno sada'**
   String get openNow;
-
-  /// No description provided for @closedNow.
-  ///
-  /// In bs, this message translates to:
-  /// **'Zatvoreno sada'**
-  String get closedNow;
 
   /// No description provided for @language.
   ///
@@ -1179,12 +1101,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'termina'**
   String get visits;
-
-  /// No description provided for @dragToReorderHint.
-  ///
-  /// In bs, this message translates to:
-  /// **'Drži i prevuci ikonicu da promijeniš redoslijed.'**
-  String get dragToReorderHint;
 
   /// No description provided for @markFavourite.
   ///
@@ -1450,12 +1366,6 @@ abstract class AppLocalizations {
   /// **'Još nema navedenih usluga.'**
   String get noServicesListed;
 
-  /// No description provided for @reviewsForSpecialist.
-  ///
-  /// In bs, this message translates to:
-  /// **'Recenzije za ovog specijalistu'**
-  String get reviewsForSpecialist;
-
   /// No description provided for @amenityInOffice.
   ///
   /// In bs, this message translates to:
@@ -1563,12 +1473,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Njegovatelj/ica'**
   String get roleGroomer;
-
-  /// No description provided for @roleMainVet.
-  ///
-  /// In bs, this message translates to:
-  /// **'Glavni veterinar'**
-  String get roleMainVet;
 
   /// No description provided for @roleNoPreference.
   ///
@@ -1714,12 +1618,6 @@ abstract class AppLocalizations {
   /// **'Ostavi prazno ako je ne mijenjaš'**
   String get newPasswordHint;
 
-  /// No description provided for @callClinic.
-  ///
-  /// In bs, this message translates to:
-  /// **'Pozovi kliniku'**
-  String get callClinic;
-
   /// No description provided for @couldNotPlaceCall.
   ///
   /// In bs, this message translates to:
@@ -1779,12 +1677,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Nazad'**
   String get a11yBack;
-
-  /// No description provided for @a11yCloseSheet.
-  ///
-  /// In bs, this message translates to:
-  /// **'Zatvori'**
-  String get a11yCloseSheet;
 
   /// No description provided for @a11yClearSearch.
   ///

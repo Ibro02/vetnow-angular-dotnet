@@ -4,6 +4,7 @@ import '../config/api_config.dart';
 import '../models/opening_hours.dart';
 import '../models/vet_station.dart';
 import 'api_client.dart';
+import 'json_list.dart';
 import 'clinic_cache.dart';
 
 class VetStationApiService {
@@ -19,6 +20,11 @@ class VetStationApiService {
       ApiConfig.vetStationSearch,
       query: {if (name != null && name.trim().isNotEmpty) 'name': name.trim()},
     );
+    // The envelope is still asserted, and still throws when it is wrong.
+    // A response that is not the shape of an answer means we did not get
+    // one, and "0 clinics found" would be a lie about it  14 the screen
+    // has an error state and a retry button for exactly this case. Only
+    // the rows inside a good envelope are forgiving.
     final list = (result as Map<String, dynamic>)['vetStations'] as List<dynamic>? ?? [];
     final raw = list.whereType<Map<String, dynamic>>().toList();
 
@@ -31,7 +37,10 @@ class VetStationApiService {
       unawaited(ClinicCache.save(raw));
     }
 
-    return raw.map(VetStation.fromJson).toList();
+    // Row by row rather than list.map: one clinic with a null id used
+    // to throw out of the whole request, and Explore showed a
+    // connection error over the nine clinics that were fine.
+    return parseRows(raw, VetStation.fromJson, context: 'clinics');
   }
 
   /// GET /api/VetStation/OpeningHours?vetStationId= — AllowAnonymous.

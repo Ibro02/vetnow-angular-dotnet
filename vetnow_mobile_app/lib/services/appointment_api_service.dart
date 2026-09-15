@@ -1,5 +1,6 @@
 import '../config/api_config.dart';
 import 'api_client.dart';
+import 'json_list.dart';
 
 /// Flattened shape returned by GET /api/Appointment/GetByCustomerId —
 /// mirrors AppointmentGetByCustomerIdEndpoint's anonymous projection
@@ -71,8 +72,7 @@ class AppointmentApiService {
       },
       token: token,
     );
-    final list = result as List<dynamic>? ?? [];
-    return list.map((e) => RemoteAppointment.fromJson(e as Map<String, dynamic>)).toList();
+    return parseRows(result, RemoteAppointment.fromJson, context: 'appointments');
   }
 
   /// POST /api/Appointment/Add — [Authorize]. CustomerId is set

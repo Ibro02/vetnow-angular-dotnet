@@ -6,6 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'crash_log.dart';
 
 /// Where a link wants to go.
+///
+/// Immutable, and marked as such: the shell compares an incoming link
+/// against the last one it acted on, so equality has to be by value, and
+/// value equality on something that can change is a bug waiting for a
+/// mutation.
+@immutable
 sealed class DeepLink {
   const DeepLink();
 }
