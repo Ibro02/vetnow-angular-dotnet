@@ -209,9 +209,16 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
               const SizedBox(height: AppSpacing.s3),
               Expanded(
                 child: _isLoading
-                    ? Padding(
+                    // Scrollable, like the list it stands in for. Three
+                    // appointment-shaped placeholders are taller than a
+                    // 320x568 screen, and in a plain Column that is a
+                    // flash of overflow stripes on every load — on the
+                    // smallest phones, the first thing anyone sees.
+                    ? ListView(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                        child: SkeletonList(count: 3, itemBuilder: () => const AppointmentCardSkeleton()),
+                        children: [
+                          SkeletonList(count: 3, itemBuilder: () => const AppointmentCardSkeleton()),
+                        ],
                       )
                     : _error != null
                         // A failed request is not an empty calendar. It used
@@ -368,7 +375,13 @@ class _AppointmentCard extends StatelessWidget {
                         children: [
                           Icon(Icons.pets, size: 13, color: AppColors.textMuted),
                           const SizedBox(width: 5),
-                          Text('${a.petName} · ${a.serviceName}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                          Expanded(
+                            child: Text(
+                              '${a.petName} · ${a.serviceName}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -376,19 +389,33 @@ class _AppointmentCard extends StatelessWidget {
                         children: [
                           Icon(Icons.person_outline, size: 13, color: AppColors.textMuted),
                           const SizedBox(width: 5),
-                          Text(a.staffName, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          Expanded(
+                            child: Text(
+                              a.staffName,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.primary),
-                              const SizedBox(width: 5),
-                              Text(_relativeDate(a.dateTime), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.text)),
-                            ],
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.primary),
+                                const SizedBox(width: 5),
+                                Flexible(
+                                  child: Text(
+                                    _relativeDate(a.dateTime),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.text),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           if (a.priceKm > 0)
                             Text('${a.priceKm.toStringAsFixed(0)} KM', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryDark)),

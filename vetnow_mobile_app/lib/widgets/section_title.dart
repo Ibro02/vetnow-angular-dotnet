@@ -18,12 +18,19 @@ class SectionTitle extends StatelessWidget {
   final FontWeight fontWeight;
   final Color? color;
 
+  /// Ellipsises past this. A heading sharing a row with an action is the
+  /// place this matters: a longer translation or a doubled text scale
+  /// pushes the button off the edge, and the overflow stripes are the
+  /// first thing anyone notices about a screen.
+  final int maxLines;
+
   const SectionTitle(
     this.text, {
     super.key,
     this.fontSize = 16,
     this.fontWeight = FontWeight.w700,
     this.color,
+    this.maxLines = 1,
   });
 
   @override
@@ -32,6 +39,8 @@ class SectionTitle extends StatelessWidget {
       header: true,
       child: Text(
         text,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(fontSize: fontSize, fontWeight: fontWeight, color: color),
       ),
     );

@@ -409,14 +409,17 @@ class _ExploreScreenState extends State<ExploreScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          // With no city selected the "… in {city}" phrasing would
-                          // read as a lie, so fall back to a plain count.
-                          _selectedCity == null
-                              ? l10n.clinicsFound(stations.length)
-                              : l10n.clinicsInCity(stations.length, _selectedCity!),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+                        Expanded(
+                          child: Text(
+                            // With no city selected the "… in {city}" phrasing would
+                            // read as a lie, so fall back to a plain count.
+                            _selectedCity == null
+                                ? l10n.clinicsFound(stations.length)
+                                : l10n.clinicsInCity(stations.length, _selectedCity!),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+                          ),
                         ),
                         Semantics(
                           button: true,
@@ -553,7 +556,9 @@ class _Hero extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const _BrandMark(),
+                // The buttons keep their size; the wordmark gives way. The
+                // other way round would push a control off the edge.
+                const Flexible(child: _BrandMark()),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -689,14 +694,19 @@ class _BrandMark extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 9),
-        const Text(
-          'VetNow',
-          style: TextStyle(
-            fontFamily: AppFonts.display,
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
-            color: Colors.white,
+        // The paw keeps its 36pt; the wordmark is what gives way when the
+        // header runs out of room.
+        const Flexible(
+          child: Text(
+            'VetNow',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: AppFonts.display,
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+              color: Colors.white,
+            ),
           ),
         ),
       ],
@@ -718,9 +728,15 @@ class _TrustPill extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: AppColors.gold),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white),
+          // Flexible, not bare: the label is a translated sentence
+          // fragment, and on a 320pt screen or at double text size it is
+          // wider than the pill it sits in.
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white),
+            ),
           ),
         ],
       ),

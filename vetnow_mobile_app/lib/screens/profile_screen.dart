@@ -117,7 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SectionTitle(l10n.myPets),
+                          // Flexible so the heading gives way rather than
+                          // pushing the action off the edge.
+                          Flexible(child: SectionTitle(l10n.myPets)),
                           TextButton(
                             onPressed: () async {
                               final changed = await Navigator.of(context).push<bool>(
@@ -220,15 +222,23 @@ class _PetsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // A horizontal strip needs a fixed height, and a fixed height set in
+    // logical pixels breaks the moment someone turns their text up: the
+    // card's contents grow and the row does not. Scaling it with the text
+    // keeps the cards intact; the cap stops a 2x setting from handing one
+    // row half the screen.
+    final rowHeight =
+        MediaQuery.textScalerOf(context).scale(130).clamp(130.0, 210.0);
+
     if (isLoading) {
-      return const SizedBox(
-        height: 130,
-        child: Center(child: PawLoader(size: 26, color: AppColors.primary)),
+      return SizedBox(
+        height: rowHeight,
+        child: const Center(child: PawLoader(size: 26, color: AppColors.primary)),
       );
     }
 
     return SizedBox(
-      height: 130,
+      height: rowHeight,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [

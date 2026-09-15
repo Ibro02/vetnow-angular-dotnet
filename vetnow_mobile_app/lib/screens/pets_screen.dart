@@ -553,11 +553,18 @@ class _ViewModeSwitch extends StatelessWidget {
           children: [
             Icon(icon, size: 15, color: selected ? Colors.white : AppColors.textSecondary),
             const SizedBox(width: 6),
-            Text(label,
+            // Two of these split the width, so on a narrow screen the
+            // label has to give rather than push past the pill's edge.
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: selected ? Colors.white : AppColors.textSecondary)),
+                    color: selected ? Colors.white : AppColors.textSecondary),
+              ),
+            ),
           ],
         ),
       ),

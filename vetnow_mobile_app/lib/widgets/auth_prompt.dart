@@ -152,9 +152,12 @@ class AuthPrompt extends StatelessWidget {
                         children: [
                           const Icon(Icons.bolt_rounded, size: 13, color: AppColors.gold),
                           const SizedBox(width: 3),
-                          Text(
-                            AppLocalizations.of(context)!.takesLessThanMinute,
-                            style: TextStyle(color: AppColors.textMuted, fontSize: 11.5),
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)!.takesLessThanMinute,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 11.5),
+                            ),
                           ),
                         ],
                       ),
