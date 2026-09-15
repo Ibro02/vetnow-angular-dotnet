@@ -6,6 +6,7 @@ import 'config/theme.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/root_shell.dart';
 import 'services/crash_log.dart';
+import 'services/deep_links.dart';
 import 'state/auth_state.dart';
 import 'state/locale_state.dart';
 import 'state/theme_state.dart';
@@ -25,7 +26,6 @@ void main() {
   );
 }
 
-
 class VetNowApp extends StatefulWidget {
   const VetNowApp({super.key});
 
@@ -37,6 +37,10 @@ class _VetNowAppState extends State<VetNowApp> {
   final _authState = AuthState();
   final _localeState = LocaleState();
   final _themeState = ThemeState();
+
+  /// The link waiting to be acted on, if the app was opened by one.
+  final _pendingLink = ValueNotifier<DeepLink?>(null);
+  late final DeepLinkListener _deepLinks;
 
   /// Exposed for widget tests, which assert that session restore always
   /// settles rather than leaving the app on the splash. Not used by app
@@ -52,10 +56,19 @@ class _VetNowAppState extends State<VetNowApp> {
     // is true and rebuilds when it flips.
     _authState.restore();
     _themeState.restore();
+
+    // Both channels matter: the link that launched a cold start arrives
+    // once at startup, and later taps arrive on a stream. Handling only
+    // one of the two means half of all links quietly open the front door
+    // instead of the page they name.
+    _deepLinks = DeepLinkListener(onLink: (link) => _pendingLink.value = link);
+    _deepLinks.start();
   }
 
   @override
   void dispose() {
+    _deepLinks.dispose();
+    _pendingLink.dispose();
     _authState.dispose();
     _localeState.dispose();
     _themeState.dispose();
@@ -70,72 +83,75 @@ class _VetNowAppState extends State<VetNowApp> {
     // sits at the top of build rather than in initState.
     final platform = MediaQuery.platformBrightnessOf(context);
 
-    return ThemeScope(
-      notifier: _themeState,
-      child: LocaleScope(
-      notifier: _localeState,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_localeState, _themeState]),
-        builder: (context, _) {
-          applyPaletteBrightness(_themeState.resolve(platform));
+    return DeepLinkScope(
+      notifier: _pendingLink,
+      child: ThemeScope(
+        notifier: _themeState,
+        child: LocaleScope(
+          notifier: _localeState,
+          child: AnimatedBuilder(
+            animation: Listenable.merge([_localeState, _themeState]),
+            builder: (context, _) {
+              applyPaletteBrightness(_themeState.resolve(platform));
 
-          return AuthScope(
-            notifier: _authState,
-            child: MaterialApp(
-              title: 'VetNow',
-              debugShowCheckedModeBanner: false,
-              // One ThemeData either way: `current` reads the palette that
-              // was just applied. Passing it as both theme and darkTheme
-              // keeps Material from swapping in its own defaults when the
-              // system flips while the app is open.
-              theme: AppTheme.current,
-              darkTheme: AppTheme.current,
-              themeMode: _themeState.mode,
-              locale: _localeState.locale,
-              supportedLocales: const [
-                Locale('bs'),
-                Locale('hr'),
-                Locale('sr'),
-              ],
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              // Guest-first: the app opens straight into Explore. Login is
-              // only requested later, right before confirming a booking (see
-              // BookingScreen) or when tapping Appointments/Profile as a guest.
-              //
-              // While a saved session is being verified we hold on a splash
-              // instead of the shell, so someone who is signed in never sees
-              // "Appointments" flash its guest prompt first.
-              // Keyed on the brightness so the whole tree is rebuilt when
-              // the theme flips.
-              //
-              // The palette is a static rather than an InheritedWidget, so
-              // nothing below depends on it the way Flutter tracks
-              // dependencies — a new ThemeData alone repaints Material's
-              // own chrome and leaves every widget that read AppColors
-              // directly showing the old colours. Changing the key is what
-              // forces those to build again.
-              //
-              // The cost is that screen state is discarded on a switch,
-              // which is why the clinic list is cached: it comes straight
-              // back rather than flashing skeletons at someone who only
-              // changed a setting.
-              home: KeyedSubtree(
-                key: ValueKey(AppColors.brightness),
-                child: AnimatedBuilder(
-                  animation: _authState,
-                  builder: (context, _) =>
-                      _authState.isRestoring ? const _SessionSplash() : const RootShell(),
+              return AuthScope(
+                notifier: _authState,
+                child: MaterialApp(
+                  title: 'VetNow',
+                  debugShowCheckedModeBanner: false,
+                  // One ThemeData either way: `current` reads the palette that
+                  // was just applied. Passing it as both theme and darkTheme
+                  // keeps Material from swapping in its own defaults when the
+                  // system flips while the app is open.
+                  theme: AppTheme.current,
+                  darkTheme: AppTheme.current,
+                  themeMode: _themeState.mode,
+                  locale: _localeState.locale,
+                  supportedLocales: const [
+                    Locale('bs'),
+                    Locale('hr'),
+                    Locale('sr'),
+                  ],
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  // Guest-first: the app opens straight into Explore. Login is
+                  // only requested later, right before confirming a booking (see
+                  // BookingScreen) or when tapping Appointments/Profile as a guest.
+                  //
+                  // While a saved session is being verified we hold on a splash
+                  // instead of the shell, so someone who is signed in never sees
+                  // "Appointments" flash its guest prompt first.
+                  // Keyed on the brightness so the whole tree is rebuilt when
+                  // the theme flips.
+                  //
+                  // The palette is a static rather than an InheritedWidget, so
+                  // nothing below depends on it the way Flutter tracks
+                  // dependencies — a new ThemeData alone repaints Material's
+                  // own chrome and leaves every widget that read AppColors
+                  // directly showing the old colours. Changing the key is what
+                  // forces those to build again.
+                  //
+                  // The cost is that screen state is discarded on a switch,
+                  // which is why the clinic list is cached: it comes straight
+                  // back rather than flashing skeletons at someone who only
+                  // changed a setting.
+                  home: KeyedSubtree(
+                    key: ValueKey(AppColors.brightness),
+                    child: AnimatedBuilder(
+                      animation: _authState,
+                      builder: (context, _) =>
+                          _authState.isRestoring ? const _SessionSplash() : const RootShell(),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

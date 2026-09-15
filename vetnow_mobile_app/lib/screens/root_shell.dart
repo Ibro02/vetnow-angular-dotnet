@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
+import '../services/deep_links.dart';
+import '../services/vet_station_api_service.dart';
 import '../widgets/luxury_nav_bar.dart';
 import 'explore_screen.dart';
 import 'my_appointments_screen.dart';
 import 'profile_screen.dart';
+import 'vet_station_detail_screen.dart';
 
 /// App shell: bottom nav across the three top-level destinations.
 /// Explore is always fully usable as a guest; Appointments/Profile stay
@@ -24,6 +27,43 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   int _tabIndex = 0;
+
+  /// The link already acted on, so a rebuild does not open the same
+  /// clinic a second time.
+  DeepLink? _handled;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final pending = DeepLinkScope.of(context)?.value;
+    if (pending == null || pending == _handled) return;
+    _handled = pending;
+
+    // After the frame: this runs during a build, and both switching tabs
+    // and pushing a route are things that cannot happen mid-build.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _follow(pending));
+  }
+
+  Future<void> _follow(DeepLink link) async {
+    switch (link) {
+      case TabLink(:final destination):
+        if (!mounted) return;
+        setState(() => _tabIndex = Destination.values.indexOf(destination));
+
+      case ClinicLink(:final id):
+        // Explore first, so backing out of the clinic page lands
+        // somewhere sensible rather than on an empty stack.
+        if (mounted) setState(() => _tabIndex = 0);
+
+        final station = await VetStationApiService.getById(id);
+        if (!mounted || station == null) return;
+
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => VetStationDetailScreen(station: station)),
+        );
+    }
+  }
 
   final List<Widget> _tabs = const [
     ExploreScreen(),

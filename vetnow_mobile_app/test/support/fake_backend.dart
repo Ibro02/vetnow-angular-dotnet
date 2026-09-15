@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:vetnow_mobile/l10n/app_localizations.dart';
 import 'package:vetnow_mobile/services/api_client.dart';
+import 'package:vetnow_mobile/services/deep_links.dart';
 import 'package:vetnow_mobile/state/auth_state.dart';
 import 'package:vetnow_mobile/state/locale_state.dart';
 import 'package:vetnow_mobile/state/theme_state.dart';
@@ -69,8 +70,7 @@ class FakeBackend extends http.BaseClient {
   }
 
   /// True if any request carried the auth header.
-  bool get sawToken =>
-      calls.any((c) => c.headers.containsKey('my-auth-token'));
+  bool get sawToken => calls.any((c) => c.headers.containsKey('my-auth-token'));
 
   String? tokenFor(String pathFragment) => calls
       .firstWhere(
@@ -95,6 +95,7 @@ Widget harness(
   bool signedIn = true,
   AuthState? auth,
   double textScale = 1.0,
+  ValueNotifier<DeepLink?>? link,
 }) {
   final authState = auth ?? AuthState();
 
@@ -112,35 +113,37 @@ Widget harness(
       ..isRestoring = false;
   }
 
-  return ThemeScope(
-    notifier: ThemeState(),
-    child: LocaleScope(
-      notifier: LocaleState(),
-      child: AuthScope(
-        notifier: authState,
-        child: MaterialApp(
-          locale: const Locale('bs'),
-          supportedLocales: const [Locale('bs'), Locale('hr'), Locale('sr')],
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          // Applied through the builder, not around MaterialApp: MaterialApp
-          // installs its own MediaQuery from the view, so one wrapped
-          // outside it is simply replaced and the scale never reaches a
-          // single Text.
-          builder: (context, navigator) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(textScale),
+  return DeepLinkScope(
+    notifier: link ?? ValueNotifier<DeepLink?>(null),
+    child: ThemeScope(
+      notifier: ThemeState(),
+      child: LocaleScope(
+        notifier: LocaleState(),
+        child: AuthScope(
+          notifier: authState,
+          child: MaterialApp(
+            locale: const Locale('bs'),
+            supportedLocales: const [Locale('bs'), Locale('hr'), Locale('sr')],
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            // Applied through the builder, not around MaterialApp: MaterialApp
+            // installs its own MediaQuery from the view, so one wrapped
+            // outside it is simply replaced and the scale never reaches a
+            // single Text.
+            builder: (context, navigator) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(textScale),
+              ),
+              child: navigator!,
             ),
-            child: navigator!,
+            home: child,
           ),
-          home: child,
         ),
       ),
     ),
   );
 }
 
-Future<AppLocalizations> bosnian() =>
-    AppLocalizations.delegate.load(const Locale('bs'));
+Future<AppLocalizations> bosnian() => AppLocalizations.delegate.load(const Locale('bs'));
 
 /// Installs [backend] for the duration of a test.
 void useBackend(FakeBackend backend) => ApiClient.client = backend;
