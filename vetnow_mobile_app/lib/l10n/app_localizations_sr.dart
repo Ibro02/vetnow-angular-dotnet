@@ -28,7 +28,7 @@ class AppLocalizationsSr extends AppLocalizations {
       'Pregledaj proverene klinike blizu tebe — bez naloga za pregledanje.';
 
   @override
-  String get searchHint => 'Pretraži klinike, usluge…';
+  String get searchHint => 'Pretraži klinike…';
 
   @override
   String get filterRecommended => 'Preporučeno';

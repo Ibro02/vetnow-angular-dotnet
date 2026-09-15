@@ -139,7 +139,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In bs, this message translates to:
-  /// **'Pretraži klinike, usluge…'**
+  /// **'Pretraži klinike…'**
   String get searchHint;
 
   /// No description provided for @filterRecommended.
