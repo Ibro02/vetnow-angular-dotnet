@@ -97,14 +97,33 @@ class StaffProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.s3),
-                              Text(
-                                staff.name,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20),
+                              // Padded: a name with a title on it runs the
+                              // full width of the screen otherwise, and off
+                              // both edges at a larger text size.
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.s6,
+                                ),
+                                child: Text(
+                                  staff.name,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20),
+                                ),
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                staff.role,
-                                style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 13),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.s6,
+                                ),
+                                child: Text(
+                                  staff.role,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 13),
+                                ),
                               ),
                               const SizedBox(height: AppSpacing.s3),
                               // Employee ratings are not recorded on the backend,

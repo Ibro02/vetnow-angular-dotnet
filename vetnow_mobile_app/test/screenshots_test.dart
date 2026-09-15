@@ -82,6 +82,18 @@ FakeBackend _backend() => FakeBackend({
       'VetStation/OpeningHours': (_) => <Map<String, dynamic>>[],
       'Review/GetByVetStation': (_) => {'average': 4.4, 'count': 5, 'reviews': []},
       'Review/Pending': (_) => <Map<String, dynamic>>[],
+      // Without this the edit-profile screen renders its error state
+      // instead of its form, and the layout suite passes it on a
+      // message rather than on the thing that has fields in it.
+      'ProfileSettings': (_) => {
+            'firstName': 'Amir',
+            'lastName': 'Hadzic',
+            'phone': '+387 61 234 567',
+            'email': 'amir.hadzic@test.com',
+            'city': 'Sarajevo',
+            'country': 'Bosna i Hercegovina',
+            'address': 'Zmaja od Bosne 4',
+          },
       'Employee/': (_) => {'dataItems': <Map<String, dynamic>>[]},
       'TimeSlot': (_) => <Map<String, dynamic>>[],
       'BreedGetBySpecies': (_) => {'dataItems': <Map<String, dynamic>>[]},
