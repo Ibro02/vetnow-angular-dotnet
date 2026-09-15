@@ -1040,4 +1040,18 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get reportReviewFailed =>
       'Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.';
+
+  @override
+  String get forgotPasswordTitle => 'Zaboravljena lozinka';
+
+  @override
+  String forgotPasswordBody(String email) {
+    return 'Resetovanje lozinke još nije dostupno u aplikaciji. Javi nam se na $email i vratićemo ti pristup.';
+  }
+
+  @override
+  String get copyEmail => 'Kopiraj adresu';
+
+  @override
+  String get copied => 'Kopirano';
 }

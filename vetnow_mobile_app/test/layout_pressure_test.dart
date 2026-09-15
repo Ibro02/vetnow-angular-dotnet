@@ -21,7 +21,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
+import 'package:vetnow_mobile/models/vet_station.dart';
+import 'package:vetnow_mobile/screens/add_pet_screen.dart';
 import 'package:vetnow_mobile/screens/diagnostics_screen.dart';
+import 'package:vetnow_mobile/screens/login_screen.dart';
+import 'package:vetnow_mobile/screens/notifications_screen.dart';
+import 'package:vetnow_mobile/screens/register_screen.dart';
+import 'package:vetnow_mobile/screens/vet_station_detail_screen.dart';
 import 'package:vetnow_mobile/screens/explore_screen.dart';
 import 'package:vetnow_mobile/screens/my_appointments_screen.dart';
 import 'package:vetnow_mobile/screens/pets_screen.dart';
@@ -37,6 +43,10 @@ const _small = Size(320, 568);
 /// A typical modern phone, for the scaled-text cases.
 const _phone = Size(390, 844);
 
+VetStation _clinic() => VetStation.fromJson(
+      (stations()['vetStations'] as List).first as Map<String, dynamic>,
+    );
+
 FakeBackend _backend() => FakeBackend({
       'SpeciesGetAll': (_) => speciesEnvelope(),
       'Animal/GetByOwnerId': (_) => animals(),
@@ -51,6 +61,11 @@ FakeBackend _backend() => FakeBackend({
       'VetStation/GetAll': (_) => stations(),
       'Review/GetByVetStation': (_) => {'average': 4.4, 'count': 5, 'reviews': []},
       'Review/Pending': (_) => <Map<String, dynamic>>[],
+      'VetStation/Get': (_) => stations()['vetStations'],
+      'VetStation/OpeningHours': (_) => <Map<String, dynamic>>[],
+      'Employee/': (_) => {'dataItems': <Map<String, dynamic>>[]},
+      'TimeSlot': (_) => <Map<String, dynamic>>[],
+      'BreedGetBySpecies': (_) => {'dataItems': <Map<String, dynamic>>[]},
     });
 
 Future<void> _render(
@@ -100,6 +115,14 @@ void main() {
     'Profile': () => const ProfileScreen(),
     'Diagnostics': () => const DiagnosticsScreen(),
     'Shell': () => const RootShell(),
+    // The rest of the app. Every one of these was found to overflow
+    // somewhere the first time it was put under this pressure, which is
+    // the argument for the list being exhaustive rather than a sample.
+    'Clinic': () => VetStationDetailScreen(station: _clinic()),
+    'Notifications': () => const NotificationsScreen(),
+    'AddPet': () => const AddPetScreen(),
+    'Login': () => const LoginScreen(),
+    'Register': () => const RegisterScreen(),
   };
 
   for (final entry in screens.entries) {

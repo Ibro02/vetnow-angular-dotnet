@@ -181,7 +181,12 @@ class _AddPetScreenState extends State<AddPetScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 176,
+            // Grows with the text, because the title under the circle is a
+            // sentence: at twice the size it is two lines and no longer fits
+            // a fixed 176. Capped so a large setting cannot hand the header
+            // the whole screen.
+            expandedHeight:
+                MediaQuery.textScalerOf(context).scale(176).clamp(176.0, 250.0),
             pinned: true,
             backgroundColor: AppColors.ink,
             iconTheme: const IconThemeData(color: Colors.white),
@@ -224,9 +229,20 @@ class _AddPetScreenState extends State<AddPetScreen> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.s3),
-                        Text(
-                          _isEditing ? l10n.editPet : l10n.tellUsAboutFriend,
-                          style: const TextStyle(fontFamily: AppFonts.display, fontSize: 19, fontWeight: FontWeight.w600, color: Colors.white),
+                        // Padded and centred: this is a full sentence, and
+                        // without a horizontal inset it ran to both edges of
+                        // the screen and off them at a larger text size.
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.s6,
+                          ),
+                          child: Text(
+                            _isEditing ? l10n.editPet : l10n.tellUsAboutFriend,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontFamily: AppFonts.display, fontSize: 19, fontWeight: FontWeight.w600, color: Colors.white),
+                          ),
                         ),
                       ],
                     ),

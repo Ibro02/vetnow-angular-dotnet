@@ -1929,6 +1929,30 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.'**
   String get reportReviewFailed;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Zaboravljena lozinka'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordBody.
+  ///
+  /// In bs, this message translates to:
+  /// **'Resetovanje lozinke još nije dostupno u aplikaciji. Javi nam se na {email} i vratit ćemo ti pristup.'**
+  String forgotPasswordBody(String email);
+
+  /// No description provided for @copyEmail.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kopiraj adresu'**
+  String get copyEmail;
+
+  /// No description provided for @copied.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kopirano'**
+  String get copied;
 }
 
 class _AppLocalizationsDelegate

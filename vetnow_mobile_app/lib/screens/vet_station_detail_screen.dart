@@ -20,6 +20,7 @@ import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
 import '../widgets/verified_badge.dart';
 import '../widgets/section_title.dart';
+import '../widgets/hero_shell.dart';
 import 'booking_screen.dart';
 import 'staff_profile_screen.dart';
 
@@ -44,6 +45,21 @@ enum _StaffSort { featured, byName }
 class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   _StaffSort _staffSort = _StaffSort.featured;
 
+  /// How tall the header is before it starts collapsing.
+  static const double _heroHeight = 190;
+
+  final _scrollController = ScrollController();
+
+  /// True once the big name has scrolled behind the bar.
+  ///
+  /// Without this the pinned bar is a blank dark strip for the rest
+  /// of a four-screen page, and the name of the clinic you are
+  /// reading about is nowhere on screen. A ValueNotifier rather than
+  /// setState: this changes on a scroll frame, and rebuilding the
+  /// whole page (staff, services, reviews) for a title fade would be
+  /// the one thing on this screen that drops frames.
+  final _titleInBar = ValueNotifier<bool>(false);
+
   // Real staff for this station, fetched from the backend once the
   // person is logged in (Employee/GetByVetStationId is [Authorize] —
   // see chat notes on the guest-first conflict). Null means "not
@@ -65,6 +81,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _loadReviews();
     _loadOpeningHours();
   }
@@ -331,6 +348,21 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
     return result;
   }
 
+  void _onScroll() {
+    final collapsed =
+        _scrollController.offset > _heroHeight - kToolbarHeight - 12;
+    if (collapsed != _titleInBar.value) _titleInBar.value = collapsed;
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    _titleInBar.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final station = widget.station;
@@ -343,12 +375,35 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
       body: Stack(
         children: [
           CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
-                expandedHeight: 180,
+                expandedHeight: _heroHeight,
                 pinned: true,
                 backgroundColor: AppColors.ink,
+                surfaceTintColor: Colors.transparent,
                 iconTheme: const IconThemeData(color: Colors.white),
+                // Appears only once the big name has gone. Fading it in
+                // rather than switching keeps the handover from reading
+                // as a glitch.
+                title: ValueListenableBuilder<bool>(
+                  valueListenable: _titleInBar,
+                  builder: (context, visible, child) => AnimatedOpacity(
+                    opacity: visible ? 1 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: child,
+                  ),
+                  child: Text(
+                    station.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
                 flexibleSpace: FlexibleSpaceBar(
                   // The clinic's own gradient block, flown in from the card
                   // that was tapped. It used to be the same ink panel with the
@@ -361,6 +416,19 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                         tag: clinicHeroTag(station.id),
                         child: ClinicAvatar(station: station, discSize: 86, fontSize: 30),
                       ),
+                      // The same three layers every other header in the
+                      // app carries: the top-left light, then a vignette
+                      // to give the panel a centre. Without them this was
+                      // a flat colour block  14 the plainest surface in the
+                      // app, on its most important page.
+                      const Positioned.fill(
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(gradient: AppGradients.inkSheen),
+                          ),
+                        ),
+                      ),
+                      const Positioned.fill(child: HeroVignette()),
                       // Each clinic's gradient is a different brightness, so
                       // the white back arrow can't rely on any one of them for
                       // contrast. A short scrim at the very top guarantees it.
@@ -376,6 +444,29 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [Color(0x4D0F2E2C), Color(0x000F2E2C)],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // The gold rim the other heroes carry, brightest in
+                      // the middle so it reads as light catching an edge
+                      // rather than as a border.
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 1.6,
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0x00E8A73C),
+                                  Color(0xCCE8A73C),
+                                  Color(0x00E8A73C),
+                                ],
+                                stops: [0.08, 0.5, 0.92],
                               ),
                             ),
                           ),
@@ -463,7 +554,13 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                             children: [
                               const Icon(Icons.info_outline, size: 13, color: AppColors.primary),
                               const SizedBox(width: 4),
-                              Text(l10n.whatIsVerifiedPartner, style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                              Flexible(
+                                child: Text(
+                                  l10n.whatIsVerifiedPartner,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.w600),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -494,7 +591,10 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SectionTitle(l10n.meetTheTeam),
+                          Flexible(
+                            child: SectionTitle(l10n.meetTheTeam, accent: true),
+                          ),
+                          const SizedBox(width: AppSpacing.s3),
                           InkWell(
                             onTap: () => setState(
                               () => _staffSort = _staffSort == _StaffSort.featured ? _StaffSort.byName : _StaffSort.featured,
@@ -553,35 +653,9 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                               ),
                             )),
                       const SizedBox(height: AppSpacing.s8),
-                      IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Container(
-                              width: 3,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [AppColors.primary, AppColors.gold],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                                borderRadius: BorderRadius.circular(AppRadius.full),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.s3),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SectionTitle(l10n.allServices),
-                                  const SizedBox(height: AppSpacing.s3),
-                                  _ServicesList(services: allServices, station: station),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      SectionTitle(l10n.allServices, accent: true),
+                      const SizedBox(height: AppSpacing.s4),
+                      _ServicesList(services: allServices, station: station),
                       const SizedBox(height: AppSpacing.s8),
                       ReviewsSection(
                         summary: _reviewSummary,
@@ -730,7 +804,16 @@ class _FeaturePill extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: AppColors.primaryDark),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryDark)),
+            // The pill sits in a Wrap, so it is free to be as wide as
+            // it needs; Flexible is what stops it exceeding the row it
+            // lands on when the label is long or the text is scaled.
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryDark),
+              ),
+            ),
             const SizedBox(width: 4),
             const Icon(Icons.info_outline, size: 11, color: AppColors.primaryDark),
           ],
@@ -848,7 +931,13 @@ class _ServicesList extends StatelessWidget {
                             children: [
                               Icon(Icons.schedule, size: 12, color: AppColors.textMuted),
                               const SizedBox(width: 3),
-                              Text('${s.durationMinutes} min', style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                              Flexible(
+                                child: Text(
+                                  '${s.durationMinutes} min',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
+                                ),
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(

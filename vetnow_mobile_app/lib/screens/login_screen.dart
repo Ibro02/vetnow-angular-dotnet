@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../config/app_info.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/api_client.dart';
@@ -33,6 +35,43 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isError = false;
   String? _errorMessage;
   bool _isLoading = false;
+
+  /// What "forgot password" does, now that it does something.
+  ///
+  /// There is no reset endpoint on the backend, so the honest answer
+  /// is to say so and hand over an address rather than to leave a
+  /// control that accepts the tap and does nothing — which is what
+  /// this was.
+  Future<void> _showPasswordHelp(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.forgotPasswordTitle),
+        content: Text(l10n.forgotPasswordBody(AppInfo.supportEmail)),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(
+                const ClipboardData(text: AppInfo.supportEmail),
+              );
+              if (!dialogContext.mounted) return;
+              Navigator.of(dialogContext).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.copied)),
+              );
+            },
+            child: Text(l10n.copyEmail),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -105,7 +144,9 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
         _isError = true;
-        _errorMessage = e.statusCode == 404 || e.statusCode == 400 ? l10n.loginInvalidCredentials : l10n.networkError;
+        _errorMessage = e.statusCode == 404 || e.statusCode == 400
+            ? l10n.loginInvalidCredentials
+            : l10n.networkError;
       });
     } catch (_) {
       if (!mounted) return;
@@ -137,7 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
           icon: Container(
             height: 34,
             width: 34,
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.14), shape: BoxShape.circle),
+            decoration:
+                BoxDecoration(color: Colors.white.withValues(alpha: 0.14), shape: BoxShape.circle),
             child: Icon(
               widget.isBookingGate ? Icons.close : Icons.arrow_back,
               color: Colors.white,
@@ -159,7 +201,8 @@ class _LoginScreenState extends State<LoginScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: AppSpacing.s8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.pagePadding, vertical: AppSpacing.s8),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 420),
                   child: Column(
@@ -172,16 +215,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadius.xl2 + 2),
                           gradient: LinearGradient(
-                            colors: [AppColors.gold.withValues(alpha: 0.5), AppColors.accent.withValues(alpha: 0.4)],
+                            colors: [
+                              AppColors.gold.withValues(alpha: 0.5),
+                              AppColors.accent.withValues(alpha: 0.4)
+                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 34, offset: const Offset(0, 18)),
+                            BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 34,
+                                offset: const Offset(0, 18)),
                           ],
                         ),
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s6, AppSpacing.s6, AppSpacing.s8),
+                          padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.s6, AppSpacing.s6, AppSpacing.s6, AppSpacing.s8),
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(AppRadius.xl2),
@@ -197,9 +247,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: AppSpacing.s2),
                               Text(
-                                widget.isBookingGate ? l10n.loginBookingGateSubtitle : l10n.loginWelcomeSubtitle,
+                                widget.isBookingGate
+                                    ? l10n.loginBookingGateSubtitle
+                                    : l10n.loginWelcomeSubtitle,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+                                style: TextStyle(
+                                    color: AppColors.textSecondary, fontSize: 13, height: 1.4),
                               ),
                               const SizedBox(height: AppSpacing.s6),
                               AppTextField(
@@ -226,10 +279,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.error_outline, size: 16, color: AppColors.danger),
+                                      const Icon(Icons.error_outline,
+                                          size: 16, color: AppColors.danger),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: Text(_errorMessage!, style: const TextStyle(fontSize: 12.5, color: AppColors.dangerHover)),
+                                        child: Text(_errorMessage!,
+                                            style: const TextStyle(
+                                                fontSize: 12.5, color: AppColors.dangerHover)),
                                       ),
                                     ],
                                   ),
@@ -239,32 +295,78 @@ class _LoginScreenState extends State<LoginScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: Checkbox(
-                                          value: _keepMeSignedIn,
-                                          activeColor: AppColors.accent,
-                                          onChanged: (v) => setState(() => _keepMeSignedIn = v ?? false),
+                                  // Both halves are translated phrases sharing
+                                  // one line; without flex the longer one pushes
+                                  // the other off the card.
+                                  // The label toggles the box too. A 20pt
+                                  // checkbox is a hard thing to hit with a
+                                  // thumb, and "tap the words" is what everyone
+                                  // tries first anyway. Squeezing Checkbox into
+                                  // a 20pt box also overflowed the row, because
+                                  // it reserves a 48pt tap target unless told
+                                  // not to.
+                                  Flexible(
+                                    child: InkWell(
+                                      onTap: () => setState(
+                                        () => _keepMeSignedIn = !_keepMeSignedIn,
+                                      ),
+                                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: Checkbox(
+                                                value: _keepMeSignedIn,
+                                                activeColor: AppColors.accent,
+                                                visualDensity: VisualDensity.compact,
+                                                materialTapTargetSize:
+                                                    MaterialTapTargetSize.shrinkWrap,
+                                                onChanged: (v) => setState(
+                                                  () => _keepMeSignedIn = v ?? false,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                l10n.keepSignedIn,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    fontSize: 13, color: AppColors.textSecondary),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        l10n.keepSignedIn,
-                                        style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                                      ),
-                                    ],
-                                  ),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: AppColors.primary,
-                                      padding: EdgeInsets.zero,
                                     ),
-                                    child: Text(l10n.forgotPassword, style: const TextStyle(fontSize: 13)),
+                                  ),
+                                  // Flexible on this half as well: Flutter
+                                  // gives non-flexible children their full
+                                  // natural width first, so a long link left
+                                  // rigid here takes the space the label was
+                                  // supposed to shrink into.
+                                  Flexible(
+                                    child: TextButton(
+                                      // Was onPressed: () {} — a control that looked
+                                      // live, took the tap, and did nothing. There is no
+                                      // reset endpoint to call, so it says so and gives
+                                      // an address that can actually help.
+                                      onPressed: () => _showPasswordHelp(context),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: AppColors.primary,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Text(
+                                        l10n.forgotPassword,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -275,8 +377,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isLoading: _isLoading,
                               ),
                               const SizedBox(height: AppSpacing.s4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              // Wrap rather than Row: at a larger text size the
+                              // question and the link stop fitting on one line,
+                              // and dropping the link to its own line is better
+                              // than clipping either half.
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   Text(
                                     l10n.noAccount,
@@ -284,13 +391,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   TextButton(
                                     onPressed: () => Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (_) => RegisterScreen(isBookingGate: widget.isBookingGate)),
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              RegisterScreen(isBookingGate: widget.isBookingGate)),
                                     ),
                                     style: TextButton.styleFrom(
                                       foregroundColor: AppColors.primary,
                                       padding: EdgeInsets.zero,
                                     ),
-                                    child: Text(l10n.register, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                    child: Text(l10n.register,
+                                        style: const TextStyle(
+                                            fontSize: 13, fontWeight: FontWeight.w600)),
                                   ),
                                 ],
                               ),
@@ -348,7 +459,7 @@ class _BrandMark extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          'Za tvog ljubimca, s ljubavlju 🐾',
+          'Za tvog ljubimca, s ljubavlju ð¾',
           style: TextStyle(fontSize: 12.5, color: Colors.white.withValues(alpha: 0.7)),
         ),
       ],

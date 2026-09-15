@@ -12,7 +12,15 @@ class NotificationSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(text, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
+        // The label gives way to the count, not the other way round: a
+        // truncated word still reads, a clipped number does not.
+        Flexible(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text),
+          ),
+        ),
         const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),

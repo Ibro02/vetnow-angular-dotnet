@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:vetnow_mobile/config/theme.dart';
 import 'package:vetnow_mobile/l10n/app_localizations.dart';
 import 'package:vetnow_mobile/services/api_client.dart';
 import 'package:vetnow_mobile/services/deep_links.dart';
@@ -125,6 +126,11 @@ Widget harness(
             locale: const Locale('bs'),
             supportedLocales: const [Locale('bs'), Locale('hr'), Locale('sr')],
             localizationsDelegates: AppLocalizations.localizationsDelegates,
+          // Without this the Scaffold takes Material's own light default
+          // while every widget that reads AppColors directly follows the
+          // palette  14 so a dark-mode test renders dark cards on a white
+          // page, which is neither what the app does nor a bug in it.
+          theme: AppTheme.current,
             // Applied through the builder, not around MaterialApp: MaterialApp
             // installs its own MediaQuery from the view, so one wrapped
             // outside it is simply replaced and the scale never reaches a

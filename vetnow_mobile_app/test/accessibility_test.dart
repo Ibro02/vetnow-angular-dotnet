@@ -263,15 +263,46 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('it does not restyle the text it replaced', (tester) async {
+    testWidgets('every section heading looks the same', (tester) async {
+      // The colour used to be left to be inherited, which meant the same
+      // widget rendered dark on one screen and mid-grey on the next,
+      // depending on the DefaultTextStyle in scope. Two headings a
+      // thumb-scroll apart on the clinic page were visibly different.
       await pump(tester, const Center(child: SectionTitle('Nalog')));
 
       final style = tester.widget<Text>(find.text('Nalog')).style!;
       expect(style.fontSize, 16);
       expect(style.fontWeight, FontWeight.w700);
-      // Left unset on purpose: these headings inherit their colour from
-      // the page they sit on.
-      expect(style.color, isNull);
+      expect(style.color, AppColors.text);
+    });
+
+    testWidgets('a heading on a dark hero can still override the colour',
+        (tester) async {
+      await pump(
+        tester,
+        const Center(child: SectionTitle('Na heroju', color: Colors.white)),
+      );
+
+      expect(tester.widget<Text>(find.text('Na heroju')).style!.color,
+          Colors.white);
+    });
+
+    testWidgets('the accent rule is decoration, not something to read',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pump(
+        tester,
+        const Center(child: SectionTitle('Sve usluge', accent: true)),
+      );
+
+      // One heading, one label  14 the rule underneath adds nothing to the
+      // reading order.
+      expect(labels(tester), ['Sve usluge']);
+      expect(
+        tester.getSemantics(find.text('Sve usluge')),
+        matchesSemantics(label: 'Sve usluge', isHeader: true),
+      );
+      handle.dispose();
     });
   });
 

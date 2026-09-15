@@ -400,5 +400,12 @@
   "reportReviewTitle": "Prijaviti ovu recenziju?",
   "reportReviewBody": "Otvorićemo e-mail s detaljima recenzije da ga pošalješ. Pregledamo svaku prijavu i uklanjamo sadržaj koji krši pravila.",
   "reportReviewSend": "Otvori e-mail",
-  "reportReviewFailed": "Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana."
+  "reportReviewFailed": "Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.",
+  "forgotPasswordTitle": "Zaboravljena lozinka",
+  "forgotPasswordBody": "Resetovanje lozinke još nije dostupno u aplikaciji. Javi nam se na {email} i vratićemo ti pristup.",
+  "copyEmail": "Kopiraj adresu",
+  "copied": "Kopirano",
+  "@forgotPasswordBody": {
+    "placeholders": { "email": { "type": "String" } }
+  }
 }
