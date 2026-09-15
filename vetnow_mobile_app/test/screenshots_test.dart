@@ -18,7 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:vetnow_mobile/models/vet_service.dart';
 import 'package:vetnow_mobile/models/vet_station.dart';
+import 'package:vetnow_mobile/screens/booking_screen.dart';
 import 'package:vetnow_mobile/screens/add_pet_screen.dart';
 import 'package:vetnow_mobile/screens/diagnostics_screen.dart';
 import 'package:vetnow_mobile/screens/login_screen.dart';
@@ -39,6 +41,23 @@ const _phone = Size(390, 844);
 VetStation _clinic() => VetStation.fromJson(
       (stations()['vetStations'] as List).first as Map<String, dynamic>,
     );
+
+/// The booking flow is the one path in the app that earns anything, and
+/// it had never been rendered anywhere.
+const _services = [
+  VetService(
+    name: 'Opci pregled',
+    description: 'Kompletan fizicki pregled',
+    priceKm: 30,
+    durationMinutes: 30,
+  ),
+  VetService(
+    name: 'Vakcinacija',
+    description: 'Osnovne vakcine i vakcina protiv bjesnila',
+    priceKm: 25,
+    durationMinutes: 20,
+  ),
+];
 
 FakeBackend _backend() => FakeBackend({
       'SpeciesGetAll': (_) => speciesEnvelope(),
@@ -86,6 +105,7 @@ void main() {
     'login': () => const LoginScreen(),
     'register': () => const RegisterScreen(),
     'clinic': () => VetStationDetailScreen(station: _clinic()),
+    'booking': () => BookingScreen(station: _clinic(), services: _services),
   };
 
   for (final entry in screens.entries) {

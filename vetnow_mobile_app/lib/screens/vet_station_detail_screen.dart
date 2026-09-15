@@ -937,7 +937,12 @@ class _ServicesList extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(s.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+                          Text(
+                            s.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
+                          ),
                           const SizedBox(height: 3),
                           Row(
                             children: [
@@ -946,15 +951,6 @@ class _ServicesList extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   '${s.durationMinutes} min',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  s.description,
-                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
                                 ),

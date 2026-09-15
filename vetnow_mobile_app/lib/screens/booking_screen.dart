@@ -551,7 +551,16 @@ class _StepLabel extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text)),
+        // The step labels are full phrases ("Choose a service"), and the
+        // numbered disc beside them is fixed width, so the label is what
+        // has to give on a narrow screen.
+        Expanded(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text),
+          ),
+        ),
       ],
     );
   }
