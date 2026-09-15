@@ -130,7 +130,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
           Text(
             l10n.verifyAccountHeadline,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.text),
+            style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.text),
           ),
           const SizedBox(height: AppSpacing.s2),
           Text(
@@ -138,7 +138,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 ? l10n.verifyAccountBody
                 : l10n.verifyAccountBodyFor(widget.emailOrUsername!),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.45),
+            style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.45),
           ),
           const SizedBox(height: AppSpacing.s8),
           Container(
@@ -159,7 +159,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   // Codes are numeric; filtering here stops a stray space
                   // or letter from producing a confusing server rejection.
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 8,
@@ -167,7 +167,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   ),
                   decoration: InputDecoration(
                     hintText: '••••••',
-                    hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8, fontSize: 24),
+                    hintStyle: TextStyle(color: AppColors.textMuted, letterSpacing: 8, fontSize: 24),
                     filled: true,
                     fillColor: AppColors.bgMuted,
                     border: OutlineInputBorder(
@@ -207,7 +207,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
           Text(
             l10n.verifyAccountResendHint,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted, height: 1.4),
+            style: TextStyle(fontSize: 11.5, color: AppColors.textMuted, height: 1.4),
           ),
         ],
       ),

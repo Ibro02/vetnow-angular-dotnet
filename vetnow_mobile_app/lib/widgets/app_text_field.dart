@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 /// Mirrors frontend components/common/sign-in-input and components/common/input.
 class AppTextField extends StatefulWidget {
@@ -36,7 +37,7 @@ class _AppTextFieldState extends State<AppTextField> {
       children: [
         Text(
           widget.label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondary,
@@ -47,13 +48,18 @@ class _AppTextFieldState extends State<AppTextField> {
           controller: widget.controller,
           obscureText: widget.isPassword && _obscure,
           keyboardType: widget.keyboardType,
-          style: const TextStyle(color: AppColors.text, fontSize: 15),
+          style: TextStyle(color: AppColors.text, fontSize: 15),
           decoration: InputDecoration(
             prefixIcon: widget.prefixIcon != null
                 ? Icon(widget.prefixIcon, size: 20, color: AppColors.textMuted)
                 : null,
             suffixIcon: widget.isPassword
                 ? IconButton(
+                    // Says what the tap will do, not what is on screen —
+                    // an unnamed eye is the classic silent control.
+                    tooltip: _obscure
+                        ? AppLocalizations.of(context)!.a11yShowPassword
+                        : AppLocalizations.of(context)!.a11yHidePassword,
                     icon: Icon(
                       _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                       size: 20,

@@ -118,6 +118,7 @@
     }
   },
   "somethingWentWrong": "Nešto je pošlo po zlu",
+  "offlineShowingSaved": "Nema veze sa serverom — prikazane su zadnje sačuvane klinike.",
   "sortByName": "Po imenu",
   "sortDefault": "Redoslijed",
   "filterMostReviewed": "Najviše recenzija",
@@ -249,6 +250,11 @@
   "closedNow": "Zatvoreno sada",
 
   "language": "Jezik",
+  "appearance": "Izgled",
+  "themeSystem": "Kao na uređaju",
+  "themeLight": "Svijetla",
+  "themeDark": "Tamna",
+  "chooseTheme": "Odaberi izgled",
   "chooseLanguage": "Odaberi jezik",
   "bosnian": "Bosanski",
   "croatian": "Hrvatski",
@@ -364,5 +370,15 @@
   "verifyAccountBodyFor": "Poslali smo kod za potvrdu na {contact}. Upiši ga ispod kako bi aktivirao račun.",
   "verifyAccountAction": "Potvrdi račun",
   "verifyAccountResendHint": "Nisi dobio kod? Pokušaj se prijaviti ponovo — novi kod šaljemo pri svakoj prijavi.",
-  "filterAllStaff": "Svi"
+  "filterAllStaff": "Svi",
+  "a11yLoading": "Učitavanje",
+  "a11yBack": "Natrag",
+  "a11yCloseSheet": "Zatvori",
+  "a11yClearSearch": "Obriši pretragu",
+  "a11yShowPassword": "Prikaži lozinku",
+  "a11yHidePassword": "Sakrij lozinku",
+  "a11yRateStars": "{count, plural, one{{count} zvjezdica} few{{count} zvjezdice} other{{count} zvjezdica}}",
+  "@a11yRateStars": {
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

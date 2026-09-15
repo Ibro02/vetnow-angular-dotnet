@@ -442,6 +442,12 @@ abstract class AppLocalizations {
   /// **'Nešto je pošlo po zlu'**
   String get somethingWentWrong;
 
+  /// No description provided for @offlineShowingSaved.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema veze sa serverom — prikazane su zadnje sačuvane klinike.'**
+  String get offlineShowingSaved;
+
   /// No description provided for @sortByName.
   ///
   /// In bs, this message translates to:
@@ -1071,6 +1077,36 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Jezik'**
   String get language;
+
+  /// No description provided for @appearance.
+  ///
+  /// In bs, this message translates to:
+  /// **'Izgled'**
+  String get appearance;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kao na uređaju'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In bs, this message translates to:
+  /// **'Svijetla'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In bs, this message translates to:
+  /// **'Tamna'**
+  String get themeDark;
+
+  /// No description provided for @chooseTheme.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi izgled'**
+  String get chooseTheme;
 
   /// No description provided for @chooseLanguage.
   ///
@@ -1731,6 +1767,48 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Svi'**
   String get filterAllStaff;
+
+  /// No description provided for @a11yLoading.
+  ///
+  /// In bs, this message translates to:
+  /// **'Učitavanje'**
+  String get a11yLoading;
+
+  /// No description provided for @a11yBack.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nazad'**
+  String get a11yBack;
+
+  /// No description provided for @a11yCloseSheet.
+  ///
+  /// In bs, this message translates to:
+  /// **'Zatvori'**
+  String get a11yCloseSheet;
+
+  /// No description provided for @a11yClearSearch.
+  ///
+  /// In bs, this message translates to:
+  /// **'Obriši pretragu'**
+  String get a11yClearSearch;
+
+  /// No description provided for @a11yShowPassword.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prikaži lozinku'**
+  String get a11yShowPassword;
+
+  /// No description provided for @a11yHidePassword.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sakrij lozinku'**
+  String get a11yHidePassword;
+
+  /// No description provided for @a11yRateStars.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{{count} zvjezdica} few{{count} zvjezdice} other{{count} zvjezdica}}'**
+  String a11yRateStars(int count);
 }
 
 class _AppLocalizationsDelegate

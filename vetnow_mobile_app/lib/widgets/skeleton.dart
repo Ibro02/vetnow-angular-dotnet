@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../config/theme.dart';
 
 /// Loading placeholders shaped like the content that is coming.
@@ -228,9 +229,22 @@ class SkeletonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer(
-      child: Column(
-        children: List.generate(count, (_) => itemBuilder()),
+    // A placeholder list is a screen-reader trap: four card-shaped boxes
+    // with no text in them read as nothing at all, so someone using
+    // TalkBack hears silence and assumes the screen is broken rather
+    // than still loading. One live-region label replaces the lot.
+    return Semantics(
+      liveRegion: true,
+      // Null-safe: a skeleton is presentation and must never be the
+      // thing that crashes a screen, even if it is ever built outside the
+      // app's localization scope.
+      label: AppLocalizations.of(context)?.a11yLoading,
+      child: ExcludeSemantics(
+        child: Shimmer(
+          child: Column(
+            children: List.generate(count, (_) => itemBuilder()),
+          ),
+        ),
       ),
     );
   }

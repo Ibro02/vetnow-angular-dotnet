@@ -92,13 +92,13 @@ class AuthPrompt extends StatelessWidget {
                       Text(
                         title,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: AppColors.text),
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: AppColors.text),
                       ),
                       const SizedBox(height: AppSpacing.s2),
                       Text(
                         message,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
                       ),
                       if (benefits.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.s6),
@@ -129,7 +129,7 @@ class AuthPrompt extends StatelessWidget {
                                         ),
                                         const SizedBox(width: 10),
                                         Expanded(
-                                          child: Text(b, style: const TextStyle(fontSize: 13.5, color: AppColors.text, height: 1.3)),
+                                          child: Text(b, style: TextStyle(fontSize: 13.5, color: AppColors.text, height: 1.3)),
                                         ),
                                       ],
                                     ),
@@ -154,7 +154,7 @@ class AuthPrompt extends StatelessWidget {
                           const SizedBox(width: 3),
                           Text(
                             AppLocalizations.of(context)!.takesLessThanMinute,
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5),
+                            style: TextStyle(color: AppColors.textMuted, fontSize: 11.5),
                           ),
                         ],
                       ),

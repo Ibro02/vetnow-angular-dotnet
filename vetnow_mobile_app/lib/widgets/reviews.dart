@@ -51,7 +51,7 @@ class ReviewsSection extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     '${data.averageRating.toStringAsFixed(1)} · ${l10n.reviewsCount(data.reviewCount)}',
-                    style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -96,18 +96,18 @@ class _EmptyReviews extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.rate_review_outlined, size: 26, color: AppColors.textMuted),
+          Icon(Icons.rate_review_outlined, size: 26, color: AppColors.textMuted),
           const SizedBox(height: AppSpacing.s2),
           Text(
             l10n.noReviewsYet,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: AppColors.text),
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: AppColors.text),
           ),
           if (canRate) ...[
             const SizedBox(height: 4),
             Text(
               l10n.beFirstToReview,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4),
             ),
           ],
         ],
@@ -146,7 +146,7 @@ class _RatingBreakdown extends StatelessWidget {
                     width: 14,
                     child: Text(
                       '$star',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
                     ),
                   ),
@@ -169,7 +169,7 @@ class _RatingBreakdown extends StatelessWidget {
                     child: Text(
                       '${summary.ratingCounts[star] ?? 0}',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted),
+                      style: TextStyle(fontSize: 10.5, color: AppColors.textMuted),
                     ),
                   ),
                 ],
@@ -206,10 +206,10 @@ class ReviewCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 12,
                       backgroundColor: AppColors.primary50,
-                      child: Icon(Icons.person, size: 13, color: AppColors.primary),
+                      child: const Icon(Icons.person, size: 13, color: AppColors.primary),
                     ),
                     const SizedBox(width: 6),
                     Flexible(
@@ -226,7 +226,7 @@ class ReviewCard extends StatelessWidget {
               if (review.createdAt != null)
                 Text(
                   formatReviewDate(review.createdAt!),
-                  style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted),
+                  style: TextStyle(fontSize: 10.5, color: AppColors.textMuted),
                 ),
             ],
           ),
@@ -245,7 +245,7 @@ class ReviewCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               review.comment,
-              style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
+              style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
             ),
           ],
         ],
@@ -387,9 +387,9 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(
             AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, AppSpacing.s6),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(AppRadius.xl2),
             topRight: Radius.circular(AppRadius.xl2),
           ),
@@ -411,14 +411,14 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
             ),
             Text(
               widget.pending.vetStationName,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text),
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text),
             ),
             const SizedBox(height: 2),
             Text(
               widget.pending.visitDate == null
                   ? l10n.rateVisitHint
                   : l10n.visitOn(formatReviewDate(widget.pending.visitDate!)),
-              style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.s5),
             Center(
@@ -427,6 +427,9 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
                 children: List.generate(5, (i) {
                   final star = i + 1;
                   return IconButton(
+                    // Five identical unnamed buttons are unusable without
+                    // sight; each one says the rating it sets.
+                    tooltip: l10n.a11yRateStars(star),
                     onPressed: _submitting
                         ? null
                         : () {

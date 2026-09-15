@@ -4,9 +4,11 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/vet_station.dart';
 import '../services/api_client.dart';
+import '../services/clinic_cache.dart';
 import '../services/vet_station_api_service.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/theme_picker.dart';
 import '../widgets/state_views.dart';
 import '../widgets/verified_badge.dart';
 import '../widgets/hover_card.dart';
@@ -16,6 +18,7 @@ import '../widgets/entrance.dart';
 import '../widgets/hero_shell.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/vet_hero_background.dart';
+import '../widgets/section_title.dart';
 import 'notifications_screen.dart';
 import 'vet_station_detail_screen.dart';
 
@@ -63,16 +66,47 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool _isLoading = true;
   String? _loadError;
 
+  /// True while what's on screen came from disk rather than the server.
+  bool _showingCached = false;
+
+  /// Set when the refresh behind cached content failed. Kept separate
+  /// from [_showingCached], which is also true in the ordinary case
+  /// where the cache simply painted first and the network is still on
+  /// its way — saying "no connection" there would be a lie.
+  bool _refreshFailed = false;
+
   @override
   void initState() {
     super.initState();
+    _openFromCache();
     _loadStations();
+  }
+
+  /// Paints the last known clinics immediately, so the app opens with
+  /// content instead of a screen of skeletons on every single launch.
+  ///
+  /// It loses the race on purpose: if the network answers first this
+  /// does nothing, because a fresh list must never be replaced by an
+  /// older one just because disk came back late.
+  Future<void> _openFromCache() async {
+    final cached = await ClinicCache.read();
+    if (!mounted || cached == null || cached.isEmpty) return;
+    if (!_isLoading || _stations.isNotEmpty) return;
+
+    setState(() {
+      _stations = cached;
+      _isLoading = false;
+      _showingCached = true;
+    });
   }
 
   Future<void> _loadStations() async {
     setState(() {
-      _isLoading = true;
+      // Only show skeletons when there is nothing to show. A refresh over
+      // cached content should leave the content up.
+      _isLoading = _stations.isEmpty;
       _loadError = null;
+      _refreshFailed = false;
     });
     try {
       final result = await VetStationApiService.search();
@@ -80,18 +114,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
       setState(() {
         _stations = result;
         _isLoading = false;
+        _showingCached = false;
+        _refreshFailed = false;
       });
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _loadError = e.message;
+        // Cached clinics on screen are better than an error page — the
+        // person can still read and tap them. The error only takes over
+        // when there is nothing behind it.
+        _loadError = _stations.isEmpty ? e.message : null;
+        _refreshFailed = _stations.isNotEmpty;
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _loadError = 'network';
+        _loadError = _stations.isEmpty ? 'network' : null;
+        _refreshFailed = _stations.isNotEmpty;
       });
     }
   }
@@ -256,14 +297,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               hintText: l10n.searchHint,
-                              hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13.5),
+                              hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13.5),
                               prefixIcon: Padding(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: Container(
                                   height: 30,
                                   width: 30,
                                   decoration:
-                                      const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                                      BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                                   child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
                                 ),
                               ),
@@ -300,9 +341,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               const Icon(Icons.location_on, size: 16, color: AppColors.primary),
                               const SizedBox(width: 4),
                               Text(_selectedCity ?? l10n.allCities,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
-                              const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
+                              Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
                             ],
                           ),
                         ),
@@ -346,6 +387,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ],
                     ),
                   ),
+                  // Only once the refresh has actually failed — while it is
+                  // merely still in flight, the cache painting first is
+                  // normal and saying "no connection" would be wrong.
+                  if (_refreshFailed && _showingCached) ...[
+                    const SizedBox(height: AppSpacing.s4),
+                    _OfflineNotice(onRetry: _loadStations),
+                  ],
                   const SizedBox(height: AppSpacing.s5),
                   // Hidden while the request is failing: "0 clinics found"
                   // above an error message claims a result we never got.
@@ -359,7 +407,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           _selectedCity == null
                               ? l10n.clinicsFound(stations.length)
                               : l10n.clinicsInCity(stations.length, _selectedCity!),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
                         ),
                         Semantics(
@@ -501,6 +549,26 @@ class _Hero extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Here as well as in Profile, because Profile is behind a
+                    // login: a guest could otherwise never change the theme,
+                    // and a guest is exactly who opens this screen first.
+                    //
+                    // Shows the brightness currently in effect rather than a
+                    // neutral icon, so the control says what state you are in
+                    // before you tap it.
+                    GlassSurface(
+                      circle: true,
+                      padding: const EdgeInsets.all(9),
+                      semanticLabel: l10n.appearance,
+                      onTap: () => showThemePicker(context),
+                      child: Icon(
+                        AppColors.brightness == Brightness.dark
+                            ? Icons.dark_mode_rounded
+                            : Icons.light_mode_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
                     GlassSurface(
                       circle: true,
                       padding: const EdgeInsets.all(9),
@@ -508,7 +576,6 @@ class _Hero extends StatelessWidget {
                       onTap: () => showLanguagePicker(context),
                       child: const Icon(Icons.translate_rounded, color: Colors.white, size: 16),
                     ),
-                    const SizedBox(width: 8),
                     // The bell used to be a decorative circle with
                     // no tap target at all.
                     GlassSurface(
@@ -677,11 +744,14 @@ class _FilterChip extends StatelessWidget {
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            gradient: selected ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]) : null,
+            // Ink on a white page is the strongest possible selected
+            // state; on a dark page it is nearly the page itself. The
+            // brand sweep is what carries the selection there.
+            gradient: selected ? AppGradients.selected : null,
             color: selected ? null : AppColors.surface,
             borderRadius: BorderRadius.circular(AppRadius.full),
             border: Border.all(color: selected ? Colors.transparent : AppColors.border),
-            boxShadow: selected ? AppShadows.glow(AppColors.ink) : null,
+            boxShadow: selected ? AppShadows.glow(AppGradients.selectedSolid) : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -777,7 +847,7 @@ class _StationCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   station.name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontWeight: FontWeight.w700, fontSize: 14.5, color: AppColors.text),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -799,7 +869,7 @@ class _StationCard extends StatelessWidget {
                                 emptyLabel: AppLocalizations.of(context)!.noRatingsYet,
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
+                              Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
                               const SizedBox(width: 2),
                               // The real street and city, now that the search
                               // endpoint returns them. This slot used to show
@@ -808,7 +878,7 @@ class _StationCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   station.locationLine,
-                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                  style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -889,9 +959,9 @@ class _CityPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(AppRadius.xl2),
           topRight: Radius.circular(AppRadius.xl2),
         ),
@@ -912,16 +982,16 @@ class _CityPickerSheet extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(AppLocalizations.of(context)!.chooseCity,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.text)),
+              SectionTitle(AppLocalizations.of(context)!.chooseCity,
+                  fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
               InkWell(
                 onTap: () => Navigator.of(context).pop(),
                 borderRadius: BorderRadius.circular(AppRadius.full),
                 child: Container(
                   height: 30,
                   width: 30,
-                  decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                  child: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                  decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                  child: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -942,7 +1012,7 @@ class _CityPickerSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
                   decoration: BoxDecoration(
                     gradient: isSelected
-                        ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark])
+                        ? AppGradients.selected
                         : null,
                     color: isSelected ? null : AppColors.bgSoft,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -977,7 +1047,7 @@ class _CityPickerSheet extends StatelessWidget {
                       if (isSelected)
                         const Icon(Icons.check_circle_rounded, color: AppColors.gold, size: 20)
                       else
-                        const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                        Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
                     ],
                   ),
                 ),
@@ -1024,9 +1094,9 @@ class _AmenitiesFilterSheet extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
       ),
       child: Column(
@@ -1045,16 +1115,16 @@ class _AmenitiesFilterSheet extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.filterClinics,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text)),
+              SectionTitle(l10n.filterClinics,
+                  fontSize: 17, fontWeight: FontWeight.w800, color: AppColors.text),
               InkWell(
                 onTap: () => Navigator.of(context).pop(),
                 borderRadius: BorderRadius.circular(AppRadius.full),
                 child: Container(
                   height: 30,
                   width: 30,
-                  decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                  child: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                  decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                  child: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -1092,7 +1162,7 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                       const SizedBox(width: AppSpacing.s3),
                       Expanded(
                         child: Text(opt.$3,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                       ),
                       Icon(
@@ -1113,12 +1183,12 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onReset,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                   ),
                   child: Text(l10n.resetFilters,
-                      style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
                 ),
               ),
               const SizedBox(width: AppSpacing.s3),
@@ -1126,6 +1196,57 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                 child: AppButton(label: l10n.applyFilters, onPressed: onApply),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown above cached clinics when the refresh behind them failed.
+///
+/// Quiet on purpose: the clinics below are real, only slightly old, and
+/// still perfectly usable — this is a note, not an error page. It does
+/// carry a retry, because the one thing someone wants here is to try
+/// again the moment their signal comes back.
+class _OfflineNotice extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _OfflineNotice({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.s3, AppSpacing.s2, AppSpacing.s2, AppSpacing.s2),
+      decoration: BoxDecoration(
+        color: AppColors.warningSoft,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off_outlined, size: 15, color: AppColors.warning),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.offlineShowingSaved,
+              style: TextStyle(fontSize: 11.5, color: AppColors.text, height: 1.35),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Semantics(
+            button: true,
+            label: l10n.retry,
+            child: InkWell(
+              onTap: onRetry,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+              child: const Padding(
+                padding: EdgeInsets.all(6),
+                child: Icon(Icons.refresh_rounded, size: 17, color: AppColors.warning),
+              ),
+            ),
           ),
         ],
       ),

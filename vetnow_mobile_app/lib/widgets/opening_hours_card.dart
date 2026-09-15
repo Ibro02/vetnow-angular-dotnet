@@ -62,12 +62,12 @@ class _OpeningHoursCardState extends State<OpeningHoursCard> {
       return _Shell(
         child: Row(
           children: [
-            const Icon(Icons.schedule, size: 15, color: AppColors.textMuted),
+            Icon(Icons.schedule, size: 15, color: AppColors.textMuted),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 l10n.noScheduleYet,
-                style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
               ),
             ),
           ],
@@ -110,7 +110,7 @@ class _OpeningHoursCardState extends State<OpeningHoursCard> {
                         padding: const EdgeInsets.only(left: 6),
                         child: Text(
                           '· ${hours.todayRange}',
-                          style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -119,7 +119,7 @@ class _OpeningHoursCardState extends State<OpeningHoursCard> {
               AnimatedRotation(
                 turns: _expanded ? 0.5 : 0,
                 duration: const Duration(milliseconds: 180),
-                child: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textMuted),
+                child: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -137,7 +137,7 @@ class _OpeningHoursCardState extends State<OpeningHoursCard> {
                     padding: const EdgeInsets.only(top: AppSpacing.s3),
                     child: Column(
                       children: [
-                        const Divider(height: 1, color: AppColors.borderLight),
+                        Divider(height: 1, color: AppColors.borderLight),
                         const SizedBox(height: AppSpacing.s2),
                         ...hours.days.map((d) => _DayRow(
                               label: _dayLabel(l10n, d.day),

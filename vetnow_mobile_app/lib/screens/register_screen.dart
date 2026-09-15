@@ -112,6 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Row(
                     children: [
                       IconButton(
+                        tooltip: l10n.a11yBack,
                         onPressed: () => Navigator.of(context).pop(),
                         icon: Container(
                           height: 34,
@@ -213,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   prefixIcon: Icons.lock_outline,
                                 ),
                                 const SizedBox(height: 6),
-                                Text(l10n.passwordRequirementsHint, style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                Text(l10n.passwordRequirementsHint, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
                                 if (_errorMessage != null) ...[
                                   const SizedBox(height: AppSpacing.s3),
                                   Container(

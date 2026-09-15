@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import '../config/api_config.dart';
 import '../models/opening_hours.dart';
 import '../models/vet_station.dart';
 import 'api_client.dart';
+import 'clinic_cache.dart';
 
 class VetStationApiService {
   VetStationApiService._();
@@ -17,7 +20,18 @@ class VetStationApiService {
       query: {if (name != null && name.trim().isNotEmpty) 'name': name.trim()},
     );
     final list = (result as Map<String, dynamic>)['vetStations'] as List<dynamic>? ?? [];
-    return list.map((e) => VetStation.fromJson(e as Map<String, dynamic>)).toList();
+    final raw = list.whereType<Map<String, dynamic>>().toList();
+
+    // Only an unfiltered list is worth keeping: it is what Explore opens
+    // with. Caching a search for "Ferhadija" would mean the next launch
+    // starts on someone's old query.
+    if (name == null || name.trim().isEmpty) {
+      // Deliberately not awaited — the caller is waiting to render, and
+      // writing the cache is housekeeping that must not add to that wait.
+      unawaited(ClinicCache.save(raw));
+    }
+
+    return raw.map(VetStation.fromJson).toList();
   }
 
   /// GET /api/VetStation/OpeningHours?vetStationId= — AllowAnonymous.

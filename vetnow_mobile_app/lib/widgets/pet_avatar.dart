@@ -99,10 +99,14 @@ class PetAvatar extends StatelessWidget {
       ),
     );
 
-    if (expand) return painted;
+    // The portrait repeats what the name next to it already says, so it
+    // is excluded rather than announced as an unlabelled image.
+    if (expand) return ExcludeSemantics(child: painted);
 
-    return ClipOval(
-      child: SizedBox(width: size, height: size, child: painted),
+    return ExcludeSemantics(
+      child: ClipOval(
+        child: SizedBox(width: size, height: size, child: painted),
+      ),
     );
   }
 }

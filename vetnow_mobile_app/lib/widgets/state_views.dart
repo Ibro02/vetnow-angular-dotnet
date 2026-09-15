@@ -39,35 +39,46 @@ class ErrorStateView extends StatelessWidget {
     // not a sentence anyone should read.
     final text = (message == null || message == 'network') ? l10n.networkError : message!;
 
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          height: 64,
-          width: 64,
-          decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-          child: const Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
-        ),
-        const SizedBox(height: AppSpacing.s4),
-        Text(
-          l10n.somethingWentWrong,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.textSecondary, height: 1.45),
-        ),
-        const SizedBox(height: AppSpacing.s5),
-        AppButton(
-          label: l10n.retry,
-          icon: Icons.refresh,
-          fullWidth: false,
-          variant: AppButtonVariant.secondary,
-          onPressed: onRetry,
-        ),
-      ],
+    // A live region because this replaces a loading placeholder without
+    // any navigation happening: without it the screen silently swaps
+    // from shimmer to an error nobody using a screen reader is told
+    // about, and the retry button has to be hunted for.
+    final content = Semantics(
+      liveRegion: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 64,
+            width: 64,
+            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            child: Icon(Icons.cloud_off_outlined, size: 28, color: AppColors.textMuted),
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          // No header flag on the title: the live region above merges the
+          // two lines into one announcement, so a heading inside it would
+          // mark the whole block as a heading and there would be nothing
+          // left to jump to anyway.
+          Text(
+            l10n.somethingWentWrong,
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.text),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textSecondary, height: 1.45),
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          AppButton(
+            label: l10n.retry,
+            icon: Icons.refresh,
+            fullWidth: false,
+            variant: AppButtonVariant.secondary,
+            onPressed: onRetry,
+          ),
+        ],
+      ),
     );
 
     if (!scrollable) {
@@ -127,21 +138,21 @@ class EmptyStateView extends StatelessWidget {
         Container(
           height: 64,
           width: 64,
-          decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
           child: Icon(icon, size: 28, color: AppColors.textMuted),
         ),
         const SizedBox(height: AppSpacing.s4),
         Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.textSecondary, height: 1.45),
+          style: TextStyle(color: AppColors.textSecondary, height: 1.45),
         ),
         if (hint != null) ...[
           const SizedBox(height: 6),
           Text(
             hint!,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5, height: 1.45),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12.5, height: 1.45),
           ),
         ],
       ],

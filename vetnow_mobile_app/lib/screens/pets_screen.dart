@@ -333,11 +333,11 @@ class _PetsScreenState extends State<PetsScreen> {
               const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s3, AppSpacing.pagePadding, 0),
           child: Row(
             children: [
-              const Icon(Icons.swap_vert_rounded, size: 14, color: AppColors.textMuted),
+              Icon(Icons.swap_vert_rounded, size: 14, color: AppColors.textMuted),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(l10n.dragWholeCardHint,
-                    style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                    style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
               ),
             ],
           ),
@@ -404,20 +404,21 @@ class _PetsScreenState extends State<PetsScreen> {
               style: const TextStyle(fontSize: 14),
               decoration: InputDecoration(
                 hintText: l10n.searchPetsHint,
-                hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 4),
                   child: Container(
                     height: 30,
                     width: 30,
-                    decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                     child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
                   ),
                 ),
                 suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.textMuted),
+                        tooltip: l10n.a11yClearSearch,
+                        icon: Icon(Icons.close_rounded, size: 18, color: AppColors.textMuted),
                         onPressed: () => setState(() => _searchController.clear()),
                       ),
                 filled: true,
@@ -467,7 +468,7 @@ class _PetsScreenState extends State<PetsScreen> {
         Expanded(
           child: filtered.isEmpty
               ? Center(
-                  child: Text(l10n.noPetsMatchFilter, style: const TextStyle(color: AppColors.textMuted)))
+                  child: Text(l10n.noPetsMatchFilter, style: TextStyle(color: AppColors.textMuted)))
               : GridView.builder(
                   padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 100),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -544,7 +545,7 @@ class _ViewModeSwitch extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 9),
         decoration: BoxDecoration(
-          gradient: selected ? const LinearGradient(colors: [AppColors.ink, AppColors.primaryDark]) : null,
+          gradient: selected ? AppGradients.selected : null,
           borderRadius: BorderRadius.circular(AppRadius.full),
         ),
         child: Row(
@@ -705,14 +706,14 @@ class _PetListCard extends StatelessWidget {
                                       TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
                             ),
                           Text(petAgeLabel(context, pet),
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
                           // Only appears in the fortnight before the day, and
                           // only turns gold on the day itself.
                           PetBirthdayBadge(pet: pet),
                           if (visitCount > 0) ...[
-                            const Icon(Icons.event_available, size: 12, color: AppColors.textMuted),
+                            Icon(Icons.event_available, size: 12, color: AppColors.textMuted),
                             Text('$visitCount ${l10n.visits}',
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
                           ],
                         ],
                       ),
@@ -754,8 +755,8 @@ class _PetListCard extends StatelessWidget {
                       child: Container(
                         margin: const EdgeInsets.only(top: 2),
                         padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                        child: const Icon(Icons.edit_outlined, color: AppColors.textSecondary, size: 15),
+                        decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                        child: Icon(Icons.edit_outlined, color: AppColors.textSecondary, size: 15),
                       ),
                     ),
                   ],
@@ -895,15 +896,15 @@ class _PetGridCard extends StatelessWidget {
                       ),
                     const SizedBox(height: 3),
                     Text(petAgeLabel(context, pet),
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
                     if (visitCount > 0) ...[
                       const SizedBox(height: 1),
                       Row(
                         children: [
-                          const Icon(Icons.event_available, size: 11, color: AppColors.textMuted),
+                          Icon(Icons.event_available, size: 11, color: AppColors.textMuted),
                           const SizedBox(width: 3),
                           Text('$visitCount ${l10n.visits}',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 10.5)),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 10.5)),
                         ],
                       ),
                     ],
@@ -933,12 +934,12 @@ class _EmptyPetsState extends StatelessWidget {
             Container(
               height: 84,
               width: 84,
-              decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
               child: const Icon(Icons.pets, size: 38, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.s5),
             Text(l10n.noPetsYet,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.text)),
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.text)),
           ],
         ),
       ),

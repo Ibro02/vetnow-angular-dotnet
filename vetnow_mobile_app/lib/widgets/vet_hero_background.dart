@@ -40,16 +40,21 @@ class _VetHeroBackgroundState extends State<VetHeroBackground> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) => CustomPaint(
-          painter: _VetPainter(
-            _controller.value,
-            showPulse: widget.showPulse,
-            showFloatingHearts: widget.showFloatingHearts,
+    // Excluded as well as ignored: this is texture, and a screen reader
+    // walking a decorative canvas is noise between the header and the
+    // first thing actually worth hearing.
+    return ExcludeSemantics(
+      child: IgnorePointer(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) => CustomPaint(
+            painter: _VetPainter(
+              _controller.value,
+              showPulse: widget.showPulse,
+              showFloatingHearts: widget.showFloatingHearts,
+            ),
+            size: Size.infinite,
           ),
-          size: Size.infinite,
         ),
       ),
     );
@@ -151,14 +156,20 @@ class _VetPainter extends CustomPainter {
     final w = size;
     path.moveTo(center.dx, center.dy + w * 0.35);
     path.cubicTo(
-      center.dx - w * 0.9, center.dy - w * 0.35,
-      center.dx - w * 0.35, center.dy - w * 0.95,
-      center.dx, center.dy - w * 0.35,
+      center.dx - w * 0.9,
+      center.dy - w * 0.35,
+      center.dx - w * 0.35,
+      center.dy - w * 0.95,
+      center.dx,
+      center.dy - w * 0.35,
     );
     path.cubicTo(
-      center.dx + w * 0.35, center.dy - w * 0.95,
-      center.dx + w * 0.9, center.dy - w * 0.35,
-      center.dx, center.dy + w * 0.35,
+      center.dx + w * 0.35,
+      center.dy - w * 0.95,
+      center.dx + w * 0.9,
+      center.dy - w * 0.35,
+      center.dx,
+      center.dy + w * 0.35,
     );
     path.close();
     canvas.drawPath(path, paint);
@@ -275,5 +286,7 @@ class _VetPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _VetPainter oldDelegate) =>
-      oldDelegate.t != t || oldDelegate.showPulse != showPulse || oldDelegate.showFloatingHearts != showFloatingHearts;
+      oldDelegate.t != t ||
+      oldDelegate.showPulse != showPulse ||
+      oldDelegate.showFloatingHearts != showFloatingHearts;
 }

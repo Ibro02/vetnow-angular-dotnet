@@ -183,7 +183,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> with Single
                   decoration: BoxDecoration(color: AppColors.bgMuted, borderRadius: BorderRadius.circular(AppRadius.full)),
                   child: TabBar(
                     controller: _tabController,
-                    indicator: BoxDecoration(color: AppColors.ink, borderRadius: BorderRadius.circular(AppRadius.full)),
+                    indicator: BoxDecoration(
+                        color: AppGradients.selectedSolid,
+                        borderRadius: BorderRadius.circular(AppRadius.full)),
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
                     labelColor: Colors.white,
@@ -357,17 +359,17 @@ class _AppointmentCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.pets, size: 13, color: AppColors.textMuted),
+                          Icon(Icons.pets, size: 13, color: AppColors.textMuted),
                           const SizedBox(width: 5),
-                          Text('${a.petName} · ${a.serviceName}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                          Text('${a.petName} · ${a.serviceName}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.person_outline, size: 13, color: AppColors.textMuted),
+                          Icon(Icons.person_outline, size: 13, color: AppColors.textMuted),
                           const SizedBox(width: 5),
-                          Text(a.staffName, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          Text(a.staffName, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -378,7 +380,7 @@ class _AppointmentCard extends StatelessWidget {
                             children: [
                               const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.primary),
                               const SizedBox(width: 5),
-                              Text(_relativeDate(a.dateTime), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.text)),
+                              Text(_relativeDate(a.dateTime), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.text)),
                             ],
                           ),
                           if (a.priceKm > 0)

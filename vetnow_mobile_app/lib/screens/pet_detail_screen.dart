@@ -132,13 +132,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(l10n.details,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
                   const SizedBox(height: AppSpacing.s3),
                   _InfoGrid(pet: pet),
                   const SizedBox(height: AppSpacing.s8),
                   Text(l10n.vaccinationHistory,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textMuted)),
                   const SizedBox(height: AppSpacing.s3),
                   const _EmptyVaccinations(),
@@ -184,13 +184,13 @@ class _InfoGrid extends StatelessWidget {
                   Container(
                     height: 32,
                     width: 32,
-                    decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                     child: Icon(rows[i].$1, color: AppColors.primary, size: 16),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                       child: Text(rows[i].$2,
-                          style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted))),
+                          style: TextStyle(fontSize: 12.5, color: AppColors.textMuted))),
                   Text(rows[i].$3, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 ],
               ),
@@ -221,14 +221,14 @@ class _EmptyVaccinations extends StatelessWidget {
           Container(
             height: 44,
             width: 44,
-            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-            child: const Icon(Icons.vaccines_outlined, color: AppColors.textMuted, size: 20),
+            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+            child: Icon(Icons.vaccines_outlined, color: AppColors.textMuted, size: 20),
           ),
           const SizedBox(height: AppSpacing.s3),
           Text(
             l10n.noVaccinationRecords,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5, height: 1.5),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12.5, height: 1.5),
           ),
         ],
       ),

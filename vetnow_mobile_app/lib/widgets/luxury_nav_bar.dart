@@ -105,35 +105,50 @@ class LuxuryNavBar extends StatelessWidget {
                     final selected = i == selectedIndex;
                     final item = items[i];
                     return Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          if (!selected) Haptics.select();
-                          onSelect(i);
-                        },
-                        borderRadius: BorderRadius.circular(AppRadius.full),
-                        child: AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 250),
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                            color: selected ? AppColors.gold : Colors.white.withValues(alpha: 0.55),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AnimatedScale(
-                                duration: const Duration(milliseconds: 250),
-                                scale: selected ? 1.12 : 1.0,
-                                curve: Curves.easeOutBack,
-                                child: Icon(
-                                  selected ? item.selectedIcon : item.icon,
-                                  size: 21,
-                                  color: selected ? AppColors.gold : Colors.white.withValues(alpha: 0.65),
-                                ),
+                      // Without this a screen reader reads the four tabs as
+                      // four loose words and never says which one you are
+                      // on. Marked as a mutually exclusive group so it is
+                      // announced as "Explore, tab 1 of 4, selected".
+                      child: Semantics(
+                        button: true,
+                        selected: selected,
+                        inMutuallyExclusiveGroup: true,
+                        label: item.label,
+                        child: InkWell(
+                          onTap: () {
+                            if (!selected) Haptics.select();
+                            onSelect(i);
+                          },
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          // The icon and label are already in the Semantics
+                          // label above; left in, they would be read a second
+                          // time as loose text under the button.
+                          child: ExcludeSemantics(
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 250),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                color: selected ? AppColors.gold : Colors.white.withValues(alpha: 0.55),
                               ),
-                              const SizedBox(height: 3),
-                              Text(item.label),
-                            ],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  AnimatedScale(
+                                    duration: const Duration(milliseconds: 250),
+                                    scale: selected ? 1.12 : 1.0,
+                                    curve: Curves.easeOutBack,
+                                    child: Icon(
+                                      selected ? item.selectedIcon : item.icon,
+                                      size: 21,
+                                      color: selected ? AppColors.gold : Colors.white.withValues(alpha: 0.65),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(item.label),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),

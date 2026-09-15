@@ -145,12 +145,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.cloud_off_rounded, size: 38, color: AppColors.textMuted),
+                        Icon(Icons.cloud_off_rounded, size: 38, color: AppColors.textMuted),
                         const SizedBox(height: AppSpacing.s3),
                         Text(
                           _loadError!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13.5, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -166,7 +166,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     Text(
                       l10n.editProfileSubtitle,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+                      style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
                     ),
                     const SizedBox(height: AppSpacing.s6),
                     _FormSection(
@@ -224,7 +224,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: AppSpacing.s2),
                         Text(
                           l10n.newPasswordHint,
-                          style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted),
+                          style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
                         ),
                       ],
                     ),
@@ -278,7 +278,7 @@ class _FormSection extends StatelessWidget {
               const SizedBox(width: AppSpacing.s3),
               Text(
                 title,
-                style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: AppColors.text),
+                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: AppColors.text),
               ),
             ],
           ),

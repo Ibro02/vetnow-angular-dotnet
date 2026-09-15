@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:vetnow_mobile/l10n/app_localizations.dart';
 import 'package:vetnow_mobile/models/vet_station.dart';
 import 'package:vetnow_mobile/widgets/clinic_avatar.dart';
 import 'package:vetnow_mobile/widgets/skeleton.dart';
@@ -28,6 +29,13 @@ VetStation station({int id = 1, String name = 'Happy Paws Vet Clinic'}) => VetSt
 Future<void> pump(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
     MaterialApp(
+      // The real delegates, not a bare MaterialApp: several of these
+      // widgets read translated strings (the skeletons announce
+      // "loading" to a screen reader), and a harness that skips the
+      // localization scope tests a tree the app never builds.
+      locale: const Locale('bs'),
+      supportedLocales: const [Locale('bs'), Locale('hr'), Locale('sr')],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: Scaffold(
         body: SingleChildScrollView(child: child),
       ),
@@ -98,16 +106,25 @@ void main() {
     testWidgets('the same clinic always gets the same colours', (tester) async {
       // The whole point of keying off the id: a clinic that looked teal on
       // the list must not look green on its own page, or on the next launch.
-      Gradient gradientOf(VetStation s) {
-        final avatar = ClinicAvatar(station: s);
-        final element = avatar.createElement();
-        final built = avatar.build(element) as Stack;
-        return ((built.children.first as DecoratedBox).decoration as BoxDecoration).gradient!;
+      // Read off the rendered tree, not off build()'s return value: the
+      // wrappers around the painted stack are presentation and change
+      // more often than the colour choice under test.
+      Future<Gradient> gradientOf(VetStation s) async {
+        await pump(tester, SizedBox(height: 120, child: ClinicAvatar(station: s)));
+        final box = tester.widget<DecoratedBox>(
+          find
+              .descendant(
+                of: find.byType(ClinicAvatar),
+                matching: find.byType(DecoratedBox),
+              )
+              .first,
+        );
+        return (box.decoration as BoxDecoration).gradient!;
       }
 
-      final first = gradientOf(station(id: 3));
-      final second = gradientOf(station(id: 3, name: 'Renamed Clinic'));
-      final other = gradientOf(station(id: 4));
+      final first = await gradientOf(station(id: 3));
+      final second = await gradientOf(station(id: 3, name: 'Renamed Clinic'));
+      final other = await gradientOf(station(id: 4));
 
       expect((first as LinearGradient).colors, (second as LinearGradient).colors);
       expect((other as LinearGradient).colors, isNot(first.colors));

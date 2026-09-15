@@ -169,14 +169,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Container(
                 height: 68,
                 width: 68,
-                decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                child: const Icon(Icons.notifications_none_rounded, size: 30, color: AppColors.textMuted),
+                decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                child: Icon(Icons.notifications_none_rounded, size: 30, color: AppColors.textMuted),
               ),
               const SizedBox(height: AppSpacing.s4),
               Text(
                 l10n.notificationsEmpty,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.textMuted, height: 1.45),
+                style: TextStyle(color: AppColors.textMuted, height: 1.45),
               ),
             ],
           ),

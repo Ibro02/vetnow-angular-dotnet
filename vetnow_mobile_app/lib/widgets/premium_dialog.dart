@@ -46,13 +46,13 @@ Future<bool> showPremiumConfirmDialog(
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.text),
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.text),
             ),
             const SizedBox(height: AppSpacing.s2),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: AppSpacing.s6),
             Row(

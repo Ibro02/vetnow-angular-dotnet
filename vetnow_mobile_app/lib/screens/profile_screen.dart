@@ -8,6 +8,7 @@ import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/paw_loader.dart';
+import '../widgets/theme_picker.dart';
 import '../widgets/pet_age.dart';
 import 'edit_profile_screen.dart';
 import 'notifications_screen.dart';
@@ -15,6 +16,7 @@ import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/language_picker.dart';
+import '../widgets/section_title.dart';
 import 'add_pet_screen.dart';
 import 'pet_detail_screen.dart';
 import 'pets_screen.dart';
@@ -114,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(l10n.myPets, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                          SectionTitle(l10n.myPets),
                           TextButton(
                             onPressed: () async {
                               final changed = await Navigator.of(context).push<bool>(
@@ -130,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: AppSpacing.s3),
                       _PetsRow(isLoading: _isLoadingPets, pets: _pets, onAdded: _refreshAfterAdd),
                       const SizedBox(height: AppSpacing.s8),
-                      Text(l10n.account, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      SectionTitle(l10n.account),
                       const SizedBox(height: AppSpacing.s3),
                       _SettingsGroup(onProfileChanged: () => setState(() {})),
                       const SizedBox(height: AppSpacing.s8),
@@ -288,7 +290,7 @@ class _PetsRow extends StatelessWidget {
                           child: Text(p.species, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: color)),
                         )
                       else
-                        Text(petAgeLabel(context, p), style: const TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
+                        Text(petAgeLabel(context, p), style: TextStyle(fontSize: 9.5, color: AppColors.textMuted)),
                     ],
                   ),
                 ),
@@ -372,6 +374,7 @@ class _SettingsGroup extends StatelessWidget {
             ),
       ),
       (Icons.translate_rounded, l10n.language, AppColors.accent, () => showLanguagePicker(context)),
+      (Icons.contrast_rounded, l10n.appearance, AppColors.ink, () => showThemePicker(context)),
       (Icons.help_outline, l10n.helpSupport, AppColors.secondary, () {}),
     ];
 
@@ -406,11 +409,11 @@ class _SettingsGroup extends StatelessWidget {
                       child: Icon(items[i].$1, size: 16, color: Colors.white),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(items[i].$2, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text))),
+                    Expanded(child: Text(items[i].$2, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.text))),
                     Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                      child: const Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 15),
+                      decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                      child: Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 15),
                     ),
                   ],
                 ),
@@ -444,7 +447,7 @@ class _LogoutButton extends StatelessWidget {
             Container(
               height: 32,
               width: 32,
-              decoration: const BoxDecoration(color: AppColors.dangerSoft, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.dangerSoft, shape: BoxShape.circle),
               child: const Icon(Icons.logout_rounded, size: 15, color: AppColors.danger),
             ),
             const SizedBox(width: 12),
@@ -453,7 +456,7 @@ class _LogoutButton extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: AppColors.dangerSoft, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.dangerSoft, shape: BoxShape.circle),
               child: const Icon(Icons.chevron_right, color: AppColors.danger, size: 15),
             ),
           ],

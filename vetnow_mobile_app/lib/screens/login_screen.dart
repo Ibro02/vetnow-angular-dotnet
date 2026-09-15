@@ -128,6 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
+          // The icon changes with the path in, so the name has to as well:
+          // on the booking gate this dismisses the prompt, everywhere
+          // else it goes back.
+          tooltip: widget.isBookingGate
+              ? MaterialLocalizations.of(context).closeButtonTooltip
+              : l10n.a11yBack,
           icon: Container(
             height: 34,
             width: 34,
@@ -193,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Text(
                                 widget.isBookingGate ? l10n.loginBookingGateSubtitle : l10n.loginWelcomeSubtitle,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+                                style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
                               ),
                               const SizedBox(height: AppSpacing.s6),
                               AppTextField(
@@ -248,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       const SizedBox(width: 6),
                                       Text(
                                         l10n.keepSignedIn,
-                                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                        style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
                                     ],
                                   ),
@@ -274,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   Text(
                                     l10n.noAccount,
-                                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                   ),
                                   TextButton(
                                     onPressed: () => Navigator.of(context).push(

@@ -47,17 +47,31 @@ void main() {
 
   group('PetAvatar', () {
     testWidgets('the same pet always gets the same colours', (tester) async {
-      Gradient gradientOf(int seed) {
-        final avatar = PetAvatar(species: 'Dog', seed: seed);
-        final built = avatar.build(avatar.createElement()) as ClipOval;
-        final box = (built.child as SizedBox).child as DecoratedBox;
+      // Read the gradient off the rendered tree rather than off build()'s
+      // return value: the wrappers around the painted box (the clip, the
+      // semantics exclusion) are presentation and change more often than
+      // the thing actually under test.
+      Future<Gradient> gradientOf(int seed) async {
+        await tester.pumpWidget(MaterialApp(
+          home: Scaffold(body: Center(child: PetAvatar(species: 'Dog', seed: seed))),
+        ));
+        final box = tester.widget<DecoratedBox>(
+          find
+              .descendant(
+                of: find.byType(PetAvatar),
+                matching: find.byType(DecoratedBox),
+              )
+              .first,
+        );
         return (box.decoration as BoxDecoration).gradient!;
       }
 
-      expect((gradientOf(3) as LinearGradient).colors,
-          (gradientOf(3) as LinearGradient).colors);
-      expect((gradientOf(4) as LinearGradient).colors,
-          isNot((gradientOf(3) as LinearGradient).colors));
+      final three = (await gradientOf(3)) as LinearGradient;
+      final threeAgain = (await gradientOf(3)) as LinearGradient;
+      final four = (await gradientOf(4)) as LinearGradient;
+
+      expect(three.colors, threeAgain.colors);
+      expect(four.colors, isNot(three.colors));
     });
 
     testWidgets('renders at a list row size without throwing', (tester) async {

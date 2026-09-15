@@ -196,7 +196,7 @@ class _RescheduleScreenState extends State<RescheduleScreen> {
         AppSpacing.pagePadding,
         AppSpacing.s6,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
@@ -267,14 +267,14 @@ class _CurrentSlotBanner extends StatelessWidget {
               children: [
                 Text(
                   l10n.currentAppointment,
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${d.day}.${d.month}.${d.year}. · '
                   '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')} · '
                   '${appointment.staffName}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.text,
@@ -428,7 +428,7 @@ class _EmptyNote extends StatelessWidget {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.4),
+              style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary, height: 1.4),
             ),
           ],
         ),

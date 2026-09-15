@@ -222,7 +222,7 @@ class GlassSurface extends StatelessWidget {
 
     if (onTap == null) return surface;
 
-    return Semantics(
+    final button = Semantics(
       button: true,
       label: semanticLabel,
       child: Material(
@@ -234,7 +234,21 @@ class GlassSurface extends StatelessWidget {
         ),
       ),
     );
+
+    if (!circle) return button;
+
+    // A 34pt circle is the right size to *look* at and too small to
+    // reliably *hit* — both Android and iOS ask for 44–48. The painted
+    // circle stays as it is and the target grows around it, so the header
+    // looks identical and stops needing a precise thumb.
+    return SizedBox(
+      width: _minTapTarget,
+      height: _minTapTarget,
+      child: Center(child: button),
+    );
   }
+
+  static const _minTapTarget = 46.0;
 }
 
 /// Darkens the corners so the middle of the header reads as lit.

@@ -12,7 +12,7 @@ class NotificationSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
+        Text(text, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
         const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
@@ -22,7 +22,7 @@ class NotificationSectionLabel extends StatelessWidget {
           ),
           child: Text(
             '$count',
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
           ),
         ),
       ],
@@ -86,13 +86,13 @@ class NotificationTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: AppColors.text),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: AppColors.text),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
-                  Text(subtitle!, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  Text(subtitle!, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                 ],
               ],
             ),
@@ -112,7 +112,7 @@ class NotificationTile extends StatelessWidget {
           else if (trailingNote != null && trailingNote!.isNotEmpty)
             Text(
               trailingNote!,
-              style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 11.5, color: AppColors.textMuted, fontWeight: FontWeight.w600),
             ),
         ],
       ),

@@ -501,7 +501,7 @@ class _InlineHint extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: AppColors.textMuted),
           const SizedBox(width: 8),
-          Expanded(child: Text(text, style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5))),
+          Expanded(child: Text(text, style: TextStyle(color: AppColors.textMuted, fontSize: 12.5))),
         ],
       ),
     );
@@ -551,7 +551,7 @@ class _StepLabel extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text)),
+        Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text)),
       ],
     );
   }
@@ -608,7 +608,7 @@ class _SelectableCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-                  Text(subtitle, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                  Text(subtitle, style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                 ],
               ),
             ),
@@ -687,7 +687,7 @@ class _ConfirmationView extends StatelessWidget {
                 Container(
                   height: 84,
                   width: 84,
-                  decoration: const BoxDecoration(color: AppColors.successSoft, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: AppColors.successSoft, shape: BoxShape.circle),
                   child: const Icon(Icons.check_rounded, color: AppColors.success, size: 44),
                 ),
                 const SizedBox(height: AppSpacing.s6),
@@ -696,7 +696,7 @@ class _ConfirmationView extends StatelessWidget {
                 Text(
                   l10n.bookingConfirmedMessage(station.name),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: AppSpacing.s8),
                 AppButton(

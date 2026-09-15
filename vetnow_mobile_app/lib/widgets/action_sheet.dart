@@ -26,9 +26,9 @@ void showActionSheet(BuildContext context, {String? title, required List<ActionS
     backgroundColor: Colors.transparent,
     builder: (sheetContext) => Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s3, AppSpacing.s6, AppSpacing.s8),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(AppRadius.xl2),
           topRight: Radius.circular(AppRadius.xl2),
         ),
@@ -46,7 +46,7 @@ void showActionSheet(BuildContext context, {String? title, required List<ActionS
             ),
           ),
           if (title != null) ...[
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.text)),
+            Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.text)),
             const SizedBox(height: AppSpacing.s4),
           ],
           ...items.map((item) => Padding(

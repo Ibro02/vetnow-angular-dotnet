@@ -239,6 +239,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get somethingWentWrong => 'Nešto je pošlo po zlu';
 
   @override
+  String get offlineShowingSaved =>
+      'Nema veze sa serverom — prikazane su zadnje sačuvane klinike.';
+
+  @override
   String get sortByName => 'Po imenu';
 
   @override
@@ -579,6 +583,21 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get language => 'Jezik';
+
+  @override
+  String get appearance => 'Izgled';
+
+  @override
+  String get themeSystem => 'Kao na uređaju';
+
+  @override
+  String get themeLight => 'Svijetla';
+
+  @override
+  String get themeDark => 'Tamna';
+
+  @override
+  String get chooseTheme => 'Odaberi izgled';
 
   @override
   String get chooseLanguage => 'Odaberi jezik';
@@ -927,4 +946,34 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get filterAllStaff => 'Svi';
+
+  @override
+  String get a11yLoading => 'Učitavanje';
+
+  @override
+  String get a11yBack => 'Natrag';
+
+  @override
+  String get a11yCloseSheet => 'Zatvori';
+
+  @override
+  String get a11yClearSearch => 'Obriši pretragu';
+
+  @override
+  String get a11yShowPassword => 'Prikaži lozinku';
+
+  @override
+  String get a11yHidePassword => 'Sakrij lozinku';
+
+  @override
+  String a11yRateStars(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zvjezdica',
+      few: '$count zvjezdice',
+      one: '$count zvjezdica',
+    );
+    return '$_temp0';
+  }
 }

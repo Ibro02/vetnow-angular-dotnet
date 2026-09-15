@@ -19,6 +19,7 @@ import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
 import '../widgets/verified_badge.dart';
+import '../widgets/section_title.dart';
 import 'booking_screen.dart';
 import 'staff_profile_screen.dart';
 
@@ -397,7 +398,15 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(station.name, style: Theme.of(context).textTheme.headlineMedium)),
+                          // The name of the thing the page is about, so
+                          // it is the first heading on it.
+                          Expanded(
+                            child: Semantics(
+                              header: true,
+                              child: Text(station.name,
+                                  style: Theme.of(context).textTheme.headlineMedium),
+                            ),
+                          ),
                           if (station.verifiedPartner) const VerifiedBadge(compact: true),
                         ],
                       ),
@@ -485,7 +494,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(l10n.meetTheTeam, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                          SectionTitle(l10n.meetTheTeam),
                           InkWell(
                             onTap: () => setState(
                               () => _staffSort = _staffSort == _StaffSort.featured ? _StaffSort.byName : _StaffSort.featured,
@@ -564,7 +573,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(l10n.allServices, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                                  SectionTitle(l10n.allServices),
                                   const SizedBox(height: AppSpacing.s3),
                                   _ServicesList(services: allServices, station: station),
                                 ],
@@ -639,9 +648,9 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(AppSpacing.s6),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -653,7 +662,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
             const SizedBox(height: AppSpacing.s2),
             Text(
               l10n.verifiedPartnerExplanation,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: AppSpacing.s5),
             AppButton(label: l10n.gotIt, onPressed: () => Navigator.of(context).pop()),
@@ -676,9 +685,9 @@ class _FeaturePill extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(AppSpacing.s6),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -689,7 +698,7 @@ class _FeaturePill extends StatelessWidget {
                 Container(
                   height: 40,
                   width: 40,
-                  decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                   child: Icon(icon, size: 18, color: AppColors.primaryDark),
                 ),
                 const SizedBox(width: AppSpacing.s3),
@@ -697,7 +706,7 @@ class _FeaturePill extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.s3),
-            Text(explanation, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5)),
+            Text(explanation, style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5)),
             const SizedBox(height: AppSpacing.s4),
           ],
         ),
@@ -767,8 +776,8 @@ class _StaffCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(staff.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
-                  Text(staff.role, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                  Text(staff.name, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: AppColors.text)),
+                  Text(staff.role, style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                   const SizedBox(height: 4),
                   // Only shown when there is a score behind it. Employee
                   // ratings are not recorded on the backend, so real staff
@@ -780,7 +789,7 @@ class _StaffCard extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
               child: const Icon(Icons.chevron_right, color: AppColors.primaryDark, size: 16),
             ),
           ],
@@ -837,16 +846,16 @@ class _ServicesList extends StatelessWidget {
                           const SizedBox(height: 3),
                           Row(
                             children: [
-                              const Icon(Icons.schedule, size: 12, color: AppColors.textMuted),
+                              Icon(Icons.schedule, size: 12, color: AppColors.textMuted),
                               const SizedBox(width: 3),
-                              Text('${s.durationMinutes} min', style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                              Text('${s.durationMinutes} min', style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   s.description,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted),
+                                  style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
                                 ),
                               ),
                             ],
@@ -860,7 +869,7 @@ class _ServicesList extends StatelessWidget {
                       style: TextStyle(color: ServiceCatalog.color(s.kind), fontWeight: FontWeight.w800, fontSize: 16),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
+                    Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
                   ],
                 ),
               ),

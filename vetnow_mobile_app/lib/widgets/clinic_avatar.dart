@@ -101,8 +101,13 @@ class ClinicAvatar extends StatelessWidget {
       ],
     );
 
-    if (borderRadius == null) return content;
-    return ClipRRect(borderRadius: borderRadius!, child: content);
+    // The initials are a stand-in for the clinic's name, which is
+    // written out right beside them — announced, they are a cryptic
+    // "HP" read before the words it abbreviates.
+    if (borderRadius == null) return ExcludeSemantics(child: content);
+    return ExcludeSemantics(
+      child: ClipRRect(borderRadius: borderRadius!, child: content),
+    );
   }
 }
 

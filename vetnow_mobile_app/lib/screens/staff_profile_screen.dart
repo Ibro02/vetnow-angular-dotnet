@@ -11,6 +11,7 @@ import '../widgets/hero_shell.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/reviews.dart';
+import '../widgets/section_title.dart';
 import 'booking_screen.dart';
 
 /// Tapped from the staff list on VetStationDetailScreen. Premium
@@ -142,20 +143,20 @@ class StaffProfileScreen extends StatelessWidget {
                           Container(
                             height: 30,
                             width: 30,
-                            decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                            child: const Icon(Icons.home_work_outlined, size: 14, color: AppColors.textSecondary),
+                            decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                            child: Icon(Icons.home_work_outlined, size: 14, color: AppColors.textSecondary),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(station.name, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                            child: Text(station.name, style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.s8),
-                      Text(l10n.servicesWithSpecialist, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      SectionTitle(l10n.servicesWithSpecialist),
                       const SizedBox(height: AppSpacing.s3),
                       if (staff.services.isEmpty)
-                        Text(l10n.noServicesListed, style: const TextStyle(color: AppColors.textMuted, fontSize: 12.5))
+                        Text(l10n.noServicesListed, style: TextStyle(color: AppColors.textMuted, fontSize: 12.5))
                       else
                         ...staff.services.map(
                           (s) => InkWell(
@@ -202,9 +203,9 @@ class StaffProfileScreen extends StatelessWidget {
                                         const SizedBox(height: 2),
                                         Row(
                                           children: [
-                                            const Icon(Icons.schedule, size: 11, color: AppColors.textMuted),
+                                            Icon(Icons.schedule, size: 11, color: AppColors.textMuted),
                                             const SizedBox(width: 3),
-                                            Text('${s.durationMinutes} min', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                            Text('${s.durationMinutes} min', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
                                           ],
                                         ),
                                       ],
@@ -212,7 +213,7 @@ class StaffProfileScreen extends StatelessWidget {
                                   ),
                                   Text('${s.priceKm.toStringAsFixed(0)} KM', style: TextStyle(color: ServiceCatalog.color(s.kind), fontWeight: FontWeight.w800, fontSize: 14.5)),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
+                                  Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
                                 ],
                               ),
                             ),
@@ -224,8 +225,7 @@ class StaffProfileScreen extends StatelessWidget {
                       // so. It used to show two invented reviews attributed to
                       // whichever specialist was on screen — a made-up opinion
                       // about a named real person.
-                      Text(l10n.clinicReviews,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      SectionTitle(l10n.clinicReviews),
                       const SizedBox(height: AppSpacing.s3),
                       FutureBuilder<ReviewSummary>(
                         future: ReviewApiService.getByVetStation(station.id),
@@ -240,7 +240,7 @@ class StaffProfileScreen extends StatelessWidget {
                           if (data == null || !data.hasReviews) {
                             return Text(
                               l10n.noReviewsYet,
-                              style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                              style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
                             );
                           }
                           // Capped: this is context on the clinic, not the

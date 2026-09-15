@@ -10,6 +10,7 @@ import '../widgets/app_button.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/vet_hero_background.dart';
+import '../widgets/section_title.dart';
 
 /// Add-or-edit pet form, saved via POST /api/PetsUpdateOrInsert/Save
 /// (real, [Authorize] — fine since this screen sits behind our login
@@ -253,7 +254,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                       children: [
                         AppTextField(label: l10n.petName, controller: _nameController, prefixIcon: Icons.badge_outlined),
                         const SizedBox(height: AppSpacing.s5),
-                        Text(l10n.species, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                        Text(l10n.species, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                         const SizedBox(height: 8),
                         if (_isLoadingSpecies)
                           const Padding(
@@ -286,10 +287,10 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                   Expanded(
                                     child: Text(
                                       _selectedSpecies?.name ?? l10n.chooseSpecies,
-                                      style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text),
+                                      style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text),
                                     ),
                                   ),
-                                  const Icon(Icons.unfold_more_rounded, size: 18, color: AppColors.textMuted),
+                                  Icon(Icons.unfold_more_rounded, size: 18, color: AppColors.textMuted),
                                 ],
                               ),
                             ),
@@ -310,7 +311,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                 Container(
                                   height: 32,
                                   width: 32,
-                                  decoration: const BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                                  decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
                                   child: const Icon(Icons.cake_outlined, size: 16, color: AppColors.primary),
                                 ),
                                 const SizedBox(width: 10),
@@ -322,14 +323,14 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                         _birthDate != null
                                             ? '${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}'
                                             : l10n.selectBirthDate,
-                                        style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text),
+                                        style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text),
                                       ),
                                       if (ageLabel != null)
-                                        Text(l10n.approxAge(ageLabel), style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                                        Text(l10n.approxAge(ageLabel), style: TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
                                     ],
                                   ),
                                 ),
-                                const Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
+                                Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
                               ],
                             ),
                           ),
@@ -432,9 +433,9 @@ class _SpeciesPickerSheetState extends State<_SpeciesPickerSheet> {
       maxChildSize: 0.92,
       expand: false,
       builder: (context, scrollController) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(AppRadius.xl2), topRight: Radius.circular(AppRadius.xl2)),
         ),
         child: Column(
           children: [
@@ -449,15 +450,15 @@ class _SpeciesPickerSheetState extends State<_SpeciesPickerSheet> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.chooseSpecies, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.text)),
+                  SectionTitle(l10n.chooseSpecies, fontSize: 17, fontWeight: FontWeight.w800, color: AppColors.text),
                   InkWell(
                     onTap: () => Navigator.of(context).pop(),
                     borderRadius: BorderRadius.circular(AppRadius.full),
                     child: Container(
                       height: 30,
                       width: 30,
-                      decoration: const BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                      child: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                      decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
+                      child: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
                     ),
                   ),
                 ],
@@ -471,19 +472,19 @@ class _SpeciesPickerSheetState extends State<_SpeciesPickerSheet> {
                 autofocus: false,
                 decoration: InputDecoration(
                   hintText: l10n.searchSpeciesHint,
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+                  prefixIcon: Icon(Icons.search, color: AppColors.textMuted, size: 20),
                   filled: true,
                   fillColor: AppColors.bgSoft,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: const BorderSide(color: AppColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: const BorderSide(color: AppColors.border)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide(color: AppColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.full), borderSide: BorderSide(color: AppColors.border)),
                 ),
               ),
             ),
             const SizedBox(height: AppSpacing.s2),
             Expanded(
               child: filtered.isEmpty
-                  ? Center(child: Text(l10n.noSpeciesFound, style: const TextStyle(color: AppColors.textMuted)))
+                  ? Center(child: Text(l10n.noSpeciesFound, style: TextStyle(color: AppColors.textMuted)))
                   : ListView.builder(
                       controller: scrollController,
                       padding: const EdgeInsets.fromLTRB(AppSpacing.s6, AppSpacing.s2, AppSpacing.s6, AppSpacing.s8),
@@ -519,7 +520,7 @@ class _SpeciesPickerSheetState extends State<_SpeciesPickerSheet> {
                                   ),
                                   const SizedBox(width: AppSpacing.s3),
                                   Expanded(
-                                    child: Text(s.name, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text)),
+                                    child: Text(s.name, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: AppColors.text)),
                                   ),
                                   if (selected) Icon(Icons.check_circle_rounded, color: color, size: 20),
                                 ],
