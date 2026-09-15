@@ -17,6 +17,7 @@ import '../widgets/app_button.dart';
 import '../widgets/clinic_avatar.dart';
 import '../widgets/entrance.dart';
 import '../widgets/hero_shell.dart';
+import '../widgets/list_end.dart';
 import '../widgets/language_picker.dart';
 import '../widgets/vet_hero_background.dart';
 import '../widgets/section_title.dart';
@@ -499,9 +500,12 @@ class _ExploreScreenState extends State<ExploreScreen>
                 110,
               ),
               sliver: SliverList.separated(
-                itemCount: stations.length,
+                // One past the end, for the mark that closes the list.
+                itemCount: stations.length + 1,
                 separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
                 itemBuilder: (context, index) {
+                  if (index == stations.length) return const ListEnd();
+
                   final station = stations[index];
                   // Keyed by clinic, so re-sorting or filtering doesn't replay
                   // the entrance on cards that were already on screen.

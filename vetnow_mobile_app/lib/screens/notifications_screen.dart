@@ -10,6 +10,7 @@ import '../state/resume_refresh.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/gradient_app_bar.dart';
+import '../widgets/list_end.dart';
 import '../widgets/notification_tile.dart';
 import '../widgets/reviews.dart';
 import '../widgets/skeleton.dart';
@@ -172,10 +173,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Column(
             children: [
               Container(
-                height: 68,
-                width: 68,
-                decoration: BoxDecoration(color: AppColors.bgMuted, shape: BoxShape.circle),
-                child: Icon(Icons.notifications_none_rounded, size: 30, color: AppColors.textMuted),
+                height: 72,
+                width: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.primary50,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
+                ),
+                child: const Icon(Icons.notifications_none_rounded, size: 30, color: AppColors.primary),
               ),
               const SizedBox(height: AppSpacing.s4),
               Text(
@@ -245,6 +250,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
           ),
         ],
+        const ListEnd(),
       ],
     );
   }

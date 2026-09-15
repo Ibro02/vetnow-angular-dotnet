@@ -108,7 +108,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.s2, AppSpacing.s2, AppSpacing.s2, 0),
+                  padding:
+                      const EdgeInsets.fromLTRB(AppSpacing.s2, AppSpacing.s2, AppSpacing.s2, 0),
                   child: Row(
                     children: [
                       IconButton(
@@ -117,7 +118,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Container(
                           height: 34,
                           width: 34,
-                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.14), shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.14), shape: BoxShape.circle),
                           child: const Icon(Icons.arrow_back, color: Colors.white, size: 18),
                         ),
                       ),
@@ -126,7 +128,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s2, AppSpacing.pagePadding, AppSpacing.s8),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.s2,
+                        AppSpacing.pagePadding, AppSpacing.s8),
                     child: Column(
                       children: [
                         Container(
@@ -135,29 +138,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           padding: const EdgeInsets.all(3),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
+                            border:
+                                Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
                           ),
                           child: Container(
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(colors: [AppColors.accent, AppColors.gold]),
                               shape: BoxShape.circle,
                               boxShadow: [
-                                BoxShadow(color: AppColors.accent, blurRadius: 22, offset: Offset(0, 8)),
+                                BoxShadow(
+                                    color: AppColors.accent, blurRadius: 22, offset: Offset(0, 8)),
                               ],
                             ),
-                            child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 26),
+                            child:
+                                const Icon(Icons.favorite_rounded, color: Colors.white, size: 26),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.s3),
-                        Text(
-                          l10n.createAccount,
-                          style: const TextStyle(fontFamily: AppFonts.display, fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s6),
+                          child: Text(
+                            l10n.createAccount,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontFamily: AppFonts.display,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          l10n.registerSubtitle,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5, height: 1.4),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s6),
+                          child: Text(
+                            l10n.registerSubtitle,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: 12.5,
+                                height: 1.4),
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.s6),
                         Container(
@@ -165,12 +187,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(AppRadius.xl2 + 2),
                             gradient: LinearGradient(
-                              colors: [AppColors.gold.withValues(alpha: 0.5), AppColors.accent.withValues(alpha: 0.4)],
+                              colors: [
+                                AppColors.gold.withValues(alpha: 0.5),
+                                AppColors.accent.withValues(alpha: 0.4)
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 34, offset: const Offset(0, 18)),
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.35),
+                                  blurRadius: 34,
+                                  offset: const Offset(0, 18)),
                             ],
                           ),
                           child: Container(
@@ -185,11 +213,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: AppTextField(label: l10n.firstName, controller: _firstNameController),
+                                      child: AppTextField(
+                                          label: l10n.firstName, controller: _firstNameController),
                                     ),
                                     const SizedBox(width: AppSpacing.s3),
                                     Expanded(
-                                      child: AppTextField(label: l10n.lastName, controller: _lastNameController),
+                                      child: AppTextField(
+                                          label: l10n.lastName, controller: _lastNameController),
                                     ),
                                   ],
                                 ),
@@ -214,21 +244,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   prefixIcon: Icons.lock_outline,
                                 ),
                                 const SizedBox(height: 6),
-                                Text(l10n.passwordRequirementsHint, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                Text(l10n.passwordRequirementsHint,
+                                    style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
                                 if (_errorMessage != null) ...[
                                   const SizedBox(height: AppSpacing.s3),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                     decoration: BoxDecoration(
                                       color: AppColors.dangerSoft,
                                       borderRadius: BorderRadius.circular(AppRadius.md),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.error_outline, size: 16, color: AppColors.danger),
+                                        const Icon(Icons.error_outline,
+                                            size: 16, color: AppColors.danger),
                                         const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(_errorMessage!, style: const TextStyle(fontSize: 12.5, color: AppColors.dangerHover)),
+                                          child: Text(_errorMessage!,
+                                              style: const TextStyle(
+                                                  fontSize: 12.5, color: AppColors.dangerHover)),
                                         ),
                                       ],
                                     ),

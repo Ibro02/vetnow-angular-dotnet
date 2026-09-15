@@ -11,6 +11,7 @@ import '../widgets/hover_card.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/list_end.dart';
 import '../widgets/state_views.dart';
 import 'appointment_detail_screen.dart';
 
@@ -288,9 +289,14 @@ class _AppointmentList extends StatelessWidget {
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 0, AppSpacing.pagePadding, 110),
-      itemCount: appointments.length,
+      // One past the end, for the mark that closes the list. Built
+      // this way rather than by wrapping the list in a Column so the
+      // rows stay lazy.
+      itemCount: appointments.length + 1,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
-      itemBuilder: (context, i) => _AppointmentCard(appointment: appointments[i], onChanged: onChanged),
+      itemBuilder: (context, i) => i == appointments.length
+          ? const ListEnd()
+          : _AppointmentCard(appointment: appointments[i], onChanged: onChanged),
     );
   }
 }

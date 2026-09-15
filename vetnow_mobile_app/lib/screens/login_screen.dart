@@ -459,7 +459,7 @@ class _BrandMark extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          'Za tvog ljubimca, s ljubavlju ð¾',
+          'Za tvog ljubimca, s ljubavlju 🐾',
           style: TextStyle(fontSize: 12.5, color: Colors.white.withValues(alpha: 0.7)),
         ),
       ],
