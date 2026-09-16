@@ -232,6 +232,96 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{Provjeri još {count} polje} few{Provjeri još {count} polja} other{Provjeri još {count} polja}}'**
   String validationCheckFields(int count);
 
+  /// No description provided for @calendarOpen.
+  ///
+  /// In bs, this message translates to:
+  /// **'Kalendar'**
+  String get calendarOpen;
+
+  /// No description provided for @pickDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Izaberi dan'**
+  String get pickDay;
+
+  /// No description provided for @monthSheetTitle.
+  ///
+  /// In bs, this message translates to:
+  /// **'Izaberi datum'**
+  String get monthSheetTitle;
+
+  /// No description provided for @dayPartMorning.
+  ///
+  /// In bs, this message translates to:
+  /// **'Jutro'**
+  String get dayPartMorning;
+
+  /// No description provided for @dayPartAfternoon.
+  ///
+  /// In bs, this message translates to:
+  /// **'Poslijepodne'**
+  String get dayPartAfternoon;
+
+  /// No description provided for @dayPartEvening.
+  ///
+  /// In bs, this message translates to:
+  /// **'Veče'**
+  String get dayPartEvening;
+
+  /// No description provided for @dayPartFull.
+  ///
+  /// In bs, this message translates to:
+  /// **'popunjeno'**
+  String get dayPartFull;
+
+  /// No description provided for @closedShort.
+  ///
+  /// In bs, this message translates to:
+  /// **'zatv.'**
+  String get closedShort;
+
+  /// No description provided for @earliestLabel.
+  ///
+  /// In bs, this message translates to:
+  /// **'Najranije slobodno'**
+  String get earliestLabel;
+
+  /// No description provided for @todayWord.
+  ///
+  /// In bs, this message translates to:
+  /// **'danas'**
+  String get todayWord;
+
+  /// No description provided for @tomorrowWord.
+  ///
+  /// In bs, this message translates to:
+  /// **'sutra'**
+  String get tomorrowWord;
+
+  /// No description provided for @pickTimeOnDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Odaberi vrijeme {date}'**
+  String pickTimeOnDay(Object date);
+
+  /// No description provided for @noSlotsOnDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nema slobodnih termina {date}.'**
+  String noSlotsOnDay(Object date);
+
+  /// No description provided for @nextFreeDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prvi slobodan: {date}'**
+  String nextFreeDay(Object date);
+
+  /// No description provided for @slotAtDuration.
+  ///
+  /// In bs, this message translates to:
+  /// **'{date} u {slot} · {duration} min'**
+  String slotAtDuration(Object date, Object slot, Object duration);
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

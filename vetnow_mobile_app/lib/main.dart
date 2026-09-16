@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'config/theme.dart';
 import 'l10n/app_localizations.dart';
@@ -14,6 +15,14 @@ import 'state/theme_state.dart';
 import 'widgets/paw_loader.dart';
 
 void main() {
+  // Month and weekday names for bs/hr/sr.
+  //
+  // DateFormat ships only English symbols by default; asking it for
+  // a Bosnian weekday without this throws LocaleDataException at the
+  // moment the booking calendar is first drawn. Cheap, synchronous,
+  // and has to happen before any widget formats a date.
+  initializeDateFormatting();
+
   // Before anything else, so a failure during the very first frame is
   // recorded rather than lost.
   CrashLog.install();

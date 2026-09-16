@@ -95,6 +95,59 @@ class AppLocalizationsBs extends AppLocalizations {
   }
 
   @override
+  String get calendarOpen => 'Kalendar';
+
+  @override
+  String get pickDay => 'Izaberi dan';
+
+  @override
+  String get monthSheetTitle => 'Izaberi datum';
+
+  @override
+  String get dayPartMorning => 'Jutro';
+
+  @override
+  String get dayPartAfternoon => 'Poslijepodne';
+
+  @override
+  String get dayPartEvening => 'Veče';
+
+  @override
+  String get dayPartFull => 'popunjeno';
+
+  @override
+  String get closedShort => 'zatv.';
+
+  @override
+  String get earliestLabel => 'Najranije slobodno';
+
+  @override
+  String get todayWord => 'danas';
+
+  @override
+  String get tomorrowWord => 'sutra';
+
+  @override
+  String pickTimeOnDay(Object date) {
+    return 'Odaberi vrijeme $date';
+  }
+
+  @override
+  String noSlotsOnDay(Object date) {
+    return 'Nema slobodnih termina $date.';
+  }
+
+  @override
+  String nextFreeDay(Object date) {
+    return 'Prvi slobodan: $date';
+  }
+
+  @override
+  String slotAtDuration(Object date, Object slot, Object duration) {
+    return '$date u $slot · $duration min';
+  }
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override

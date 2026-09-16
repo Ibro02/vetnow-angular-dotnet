@@ -26,6 +26,24 @@ class OpeningHours {
     this.days = const [],
   });
 
+  /// Weekdays the clinic is shut, as DateTime.weekday numbers
+  /// (1 = Monday through 7 = Sunday).
+  ///
+  /// [days] arrives Monday-first, so the index is the weekday number
+  /// already. Used by the booking calendar to grey out days rather than
+  /// offer them and then come back empty.
+  ///
+  /// Empty when the clinic has no schedule at all: "we do not know" is
+  /// not the same as "closed every day", and greying out the whole
+  /// strip would make the clinic look shut when it is only unlisted.
+  Set<int> get closedWeekdays {
+    if (!hasSchedule) return const {};
+    return {
+      for (var i = 0; i < days.length && i < 7; i++)
+        if (days[i].closed) i + 1,
+    };
+  }
+
   /// "08:00 – 16:00" for today, or null when today is a closed day.
   String? get todayRange {
     if (todayOpensAt == null || todayClosesAt == null) return null;

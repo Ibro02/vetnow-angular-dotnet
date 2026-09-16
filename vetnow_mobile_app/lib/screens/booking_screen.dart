@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
+import 'package:intl/intl.dart';
+
 import 'package:flutter/material.dart';
 import '../config/haptics.dart';
 import '../config/theme.dart';
@@ -13,7 +16,11 @@ import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
 import '../services/employee_api_service.dart';
 import '../services/pets_api_service.dart';
+import '../services/slot_grouping.dart';
 import '../services/timeslot_api_service.dart';
+import '../services/vet_station_api_service.dart';
+import '../widgets/date_strip.dart';
+import '../widgets/slot_groups.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/gradient_app_bar.dart';
@@ -68,6 +75,24 @@ class _BookingScreenState extends State<BookingScreen> {
   int? _selectedRealStaffId;
   List<RemoteTimeSlot> _realSlots = [];
   bool _loadingSlots = false;
+
+  /// Which day the slots below belong to.
+  ///
+  /// Defaults to today, which is what the screen used to be hard-wired
+  /// to — the endpoint always took a date, it was simply never given
+  /// one, so "tomorrow" was not something the app could express.
+  DateTime _selectedDay = dayOf(clock.now());
+
+  /// Weekdays this clinic is shut. From the opening-hours endpoint the
+  /// clinic page already calls, so a closed day is free to know about.
+  Set<int> _closedWeekdays = {};
+
+  /// Days opened so far that turned out to have something free.
+  ///
+  /// Only what has actually been looked at. Filling the whole strip in
+  /// would be fourteen requests per employee every time this screen
+  /// appears, which is not a price worth paying for fourteen dots.
+  final Set<DateTime> _daysWithSlots = {};
   int? _selectedRealSlotId;
   List<Pet> _myPets = [];
   int? _selectedPetId;
@@ -124,6 +149,7 @@ class _BookingScreenState extends State<BookingScreen> {
         _selectedRealSlotId = null;
       });
       if (_selectedRealStaffId != null) unawaited(_loadSlotsFor(_selectedRealStaffId!));
+      unawaited(_loadOpeningHours());
     } catch (_) {
       if (!mounted) return;
       // Couldn't load real data (network hiccup) — stay in mock mode
@@ -133,9 +159,11 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  Future<void> _loadSlotsFor(int employeeId) async {
+  Future<void> _loadSlotsFor(int employeeId, {DateTime? day}) async {
     final auth = AuthScope.of(context);
     if (auth.token == null) return;
+
+    final target = day ?? _selectedDay;
     setState(() {
       _loadingSlots = true;
       _realSlots = [];
@@ -144,17 +172,90 @@ class _BookingScreenState extends State<BookingScreen> {
     try {
       final slots = await TimeSlotApiService.getForEmployee(
         employeeId: employeeId,
-        date: DateTime.now(),
+        date: target,
         token: auth.token!,
       );
       if (!mounted) return;
+
+      // Filtered here, not just at paint time. The backend answers
+      // with the whole day, so at five in the afternoon it still
+      // offers four o'clock — which is how a booking for 16:00 got
+      // made at 17:00 and landed straight in past visits.
+      final bookable = upcomingOnly(slots);
+
       setState(() {
-        _realSlots = slots;
+        _realSlots = bookable;
         _loadingSlots = false;
+        if (bookable.isNotEmpty) {
+          _daysWithSlots.add(dayOf(target));
+        } else {
+          _daysWithSlots.remove(dayOf(target));
+        }
       });
     } catch (_) {
       if (!mounted) return;
       setState(() => _loadingSlots = false);
+    }
+  }
+
+  /// "danas", "sutra", or a written-out date.
+  ///
+  /// Every sentence on this screen used to say "danas" because the
+  /// screen could only mean today. Now that it can mean any day, the
+  /// word has to come from the date — and for the two days people book
+  /// most, the word is friendlier than the number.
+  static String _dayLabel(BuildContext context, DateTime day) {
+    final l10n = AppLocalizations.of(context)!;
+    final today = dayOf(clock.now());
+
+    if (isSameDay(day, today)) return l10n.todayWord;
+    if (isSameDay(day, DateTime(today.year, today.month, today.day + 1))) {
+      return l10n.tomorrowWord;
+    }
+
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    return DateFormat.MMMMEEEEd(locale).format(day);
+  }
+
+  /// The soonest day after this one that is already known to have
+  /// something free, or null if none is.
+  ///
+  /// Only days that were actually opened count. Searching for the next
+  /// opening would mean asking the server about day after day until
+  /// one answered, and an empty Tuesday does not justify a burst of
+  /// requests — so the offer appears when we happen to know, and
+  /// stays quiet when we do not.
+  DateTime? get _nextKnownFreeDay {
+    final later = _daysWithSlots.where((d) => d.isAfter(_selectedDay)).toList()
+      ..sort();
+    return later.firstOrNull;
+  }
+
+  /// Moves the whole picker to another day.
+  void _selectDay(DateTime day) {
+    if (isSameDay(day, _selectedDay)) return;
+    setState(() {
+      _selectedDay = dayOf(day);
+      _selectedRealSlotId = null;
+    });
+    if (_selectedRealStaffId != null) {
+      unawaited(_loadSlotsFor(_selectedRealStaffId!));
+    }
+  }
+
+  /// Which weekdays the clinic is shut, so those days can be greyed
+  /// out rather than offered and then found empty.
+  ///
+  /// One request for the whole clinic, and the clinic page already
+  /// makes it. A failure here is not worth surfacing: the strip simply
+  /// shows every day as open, which is what it did before.
+  Future<void> _loadOpeningHours() async {
+    try {
+      final hours = await VetStationApiService.openingHours(widget.station.id);
+      if (!mounted) return;
+      setState(() => _closedWeekdays = hours.closedWeekdays);
+    } catch (_) {
+      // Left open. See above.
     }
   }
 
@@ -274,6 +375,15 @@ class _BookingScreenState extends State<BookingScreen> {
                 loadingSlots: _loadingSlots,
                 selectedSlotId: _selectedRealSlotId,
                 onSlotTap: (id) => setState(() => _selectedRealSlotId = id),
+                selectedDay: _selectedDay,
+                onSelectDay: _selectDay,
+                closedWeekdays: _closedWeekdays,
+                daysWithSlots: _daysWithSlots,
+                dayLabel: _dayLabel(context, _selectedDay),
+                nextKnownFreeDay: _nextKnownFreeDay,
+                nextFreeLabel: _nextKnownFreeDay == null
+                    ? ''
+                    : _dayLabel(context, _nextKnownFreeDay!),
               ),
               const SizedBox(height: AppSpacing.s6),
               _StepLabel(number: 4, label: l10n.choosePet),
@@ -349,6 +459,7 @@ class _BookingScreenState extends State<BookingScreen> {
             if (_selectedService != null)
               _SummaryCard(
                 service: _selectedService!,
+                dayLabel: _dayLabel(context, _selectedDay),
                 slotLabel: _usingReal
                     ? _realSlots
                         .where((s) => s.id == _selectedRealSlotId)
@@ -431,6 +542,13 @@ class _RealStaffAndTimeSection extends StatelessWidget {
   final bool loadingSlots;
   final int? selectedSlotId;
   final ValueChanged<int> onSlotTap;
+  final DateTime selectedDay;
+  final ValueChanged<DateTime> onSelectDay;
+  final Set<int> closedWeekdays;
+  final Set<DateTime> daysWithSlots;
+  final String dayLabel;
+  final DateTime? nextKnownFreeDay;
+  final String nextFreeLabel;
 
   const _RealStaffAndTimeSection({
     required this.staff,
@@ -440,6 +558,13 @@ class _RealStaffAndTimeSection extends StatelessWidget {
     required this.loadingSlots,
     required this.selectedSlotId,
     required this.onSlotTap,
+    required this.selectedDay,
+    required this.onSelectDay,
+    required this.closedWeekdays,
+    required this.daysWithSlots,
+    required this.dayLabel,
+    required this.nextKnownFreeDay,
+    required this.nextFreeLabel,
   });
 
   @override
@@ -464,43 +589,21 @@ class _RealStaffAndTimeSection extends StatelessWidget {
             ),
           ),
         const SizedBox(height: AppSpacing.s6),
-        _StepLabel(number: 3, label: l10n.pickTimeToday),
+        _StepLabel(number: 3, label: l10n.pickTimeOnDay(dayLabel)),
         const SizedBox(height: AppSpacing.s3),
-        if (loadingSlots)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: PawLoader(size: 24, color: AppColors.primary),
-          )
-        else if (slots.isEmpty)
-          _InlineHint(icon: Icons.event_busy_outlined, text: l10n.noSlotsToday)
-        else
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: slots.map((slot) {
-              final selected = selectedSlotId == slot.id;
-              return InkWell(
-                onTap: () => onSlotTap(slot.id),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: selected ? AppColors.ink : AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    border: Border.all(color: selected ? AppColors.ink : AppColors.border),
-                  ),
-                  child: Text(
-                    slot.appointmentTime,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color: selected ? Colors.white : AppColors.text,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+        _DayAndSlotPanel(
+          selectedDay: selectedDay,
+          onSelectDay: onSelectDay,
+          closedWeekdays: closedWeekdays,
+          daysWithSlots: daysWithSlots,
+          slots: slots,
+          loadingSlots: loadingSlots,
+          selectedSlotId: selectedSlotId,
+          onSlotTap: onSlotTap,
+          dayLabel: dayLabel,
+          nextKnownFreeDay: nextKnownFreeDay,
+          nextFreeLabel: nextFreeLabel,
+        ),
       ],
     );
   }
@@ -667,7 +770,17 @@ class _SelectableCard extends StatelessWidget {
 class _SummaryCard extends StatelessWidget {
   final VetService service;
   final String? slotLabel;
-  const _SummaryCard({required this.service, required this.slotLabel});
+
+  /// Which day the slot is on. This card used to say "Danas u 16:00"
+  /// unconditionally, because the screen could only book today — with
+  /// a calendar on it, that sentence would be a lie half the time.
+  final String dayLabel;
+
+  const _SummaryCard({
+    required this.service,
+    required this.slotLabel,
+    required this.dayLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -692,7 +805,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             slotLabel != null
-                ? l10n.todayAtDuration(slotLabel!, service.durationMinutes)
+                ? l10n.slotAtDuration(dayLabel, slotLabel!, service.durationMinutes)
                 : l10n.pickTimeAbove,
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
@@ -752,6 +865,146 @@ class _ConfirmationView extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The dark panel that holds the day strip and the times.
+///
+/// Ink rather than the page's own surface, and on purpose: this is the
+/// one decision the whole screen exists to collect, and the panel says
+/// so by being the only dark thing on a light page. It also lets the
+/// strip and the slot pills share the glass language the hero and the
+/// nav pill already use, instead of inventing a third look.
+class _DayAndSlotPanel extends StatelessWidget {
+  final DateTime selectedDay;
+  final ValueChanged<DateTime> onSelectDay;
+  final Set<int> closedWeekdays;
+  final Set<DateTime> daysWithSlots;
+  final List<RemoteTimeSlot> slots;
+  final bool loadingSlots;
+  final int? selectedSlotId;
+  final ValueChanged<int> onSlotTap;
+  final String dayLabel;
+  final DateTime? nextKnownFreeDay;
+  final String nextFreeLabel;
+
+  const _DayAndSlotPanel({
+    required this.selectedDay,
+    required this.onSelectDay,
+    required this.closedWeekdays,
+    required this.daysWithSlots,
+    required this.slots,
+    required this.loadingSlots,
+    required this.selectedSlotId,
+    required this.onSlotTap,
+    required this.dayLabel,
+    required this.nextKnownFreeDay,
+    required this.nextFreeLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final earliest = earliestOf(slots);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      decoration: BoxDecoration(
+        gradient: AppGradients.ink,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // The answer to the question most people actually came with,
+          // before they are asked to pick anything. Free: the day is
+          // already loaded and this is its first slot.
+          if (earliest != null && selectedSlotId == null) ...[
+            EarliestSlotBanner(
+              dayLabel: dayLabel,
+              time: earliest.appointmentTime,
+              onTap: () => onSlotTap(earliest.id),
+            ),
+            const SizedBox(height: AppSpacing.s5),
+          ],
+          DateStrip(
+            selected: selectedDay,
+            onSelect: onSelectDay,
+            closedWeekdays: closedWeekdays,
+            daysWithSlots: daysWithSlots,
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          Container(height: 1, color: Colors.white.withValues(alpha: 0.10)),
+          const SizedBox(height: AppSpacing.s5),
+          if (loadingSlots)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 14),
+                child: PawLoader(size: 24, color: Colors.white),
+              ),
+            )
+          else if (slots.isEmpty) ...[
+            Row(
+              children: [
+                Icon(Icons.event_busy_outlined,
+                    size: 17, color: Colors.white.withValues(alpha: 0.55)),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(
+                    l10n.noSlotsOnDay(dayLabel),
+                    style: TextStyle(
+                        fontSize: 13, color: Colors.white.withValues(alpha: 0.72)),
+                  ),
+                ),
+              ],
+            ),
+            // Offered only when a free day is already known from a day
+            // that was actually opened. Hunting for the next opening
+            // would mean asking the server about day after day, and an
+            // empty Tuesday is not worth a burst of requests.
+            if (nextKnownFreeDay != null) ...[
+              const SizedBox(height: AppSpacing.s4),
+              InkWell(
+                onTap: () => onSelectDay(nextKnownFreeDay!),
+                borderRadius: BorderRadius.circular(AppRadius.full),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.arrow_forward_rounded,
+                          size: 15, color: AppColors.accent),
+                      const SizedBox(width: 7),
+                      Text(
+                        l10n.nextFreeDay(nextFreeLabel),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ]
+          else
+            SlotGroups(
+              slots: slots,
+              selectedSlotId: selectedSlotId,
+              onSlotTap: onSlotTap,
+            ),
+        ],
       ),
     );
   }
