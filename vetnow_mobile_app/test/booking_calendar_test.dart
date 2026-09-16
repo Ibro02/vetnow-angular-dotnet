@@ -48,6 +48,15 @@ void main() {
   late FakeBackend backend;
 
   FakeBackend healthy() => FakeBackend({
+        // The screen asks the trade-specific endpoint for whichever
+        // service is chosen, so the vet one has to be routed too  and
+        // before the general one, since FakeBackend matches on a path
+        // substring in insertion order.
+        'Employee/GetVetsByVetStationId': (_) => {
+              'dataItems': [
+                {'id': 7, 'firstName': 'Amina', 'lastName': 'Hodžić', 'roleId': 4},
+              ],
+            },
         'Employee/GetByVetStationId': (_) => {
               'dataItems': [
                 {'id': 7, 'firstName': 'Amina', 'lastName': 'Hodžić', 'roleId': 4},

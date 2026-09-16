@@ -16,6 +16,7 @@ import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
 import '../services/employee_api_service.dart';
 import '../services/pets_api_service.dart';
+import '../services/service_staffing.dart';
 import '../services/slot_grouping.dart';
 import '../services/timeslot_api_service.dart';
 import '../services/vet_station_api_service.dart';
@@ -126,10 +127,14 @@ class _BookingScreenState extends State<BookingScreen> {
       // Staff and pets are unrelated lookups — requested together so the
       // switch into "real mode" costs one round-trip, not two.
       final results = await Future.wait([
-        EmployeeApiService.getByStation(
+        EmployeeApiService.getByStationFiltered(
           stationId: widget.station.id,
           token: auth.token!,
           context: context,
+          // Narrowed to the trade that performs the chosen service.
+          // Before this the whole team was offered for everything, so
+          // a groomer could be booked for a dental procedure.
+          filter: ServiceStaffing.filterFor(_selectedService?.kind),
         ),
         PetsApiService.getByOwner(ownerId: auth.userId!, token: auth.token!),
       ]);
@@ -215,6 +220,60 @@ class _BookingScreenState extends State<BookingScreen> {
 
     final locale = Localizations.localeOf(context).toLanguageTag();
     return DateFormat.MMMMEEEEd(locale).format(day);
+  }
+
+  /// Picks a service, and re-asks who can actually perform it.
+  ///
+  /// The staff list is a function of the service, not of the station:
+  /// a nail trim is the groomer's, a tooth is the vet's. Changing the
+  /// service therefore has to change who is on offer, and it drops the
+  /// chosen person and time — keeping a groomer selected while
+  /// switching to dentistry is exactly the pairing this prevents.
+  void _selectService(VetService service) {
+    if (service.kind == _selectedService?.kind) {
+      setState(() => _selectedService = service);
+      return;
+    }
+
+    setState(() {
+      _selectedService = service;
+      _selectedRealStaffId = null;
+      _selectedRealSlotId = null;
+      _selectedSlot = null;
+      _realSlots = [];
+      _daysWithSlots.clear();
+    });
+
+    if (_usingReal) unawaited(_reloadStaffForService());
+  }
+
+  Future<void> _reloadStaffForService() async {
+    final auth = AuthScope.of(context);
+    if (auth.token == null) return;
+
+    setState(() => _loadingReal = true);
+    try {
+      final staff = await EmployeeApiService.getByStationFiltered(
+        stationId: widget.station.id,
+        token: auth.token!,
+        context: context,
+        filter: ServiceStaffing.filterFor(_selectedService?.kind),
+      );
+      if (!mounted) return;
+      setState(() {
+        _realStaff = staff;
+        _selectedRealStaffId = staff.isNotEmpty ? staff.first.id : null;
+        _loadingReal = false;
+      });
+      if (_selectedRealStaffId != null) {
+        unawaited(_loadSlotsFor(_selectedRealStaffId!));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      // Keep whoever was listed rather than emptying the screen on a
+      // network hiccup; the person can change the service again.
+      setState(() => _loadingReal = false);
+    }
   }
 
   /// The soonest day after this one that is already known to have
@@ -356,7 +415,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 icon: ServiceCatalog.icon(s.kind),
                 accentColor: ServiceCatalog.color(s.kind),
                 selected: _selectedService == s,
-                onTap: () => setState(() => _selectedService = s),
+                onTap: () => _selectService(s),
               ),
             ),
             const SizedBox(height: AppSpacing.s6),

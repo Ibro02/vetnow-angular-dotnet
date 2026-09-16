@@ -128,6 +128,9 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
         StaffRoleFilter.vets => ServiceCatalog.roleVeterinarian(context),
         StaffRoleFilter.nurses => ServiceCatalog.roleNurse(context),
         StaffRoleFilter.groomers => ServiceCatalog.roleGroomer(context),
+        // Only the booking screen asks for that combination, and this
+        // chip row does not offer it.
+        StaffRoleFilter.vetsAndNurses => l10n.filterAllStaff,
       };
 
   void _applyRoleFilter(StaffRoleFilter f) {
