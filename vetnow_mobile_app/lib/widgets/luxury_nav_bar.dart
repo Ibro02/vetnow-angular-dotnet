@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../config/haptics.dart';
 import '../config/theme.dart';
@@ -28,7 +30,24 @@ class LuxuryNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final systemInset = MediaQuery.of(context).padding.bottom;
+
+    // The pill tucks 4 into the gesture bar when there is one, and
+    // otherwise floats 14 off the bottom.
+    //
+    // clamped, and that is the whole point of this line. It used to be
+    // a bare `systemInset - 4`, which is fine at rest — a gesture bar
+    // is 24 to 48 — but not while it is moving. Focusing a text field
+    // hands the bottom of the screen to the keyboard, so padding.bottom
+    // animates to zero, and for the one or two frames it spends between
+    // 4 and 0 the subtraction went negative. RenderPadding asserts on a
+    // negative inset, the whole screen became Flutter's red error panel,
+    // and the next frame it was past 4 and everything was fine again.
+    //
+    // Reported as "something red flashes for a millisecond when I tap
+    // search", which is exactly what it was.
+    final bottomInset =
+        systemInset > 0 ? math.max(systemInset - 4, 0.0) : 14.0;
 
     // Force full transparency around the pill explicitly — Scaffold
     // sometimes paints its own Material behind bottomNavigationBar
@@ -37,7 +56,7 @@ class LuxuryNavBar extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomInset > 0 ? bottomInset - 4 : 14),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomInset),
       child: Container(
         height: 68,
         decoration: BoxDecoration(

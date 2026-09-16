@@ -425,6 +425,81 @@ void main() {
       expect(contrastRatio(Colors.white, AppColors.primary), closeTo(2.58, 0.05));
     });
   });
+
+  group('the floating pill and the system inset', () {
+    // Found on a phone, as a red flash lasting one frame.
+    //
+    // The pill tucks 4 into the gesture bar, so its padding was
+    // `padding.bottom - 4`. At rest that is fine: a gesture bar is 24 to
+    // 48. But focusing a text field hands the bottom of the screen to
+    // the keyboard, padding.bottom animates to zero, and every frame it
+    // spends between 4 and 0 made that subtraction negative.
+    // RenderPadding asserts on a negative inset, so the entire screen
+    // became Flutter's red error panel until the next frame.
+    for (final inset in [0.0, 0.5, 2.0, 3.9, 4.0, 24.0, 48.0]) {
+      testWidgets('lays out with a system inset of $inset', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(padding: EdgeInsets.only(bottom: inset)),
+              child: Scaffold(
+                bottomNavigationBar: LuxuryNavBar(
+                  selectedIndex: 0,
+                  onSelect: (_) {},
+                  items: const [
+                    NavItem(
+                      icon: Icons.search_outlined,
+                      selectedIcon: Icons.search_rounded,
+                      label: 'Istraži',
+                    ),
+                    NavItem(
+                      icon: Icons.event_outlined,
+                      selectedIcon: Icons.event_rounded,
+                      label: 'Termini',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('survives the inset animating away under a keyboard',
+        (tester) async {
+      // The real sequence, frame by frame, rather than a set of resting
+      // values: 48 down to 0 the way Android reports it while the
+      // keyboard slides up.
+      for (final inset in [48.0, 30.0, 12.0, 3.5, 1.0, 0.0]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(padding: EdgeInsets.only(bottom: inset)),
+              child: Scaffold(
+                bottomNavigationBar: LuxuryNavBar(
+                  selectedIndex: 0,
+                  onSelect: (_) {},
+                  items: const [
+                    NavItem(
+                      icon: Icons.search_outlined,
+                      selectedIcon: Icons.search_rounded,
+                      label: 'Istraži',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'inset $inset');
+      }
+    });
+  });
 }
 
 /// WCAG 2.1 relative luminance.
