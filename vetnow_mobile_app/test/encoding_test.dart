@@ -79,4 +79,35 @@ void main() {
 
     expect(broken, isEmpty, reason: 'Not valid UTF-8:\n${broken.join('\n')}');
   });
+
+  test('no character has been flattened into its own hex code', () {
+    // A different failure from double-encoding, and a subtler one.
+    //
+    // An em dash (U+2014) came back from one tooling pass as the literal
+    // characters "1" and "4" surrounded by spaces, mid-sentence, where
+    // the dash had been. Perfectly valid UTF-8, perfectly valid Dart, and
+    // invisible unless you happen to read that line. Seven of them were
+    // sitting in the source before anyone noticed.
+    //
+    // The tell is a bare two-digit hex code standing alone between
+    // spaces where a word should be, so that is what is looked for.
+    final flattened = RegExp(r'\s\s(14|19|1c|1d|26|a0|a9)\s');
+    final found = <String>[];
+
+    for (final file in _sourceFiles()) {
+      final lines = file.readAsStringSync().split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        if (flattened.hasMatch(lines[i])) {
+          found.add('${file.path}:${i + 1}: ${lines[i].trim()}');
+        }
+      }
+    }
+
+    expect(
+      found,
+      isEmpty,
+      reason: 'A punctuation character looks like it was replaced by its '
+          'hex code:\n${found.join('\n')}',
+    );
+  });
 }

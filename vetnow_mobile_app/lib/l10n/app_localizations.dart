@@ -136,6 +136,12 @@ abstract class AppLocalizations {
   /// **'Pretraži klinike…'**
   String get searchHint;
 
+  /// Tooltip on the X inside the Explore search field.
+  ///
+  /// In bs, this message translates to:
+  /// **'Obriši pretragu'**
+  String get clearSearch;
+
   /// No description provided for @filterRecommended.
   ///
   /// In bs, this message translates to:

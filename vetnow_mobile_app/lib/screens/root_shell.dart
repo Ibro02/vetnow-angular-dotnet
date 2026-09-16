@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/deep_links.dart';
+import '../state/auth_state.dart';
 import '../services/vet_station_api_service.dart';
 import '../widgets/luxury_nav_bar.dart';
 import 'explore_screen.dart';
@@ -35,6 +36,23 @@ class _RootShellState extends State<RootShell> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // Signing in lands on Explore, wherever it was started from.
+    //
+    // The login screen is a route over the current tab, so someone who
+    // tapped "sign in" from Profile came back to Profile, and someone
+    // who came through the booking gate came back to a clinic page. Both
+    // are a dead end: the thing to do after signing in is to look at
+    // clinics.
+    final auth = AuthScope.of(context);
+    if (auth.justSignedIn) {
+      auth.justSignedIn = false;
+      // Post-frame because this runs during a build, and because the
+      // login route is usually still mid-pop at this point.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _tabIndex = 0);
+      });
+    }
 
     final pending = DeepLinkScope.of(context)?.value;
     if (pending == null || pending == _handled) return;

@@ -420,7 +420,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                       // The same three layers every other header in the
                       // app carries: the top-left light, then a vignette
                       // to give the panel a centre. Without them this was
-                      // a flat colour block  14 the plainest surface in the
+                      // a flat colour block — the plainest surface in the
                       // app, on its most important page.
                       const Positioned.fill(
                         child: IgnorePointer(
@@ -704,8 +704,10 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
               ),
               child: Row(
                 children: [
+                  // Equal halves. The 2:3 split was meant to favour the
+                  // primary action, but at this size it just reads as two
+                  // buttons that were supposed to match and do not.
                   Expanded(
-                    flex: 2,
                     child: AppButton(
                       label: l10n.call,
                       icon: Icons.call,
@@ -715,7 +717,6 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
                   ),
                   const SizedBox(width: AppSpacing.s3),
                   Expanded(
-                    flex: 3,
                     child: AppButton(
                       label: l10n.book,
                       icon: Icons.calendar_month_outlined,

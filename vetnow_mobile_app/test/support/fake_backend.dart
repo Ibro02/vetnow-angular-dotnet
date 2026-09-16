@@ -131,7 +131,7 @@ Widget harness(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
           // Without this the Scaffold takes Material's own light default
           // while every widget that reads AppColors directly follows the
-          // palette  14 so a dark-mode test renders dark cards on a white
+          // palette — so a dark-mode test renders dark cards on a white
           // page, which is neither what the app does nor a bug in it.
           theme: AppTheme.current,
             // Applied through the builder, not around MaterialApp: MaterialApp

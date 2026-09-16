@@ -276,7 +276,7 @@ class _FormSection extends StatelessWidget {
                 child: Icon(icon, size: 16, color: AppColors.primaryDark),
               ),
               const SizedBox(width: AppSpacing.s3),
-              // Section titles here are phrases  14 "Lozinka i sigurnost"  14
+              // Section titles here are phrases — "Lozinka i sigurnost" —
               // beside a fixed-width icon tile.
               Expanded(
                 child: Text(

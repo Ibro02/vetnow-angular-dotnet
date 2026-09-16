@@ -11,6 +11,8 @@
 // accessibility guideline matchers, which is the cheapest way to keep a
 // later redesign from quietly shrinking a control below the thumb.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -295,7 +297,7 @@ void main() {
         const Center(child: SectionTitle('Sve usluge', accent: true)),
       );
 
-      // One heading, one label  14 the rule underneath adds nothing to the
+      // One heading, one label — the rule underneath adds nothing to the
       // reading order.
       expect(labels(tester), ['Sve usluge']);
       expect(
@@ -361,19 +363,87 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('an error state is readable, and stays readable in dark mode',
-        (tester) async {
+    testWidgets('an error state is readable', (tester) async {
       final handle = tester.ensureSemantics();
 
       await pump(tester, ErrorStateView(onRetry: () {}));
       await expectLater(tester, meetsGuideline(textContrastGuideline));
 
-      applyPaletteBrightness(Brightness.dark);
-      await pump(tester, ErrorStateView(onRetry: () {}));
-      await expectLater(tester, meetsGuideline(textContrastGuideline));
-      applyPaletteBrightness(Brightness.light);
-
       handle.dispose();
     });
+
+    test('text clears WCAG AA against every surface it sits on', () {
+      // Deliberately not textContrastGuideline, and the reason is worth
+      // writing down.
+      //
+      // That guideline samples the pixels inside a semantics node and
+      // infers which of them are the text. On a filled button it infers
+      // wrong: it compares the button's own fill against the page behind
+      // it, and never looks at the label. So it passed, happily, on a
+      // secondary button that hard-coded a white fill — which in dark
+      // mode was near-white text on a white slab, unreadable, and
+      // scoring well precisely because the white fill contrasted nicely
+      // with the dark page around it. The bug was found on a phone, by
+      // eye, with the test suite green.
+      //
+      // These pairs are therefore checked directly: the colour the text
+      // is painted in, against the colour actually behind it.
+      for (final brightness in Brightness.values) {
+        applyPaletteBrightness(brightness);
+
+        final pairs = <String, List<Color>>{
+          'body text on the page': [AppColors.text, AppColors.bg],
+          'body text on the soft ground': [AppColors.text, AppColors.bgSoft],
+          'body text on a card': [AppColors.text, AppColors.surface],
+          'a quiet button label': [AppColors.text, AppColors.bgMuted],
+          'secondary text on a card': [AppColors.textSecondary, AppColors.surface],
+          'secondary text on the page': [AppColors.textSecondary, AppColors.bg],
+          'white on a hero': [Colors.white, AppColors.ink],
+        };
+
+        pairs.forEach((what, pair) {
+          final ratio = contrastRatio(pair[0], pair[1]);
+          expect(
+            ratio,
+            greaterThanOrEqualTo(4.5),
+            reason: '$what, ${brightness.name}: ${ratio.toStringAsFixed(2)}:1',
+          );
+        });
+      }
+
+      applyPaletteBrightness(Brightness.light);
+    });
+
+    test('the brand fills are recorded, not silently assumed to be fine', () {
+      // White on the mint primary measures 2.07:1, which misses AA (4.5)
+      // and misses even the large-text bar (3.0). Raising it means making
+      // the primary action a deeper green, which changes how every screen
+      // in the app looks — an owner's call, not a test's. Pinned here so
+      // the number is visible and a change to it is deliberate rather
+      // than accidental.
+      expect(contrastRatio(Colors.white, AppColors.accent), closeTo(2.07, 0.05));
+      expect(contrastRatio(Colors.white, AppColors.primary), closeTo(2.58, 0.05));
+    });
   });
+}
+
+/// WCAG 2.1 relative luminance.
+double _luminance(Color c) {
+  double channel(double v) {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+  }
+
+  return 0.2126 * channel(c.r * 255) +
+      0.7152 * channel(c.g * 255) +
+      0.0722 * channel(c.b * 255);
+}
+
+/// WCAG 2.1 contrast ratio between two opaque colours, 1..21.
+double contrastRatio(Color a, Color b) {
+  final la = _luminance(a);
+  final lb = _luminance(b);
+  final lighter = math.max(la, lb);
+  final darker = math.min(la, lb);
+  return (lighter + 0.05) / (darker + 0.05);
 }

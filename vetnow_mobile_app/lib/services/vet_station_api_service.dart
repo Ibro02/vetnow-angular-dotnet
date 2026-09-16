@@ -22,7 +22,7 @@ class VetStationApiService {
     );
     // The envelope is still asserted, and still throws when it is wrong.
     // A response that is not the shape of an answer means we did not get
-    // one, and "0 clinics found" would be a lie about it  14 the screen
+    // one, and "0 clinics found" would be a lie about it — the screen
     // has an error state and a retry button for exactly this case. Only
     // the rows inside a good envelope are forgiving.
     final list = (result as Map<String, dynamic>)['vetStations'] as List<dynamic>? ?? [];

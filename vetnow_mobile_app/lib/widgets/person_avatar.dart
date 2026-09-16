@@ -89,7 +89,7 @@ class PersonAvatar extends StatelessWidget {
 
     // Excluded: the initials are an abbreviation of the name written
     // immediately beside them, so a screen reader was announcing
-    // "A H, Dr. Amina Hodzic"  14 two letters of noise before every name
+    // "A H, Dr. Amina Hodzic" — two letters of noise before every name
     // in the list. The clinic and pet avatars are excluded for the same
     // reason.
     return ExcludeSemantics(

@@ -29,6 +29,15 @@ class AppButton extends StatelessWidget {
 
   bool get _disabled => onPressed == null && !isLoading;
 
+  /// Every variant is exactly this tall.
+  ///
+  /// The gradient variants are a padded Container and the secondary is
+  /// an OutlinedButton, which brings its own minimum size and tap-target
+  /// padding. Left to themselves the two came out different heights, and
+  /// side by side at the bottom of the clinic page that reads as a
+  /// mistake rather than as a hierarchy.
+  static const double _height = 50;
+
   @override
   Widget build(BuildContext context) {
     final Widget child = isLoading
@@ -66,6 +75,7 @@ class AppButton extends StatelessWidget {
           glowColor: AppColors.accent,
           onTap: isLoading ? null : onPressed,
           disabled: _disabled,
+          height: _height,
           child: DefaultTextStyle(
             style: const TextStyle(color: Colors.white),
             child: IconTheme(data: const IconThemeData(color: Colors.white), child: child),
@@ -76,18 +86,33 @@ class AppButton extends StatelessWidget {
           glowColor: AppColors.danger,
           onTap: isLoading ? null : onPressed,
           disabled: _disabled,
+          height: _height,
           child: DefaultTextStyle(
             style: const TextStyle(color: Colors.white),
             child: IconTheme(data: const IconThemeData(color: Colors.white), child: child),
           ),
         ),
+      // backgroundColor was a literal Colors.white, which in the dark
+      // theme is a white slab carrying text that is itself nearly
+      // white — the "Call" button on a clinic page, and the retry
+      // button on every error screen, were both unreadable.
       AppButtonVariant.secondary => OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.text,
-            backgroundColor: Colors.white,
+            // bgMuted rather than surface: on a dark page, surface is
+            // within a shade of the page itself, so the button read as
+            // loose text behind a faint outline. This sits a step above
+            // the page in both themes, which is what a raised control
+            // should do.
+            backgroundColor: AppColors.bgMuted,
             side: BorderSide(color: AppColors.border),
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            minimumSize: const Size(0, _height),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            // Without this the button reserves a 48pt tap target of
+            // its own on top of the height set above, and ends up
+            // taller than the gradient variants beside it.
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
@@ -98,7 +123,9 @@ class AppButton extends StatelessWidget {
           onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
             foregroundColor: AppColors.textSecondary,
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            minimumSize: const Size(0, _height),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: child,
         ),
@@ -113,6 +140,7 @@ class _GradientButton extends StatelessWidget {
   final Color glowColor;
   final VoidCallback? onTap;
   final bool disabled;
+  final double height;
   final Widget child;
 
   const _GradientButton({
@@ -120,6 +148,7 @@ class _GradientButton extends StatelessWidget {
     required this.glowColor,
     required this.onTap,
     required this.disabled,
+    required this.height,
     required this.child,
   });
 
@@ -144,7 +173,8 @@ class _GradientButton extends StatelessWidget {
             boxShadow: disabled ? null : AppShadows.glow(glowColor),
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            height: height,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             alignment: Alignment.center,
             child: child,
           ),

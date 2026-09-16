@@ -34,7 +34,7 @@ class VetNowApp extends StatefulWidget {
 }
 
 /// Public so a test can reach [debugAuthState] with a type rather than
-/// through a dynamic cast  14 the same reason FormState and friends are
+/// through a dynamic cast — the same reason FormState and friends are
 /// public in the framework.
 class VetNowAppState extends State<VetNowApp> {
   final _authState = AuthState();

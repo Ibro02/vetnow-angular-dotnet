@@ -303,6 +303,22 @@ class _ExploreScreenState extends State<ExploreScreen>
                           child: TextField(
                             controller: _searchController,
                             onChanged: (_) => setState(() {}),
+                            // A search field, and told to behave like one.
+                            //
+                            // Filtering is live, so the key is really just a
+                            // way to put the keyboard away once you have
+                            // what you wanted; without it the keyboard sat
+                            // over the results you had just typed for.
+                            //
+                            // Autocorrect and suggestions are off because
+                            // clinic names are not dictionary words — the
+                            // keyboard was quietly rewriting "Ferhadija"
+                            // and turning a search into no results.
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            textCapitalization: TextCapitalization.words,
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               hintText: l10n.searchHint,
@@ -317,6 +333,22 @@ class _ExploreScreenState extends State<ExploreScreen>
                                   child: const Icon(Icons.search_rounded, color: AppColors.primary, size: 18),
                                 ),
                               ),
+                              // Only once there is something to clear.
+                              // Emptying the field by hand meant fourteen
+                              // taps on backspace with the results
+                              // flickering under the keyboard the whole way.
+                              suffixIcon: _searchController.text.isEmpty
+                                  ? null
+                                  : IconButton(
+                                      icon: Icon(Icons.close_rounded,
+                                          size: 18, color: AppColors.textMuted),
+                                      tooltip: l10n.clearSearch,
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        FocusScope.of(context).unfocus();
+                                        setState(() {});
+                                      },
+                                    ),
                               filled: true,
                               fillColor: AppColors.surface,
                               contentPadding: const EdgeInsets.symmetric(vertical: 4),

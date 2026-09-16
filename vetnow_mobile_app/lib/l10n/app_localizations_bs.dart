@@ -28,6 +28,9 @@ class AppLocalizationsBs extends AppLocalizations {
   String get searchHint => 'Pretraži klinike…';
 
   @override
+  String get clearSearch => 'Obriši pretragu';
+
+  @override
   String get filterRecommended => 'Preporučeno';
 
   @override

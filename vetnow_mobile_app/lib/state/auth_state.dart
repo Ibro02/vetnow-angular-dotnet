@@ -23,6 +23,18 @@ class AuthState extends ChangeNotifier {
   /// at someone who is, in fact, signed in.
   bool isRestoring = true;
 
+  /// Set by [loginWithToken] and cleared by whoever acts on it.
+  ///
+  /// The sign-in screen is a route pushed over whichever tab the
+  /// person happened to be on, so popping it used to drop them back
+  /// on Profile or Appointments. The shell watches this to bring them
+  /// to Explore instead, which is the screen the app is actually for.
+  ///
+  /// Deliberately not just "isLoggedIn went from false to true":
+  /// [restore] does that too, at launch, and would then fight a deep
+  /// link that had already chosen a tab.
+  bool justSignedIn = false;
+
   /// Stores the token from a successful login, then tries to fetch the
   /// full profile (name, id, email) from the backend. If that call
   /// fails for any reason, we still consider the person logged in —
@@ -34,6 +46,7 @@ class AuthState extends ChangeNotifier {
   /// is false the session lives only until the app is closed.
   Future<void> loginWithToken(String newToken, {String? fallbackName, bool remember = false}) async {
     isLoggedIn = true;
+    justSignedIn = true;
     token = newToken;
     displayName = fallbackName;
     username = fallbackName;

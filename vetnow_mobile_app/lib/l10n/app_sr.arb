@@ -9,6 +9,10 @@
   "exploreHeroTitle": "Pouzdana nega,\nzakazana za sekunde.",
   "exploreHeroSubtitle": "Pregledaj proverene klinike blizu tebe — bez naloga za pregledanje.",
   "searchHint": "Pretraži klinike…",
+  "clearSearch": "Obriši pretragu",
+  "@clearSearch": {
+    "description": "Tooltip on the X inside the Explore search field."
+  },
   "filterRecommended": "Preporučeno",
   "filterTopRated": "Najbolje ocenjeno",
   "clinicsInCity": "{count, plural, one{{count} klinika u {city}} few{{count} klinike u {city}} other{{count} klinika u {city}}}",
