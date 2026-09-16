@@ -81,3 +81,18 @@ mixin ResumeRefresh<T extends StatefulWidget> on State<T>, WidgetsBindingObserve
     }
   }
 }
+
+/// A screen inside the shell's IndexedStack, which is not rebuilt when
+/// you come back to it.
+///
+/// Keeping the tabs alive is what stops a tab switch from throwing away
+/// a typed search and a scroll position, but it also means the data on a
+/// tab is as old as the last time it was looked at. Book a visit from
+/// Explore, tap Termini, and the new appointment would not be there.
+///
+/// The shell calls this when a tab is selected. It must not tear the
+/// screen down — what is on screen stays up until the new data lands,
+/// so coming back to a tab never flashes skeletons at anybody.
+abstract class Revisitable {
+  Future<void> onRevisit();
+}

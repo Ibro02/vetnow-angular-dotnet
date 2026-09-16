@@ -35,11 +35,15 @@ class MyAppointmentsScreen extends StatefulWidget {
 }
 
 class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver, ResumeRefresh<MyAppointmentsScreen> {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver, ResumeRefresh<MyAppointmentsScreen>
+    implements Revisitable {
   // A visit cancelled or moved from the web should not still read as
   // booked because this screen was left open since yesterday.
   @override
   Future<void> onResumeRefresh() => _load();
+
+  @override
+  Future<void> onRevisit() => _load();
 
   late final TabController _tabController;
   bool _loaded = false;
@@ -74,7 +78,11 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
     final auth = AuthScope.of(context);
     if (auth.token == null || auth.userId == null) return;
     setState(() {
-      _isLoading = true;
+      // Skeletons only when there is nothing to show yet. A refresh
+      // over a list that is already on screen used to wipe it back to
+      // placeholders for as long as the request took, which made a
+      // pull-to-refresh look like the appointments had been lost.
+      _isLoading = _upcoming.isEmpty && _past.isEmpty;
       _error = null;
     });
     try {

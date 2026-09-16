@@ -40,12 +40,16 @@ class ExploreScreen extends StatefulWidget {
 enum _SortFilter { recommended, topRated, mostReviewed }
 
 class _ExploreScreenState extends State<ExploreScreen>
-    with WidgetsBindingObserver, ResumeRefresh<ExploreScreen> {
+    with WidgetsBindingObserver, ResumeRefresh<ExploreScreen>
+    implements Revisitable {
   // Opening hours and "open now" are the reason: a list that says a
   // clinic is open, rendered at four in the afternoon and read at eight
   // in the evening, is simply wrong.
   @override
   Future<void> onResumeRefresh() => _loadStations();
+
+  @override
+  Future<void> onRevisit() => _loadStations();
 
   final _searchController = TextEditingController();
 

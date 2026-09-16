@@ -246,6 +246,29 @@ void main() {
       expect(backend.calls.where((c) => c.url.path.contains('Appointment')),
           isNotEmpty);
     });
+
+    testWidgets('asks a tab it kept alive for fresh data', (tester) async {
+      // The other side of keeping tabs alive: the data on one is as old
+      // as the last time it was looked at. Book a visit from Explore,
+      // tap Termini, and the new appointment would not be there.
+      await openShell(tester);
+
+      await tester.tap(find.text('Termini'));
+      await settle(tester, frames: 6);
+      final first =
+          backend.calls.where((c) => c.url.path.contains('Appointment')).length;
+      expect(first, greaterThan(0));
+
+      await tester.tap(find.text('Istraži'));
+      await settle(tester, frames: 6);
+      await tester.tap(find.text('Termini'));
+      await settle(tester, frames: 6);
+
+      expect(
+        backend.calls.where((c) => c.url.path.contains('Appointment')).length,
+        greaterThan(first),
+      );
+    });
   });
 
   group('the back gesture', () {

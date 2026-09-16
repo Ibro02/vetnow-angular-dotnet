@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/deep_links.dart';
 import '../state/auth_state.dart';
+import '../state/resume_refresh.dart';
 import '../services/vet_station_api_service.dart';
 import '../widgets/luxury_nav_bar.dart';
 import 'explore_screen.dart';
@@ -86,11 +89,20 @@ class _RootShellState extends State<RootShell> {
     }
   }
 
-  static const List<Widget> _tabs = [
-    ExploreScreen(),
-    MyAppointmentsScreen(embedded: true),
-    ProfileScreen(embedded: true),
-  ];
+  static const int _tabCount = 3;
+
+  /// One per tab, so a tab that is already alive can be told it is
+  /// being looked at again. See [Revisitable]. The key goes on the
+  /// screen itself, not on a wrapper — currentState is null for a
+  /// stateless one.
+  final List<GlobalKey<State>> _tabKeys =
+      List.generate(_tabCount, (_) => GlobalKey<State>());
+
+  Widget _tab(int i) => switch (i) {
+        0 => ExploreScreen(key: _tabKeys[0]),
+        1 => MyAppointmentsScreen(key: _tabKeys[1], embedded: true),
+        _ => ProfileScreen(key: _tabKeys[2], embedded: true),
+      };
 
   /// Tabs that have been opened at least once.
   ///
@@ -100,6 +112,25 @@ class _RootShellState extends State<RootShell> {
   /// before anyone had asked to see either. A tab is built the first
   /// time it is opened and kept from then on.
   final Set<int> _opened = {0};
+
+  /// Switches to [i], and tells a tab that was already built that it
+  /// is on screen again.
+  ///
+  /// A tab opened for the first time builds and fetches by itself; one
+  /// that has been alive in the stack all along would otherwise still
+  /// be showing whatever it last loaded — book a visit from Explore,
+  /// tap Termini, and the new appointment would not be in the list.
+  void _openTab(int i) {
+    final alreadyBuilt = _opened.contains(i);
+    setState(() {
+      _tabIndex = i;
+      _opened.add(i);
+    });
+    if (!alreadyBuilt) return;
+
+    final Object? state = _tabKeys[i].currentState;
+    if (state is Revisitable) unawaited(state.onRevisit());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,17 +161,14 @@ class _RootShellState extends State<RootShell> {
           child: IndexedStack(
             index: _tabIndex,
             children: [
-              for (var i = 0; i < _tabs.length; i++)
-                if (_opened.contains(i)) _tabs[i] else const SizedBox.shrink(),
+              for (var i = 0; i < _tabCount; i++)
+                if (_opened.contains(i)) _tab(i) else const SizedBox.shrink(),
             ],
           ),
         ),
         bottomNavigationBar: LuxuryNavBar(
           selectedIndex: _tabIndex,
-          onSelect: (i) => setState(() {
-            _tabIndex = i;
-            _opened.add(i);
-          }),
+          onSelect: _openTab,
           items: [
             NavItem(icon: Icons.search_outlined, selectedIcon: Icons.search_rounded, label: l10n.navExplore),
             NavItem(icon: Icons.event_outlined, selectedIcon: Icons.event_rounded, label: l10n.navAppointments),
