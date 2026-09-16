@@ -172,6 +172,12 @@ abstract class AppLocalizations {
   /// **'Odaberi grad'**
   String get chooseCity;
 
+  /// Shown on the sign-in prompt when the backend refused the saved token.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sesija je istekla. Prijavite se ponovo.'**
+  String get sessionExpired;
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

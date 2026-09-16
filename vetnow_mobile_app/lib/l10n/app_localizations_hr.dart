@@ -55,6 +55,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get chooseCity => 'Odaberi grad';
 
   @override
+  String get sessionExpired => 'Sesija je istekla. Prijavite se ponovo.';
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override

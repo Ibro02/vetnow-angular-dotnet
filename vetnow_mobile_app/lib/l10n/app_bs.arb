@@ -24,6 +24,10 @@
   },
   "noClinicsMatch": "Nijedna klinika ne odgovara tvojim filterima",
   "chooseCity": "Odaberi grad",
+  "sessionExpired": "Sesija je istekla. Prijavite se ponovo.",
+  "@sessionExpired": {
+    "description": "Shown on the sign-in prompt when the backend refused the saved token."
+  },
   "allCities": "Svi gradovi",
   "noRatingsYet": "Nova",
   "noReviewsYet": "Još nema recenzija",

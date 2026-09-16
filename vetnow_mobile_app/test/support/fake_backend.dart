@@ -41,6 +41,10 @@ class FakeBackend extends http.BaseClient {
   /// Paths that should answer with a 500.
   final Set<String> broken = {};
 
+  /// Paths that should answer 401, the way the backend does once a
+  /// token has expired or been revoked from another device.
+  final Set<String> unauthorized = {};
+
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     calls.add(request);
@@ -51,6 +55,9 @@ class FakeBackend extends http.BaseClient {
     }
     if (broken.any(path.contains)) {
       return _respond(request, 500, '"Server je pao."');
+    }
+    if (unauthorized.any(path.contains)) {
+      return _respond(request, 401, '"Unauthorized"');
     }
 
     for (final entry in routes.entries) {

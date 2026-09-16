@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../services/auth_api_service.dart';
 import '../services/session_store.dart';
@@ -35,6 +37,11 @@ class AuthState extends ChangeNotifier {
   /// link that had already chosen a tab.
   bool justSignedIn = false;
 
+  /// True when the session ended because the backend refused the
+  /// token, rather than because anybody asked to sign out. Cleared on
+  /// the next successful sign-in.
+  bool sessionExpired = false;
+
   /// Stores the token from a successful login, then tries to fetch the
   /// full profile (name, id, email) from the backend. If that call
   /// fails for any reason, we still consider the person logged in —
@@ -47,6 +54,7 @@ class AuthState extends ChangeNotifier {
   Future<void> loginWithToken(String newToken, {String? fallbackName, bool remember = false}) async {
     isLoggedIn = true;
     justSignedIn = true;
+    sessionExpired = false;
     token = newToken;
     displayName = fallbackName;
     username = fallbackName;
@@ -141,6 +149,31 @@ class AuthState extends ChangeNotifier {
     await SessionStore.clear();
 
     if (oldToken != null) await AuthApiService.logout(oldToken);
+  }
+
+  /// The backend stopped accepting the session token.
+  ///
+  /// Different from [logOut] in two ways that matter. There is no
+  /// server call — the token is already refused, and asking it to be
+  /// revoked would only fail again. And [sessionExpired] is left set,
+  /// so the sign-in prompt can say why the person is suddenly looking
+  /// at it instead of at their appointments.
+  ///
+  /// Before this existed, a token that had expired overnight meant
+  /// every screen behind the login showed "Request failed (401)." with
+  /// a retry button that could only ever fail the same way.
+  void expire() {
+    if (!isLoggedIn) return;
+
+    isLoggedIn = false;
+    sessionExpired = true;
+    token = null;
+    userId = null;
+    displayName = null;
+    email = null;
+    username = null;
+    unawaited(SessionStore.clear());
+    notifyListeners();
   }
 }
 

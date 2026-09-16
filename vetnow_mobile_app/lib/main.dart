@@ -7,6 +7,7 @@ import 'l10n/app_localizations.dart';
 import 'screens/root_shell.dart';
 import 'services/crash_log.dart';
 import 'services/deep_links.dart';
+import 'services/api_client.dart';
 import 'state/auth_state.dart';
 import 'state/locale_state.dart';
 import 'state/theme_state.dart';
@@ -60,6 +61,11 @@ class VetNowAppState extends State<VetNowApp> {
     _authState.restore();
     _themeState.restore();
 
+    // A token can stop being accepted while the app is open. Without
+    // this every screen behind the login just showed the 401 and a
+    // retry button that could only fail again.
+    ApiClient.onSessionExpired = _authState.expire;
+
     // Both channels matter: the link that launched a cold start arrives
     // once at startup, and later taps arrive on a stream. Handling only
     // one of the two means half of all links quietly open the front door
@@ -70,6 +76,7 @@ class VetNowAppState extends State<VetNowApp> {
 
   @override
   void dispose() {
+    ApiClient.onSessionExpired = null;
     _deepLinks.dispose();
     _pendingLink.dispose();
     _authState.dispose();

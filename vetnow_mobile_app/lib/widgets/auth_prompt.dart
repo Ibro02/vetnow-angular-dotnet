@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../widgets/app_button.dart';
 import '../widgets/hero_shell.dart';
 import '../widgets/vet_hero_background.dart';
+import '../state/auth_state.dart';
 import '../screens/login_screen.dart';
 
 /// Shown inside a tab (Appointments / Profile) when the visitor is
@@ -100,6 +101,42 @@ class AuthPrompt extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
                       ),
+                      // Only when the session ended on its own.
+                      //
+                      // Being returned to a sign-in screen you did not
+                      // ask for reads as the app having lost your
+                      // account. One line is the difference between that
+                      // and "your session ran out, sign in again".
+                      if (AuthScope.of(context).sessionExpired) ...[
+                        const SizedBox(height: AppSpacing.s4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
+                          decoration: BoxDecoration(
+                            color: AppColors.warningSoft,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(
+                                color: AppColors.warning.withValues(alpha: 0.35)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.schedule_rounded,
+                                  size: 16, color: AppColors.warning),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  AppLocalizations.of(context)!.sessionExpired,
+                                  style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.text),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       if (benefits.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.s6),
                         Container(

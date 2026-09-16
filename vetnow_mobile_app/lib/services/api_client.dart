@@ -107,6 +107,18 @@ class ApiClient {
     );
   }
 
+  /// Called once when a request that carried a session token came
+  /// back 401.
+  ///
+  /// A token can stop being accepted while the app is open — it
+  /// expires, or it is revoked from another device — and every screen
+  /// behind the login then showed "Request failed (401)." over a retry
+  /// button that could only fail the same way. There was no path back
+  /// to the sign-in screen from there except reinstalling.
+  ///
+  /// Set by main(); AuthState.expire() is on the other end.
+  static void Function()? onSessionExpired;
+
   static Map<String, String> _headers(String? token) => {
         'Content-Type': 'application/json',
         if (token != null) ApiConfig.authHeaderName: token,
@@ -192,6 +204,15 @@ class ApiClient {
         message = res.body;
       }
     }
+    // Only for a request that actually carried a token. Signing in
+    // with a wrong password is also a 401, and so is a login that
+    // needs verification first — neither is an expired session, and
+    // neither should sign anybody out.
+    if (res.statusCode == 401 &&
+        res.request?.headers[ApiConfig.authHeaderName] != null) {
+      onSessionExpired?.call();
+    }
+
     throw ApiException(res.statusCode, message, body: decodedBody);
   }
 
