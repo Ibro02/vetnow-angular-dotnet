@@ -58,6 +58,43 @@ class AppLocalizationsSr extends AppLocalizations {
   String get sessionExpired => 'Sesija je istekla. Prijavite se ponovo.';
 
   @override
+  String get validationFirstNameRequired => 'Unesi ime';
+
+  @override
+  String get validationLastNameRequired => 'Unesi prezime';
+
+  @override
+  String get validationNameTooShort => 'Najmanje 2 slova';
+
+  @override
+  String get validationEmailRequired => 'Unesi email adresu';
+
+  @override
+  String get validationEmailInvalid => 'Ovo ne izgleda kao email adresa';
+
+  @override
+  String get validationPhoneInvalid => 'Samo brojevi, razmaci i +';
+
+  @override
+  String get validationPhoneTooShort => 'Broj je prekratak';
+
+  @override
+  String get validationPasswordTooShort =>
+      'Lozinka mora imati najmanje 8 znakova';
+
+  @override
+  String validationCheckFields(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Proveri još $count polja',
+      few: 'Proveri još $count polja',
+      one: 'Proveri još $count polje',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override

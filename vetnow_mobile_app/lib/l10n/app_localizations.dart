@@ -178,6 +178,60 @@ abstract class AppLocalizations {
   /// **'Sesija je istekla. Prijavite se ponovo.'**
   String get sessionExpired;
 
+  /// No description provided for @validationFirstNameRequired.
+  ///
+  /// In bs, this message translates to:
+  /// **'Unesi ime'**
+  String get validationFirstNameRequired;
+
+  /// No description provided for @validationLastNameRequired.
+  ///
+  /// In bs, this message translates to:
+  /// **'Unesi prezime'**
+  String get validationLastNameRequired;
+
+  /// No description provided for @validationNameTooShort.
+  ///
+  /// In bs, this message translates to:
+  /// **'Najmanje 2 slova'**
+  String get validationNameTooShort;
+
+  /// No description provided for @validationEmailRequired.
+  ///
+  /// In bs, this message translates to:
+  /// **'Unesi email adresu'**
+  String get validationEmailRequired;
+
+  /// No description provided for @validationEmailInvalid.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ovo ne izgleda kao email adresa'**
+  String get validationEmailInvalid;
+
+  /// No description provided for @validationPhoneInvalid.
+  ///
+  /// In bs, this message translates to:
+  /// **'Samo brojevi, razmaci i +'**
+  String get validationPhoneInvalid;
+
+  /// No description provided for @validationPhoneTooShort.
+  ///
+  /// In bs, this message translates to:
+  /// **'Broj je prekratak'**
+  String get validationPhoneTooShort;
+
+  /// No description provided for @validationPasswordTooShort.
+  ///
+  /// In bs, this message translates to:
+  /// **'Lozinka mora imati najmanje 8 znakova'**
+  String get validationPasswordTooShort;
+
+  /// No description provided for @validationCheckFields.
+  ///
+  /// In bs, this message translates to:
+  /// **'{count, plural, one{Provjeri još {count} polje} few{Provjeri još {count} polja} other{Provjeri još {count} polja}}'**
+  String validationCheckFields(int count);
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

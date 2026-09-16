@@ -12,6 +12,15 @@ class AppTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final IconData? prefixIcon;
 
+  /// Supplied when something outside the field needs to move focus
+  /// here — a failed save scrolling to the first field it objects to.
+  final FocusNode? focusNode;
+
+  /// Fires on every keystroke. The screen uses it to clear this
+  /// field's error the moment someone starts fixing it, rather than
+  /// leaving it red until the next save.
+  final ValueChanged<String>? onChanged;
+
   const AppTextField({
     super.key,
     required this.label,
@@ -21,6 +30,8 @@ class AppTextField extends StatefulWidget {
     this.errorText,
     this.keyboardType = TextInputType.text,
     this.prefixIcon,
+    this.focusNode,
+    this.onChanged,
   });
 
   @override
@@ -46,6 +57,8 @@ class _AppTextFieldState extends State<AppTextField> {
         const SizedBox(height: 6),
         TextField(
           controller: widget.controller,
+          focusNode: widget.focusNode,
+          onChanged: widget.onChanged,
           obscureText: widget.isPassword && _obscure,
           keyboardType: widget.keyboardType,
           style: TextStyle(color: AppColors.text, fontSize: 15),
@@ -84,10 +97,26 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
         ),
         if (widget.errorText != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            widget.errorText!,
-            style: const TextStyle(color: AppColors.danger, fontSize: 12),
+          const SizedBox(height: 5),
+          // Icon as well as colour. Red alone carries the whole
+          // message otherwise, and for a red-green colour blind
+          // reader it carries none of it.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.error_outline_rounded,
+                  size: 14, color: AppColors.danger),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  widget.errorText!,
+                  style: const TextStyle(
+                      color: AppColors.danger,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ),
         ],
       ],

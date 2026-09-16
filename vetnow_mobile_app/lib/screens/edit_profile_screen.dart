@@ -3,6 +3,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/api_client.dart';
 import '../services/profile_settings_api_service.dart';
+import '../services/profile_validation.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/app_text_field.dart';
@@ -42,6 +43,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _saving = false;
   String? _loadError;
 
+  /// Everything currently wrong with the form, by field. Empty when
+  /// the form is good.
+  Map<ProfileField, String> _errors = {};
+
+  /// So a failed save can put the cursor in the first field it
+  /// objects to, rather than leaving someone to hunt for the red one.
+  final _focus = {
+    for (final field in ProfileField.values) field: FocusNode(),
+  };
+
+  /// So the same field can be scrolled into view. A FocusNode alone
+  /// moves the caret but not the page, and on a form this long the
+  /// field in question is usually off screen.
+  final _anchors = {
+    for (final field in ProfileField.values) field: GlobalKey(),
+  };
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +70,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     for (final c in [_firstName, _lastName, _phone, _email, _city, _country, _address, _password]) {
       c.dispose();
+    }
+    for (final node in _focus.values) {
+      node.dispose();
     }
     super.dispose();
   }
@@ -91,12 +112,90 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  /// Clears one field's complaint as soon as it is being fixed.
+  ///
+  /// Leaving a field red while someone is actively typing into it is
+  /// the app arguing with them about something they are already
+  /// dealing with.
+  void _clearError(ProfileField field) {
+    if (!_errors.containsKey(field)) return;
+    setState(() => _errors = {..._errors}..remove(field));
+  }
+
+  /// Puts the first rejected field on screen and in focus.
+  ///
+  /// Order matters: ProfileField.values runs top to bottom down the
+  /// form, so "first" means the one nearest the top, not whichever
+  /// the map happened to yield first.
+  void _goToFirstError() {
+    final field =
+        ProfileField.values.firstWhere(_errors.containsKey, orElse: () => ProfileField.firstName);
+    final anchor = _anchors[field]?.currentContext;
+    if (anchor == null) return;
+
+    Scrollable.ensureVisible(
+      anchor,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      // Not flush against the top edge — a field pinned to the very
+      // top of the viewport reads as cut off, and its label sits
+      // under the app bar.
+      alignment: 0.15,
+    );
+    _focus[field]?.requestFocus();
+  }
+
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
     final auth = AuthScope.of(context);
-    if (auth.token == null || auth.username == null) return;
 
-    setState(() => _saving = true);
+    // The backend wants the username on every save as the identifying
+    // field, and it is carried through from the session rather than
+    // being editable. If it is somehow missing, this used to `return`
+    // — the button stopped spinning, nothing was sent, and nothing
+    // was said. A save that silently does nothing is worse than one
+    // that fails.
+    if (auth.token == null || auth.username == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.sessionExpired)));
+      return;
+    }
+
+    // Checked here rather than left to the backend. Its refusal comes
+    // back as an English sentence with no idea which field caused it,
+    // which in an app that speaks Bosnian, Croatian and Serbian is
+    // not an error message so much as a dead end.
+    final problems = validateProfile(
+      firstName: _firstName.text,
+      lastName: _lastName.text,
+      email: _email.text,
+      phone: _phone.text,
+      password: _password.text,
+      l10n: l10n,
+    );
+
+    if (problems.isNotEmpty) {
+      setState(() => _errors = problems);
+      _goToFirstError();
+
+      // Only when there is more than one. With a single error the
+      // field it just scrolled to says everything, and a message
+      // repeating it is noise.
+      if (problems.length > 1) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+            content: Text(l10n.validationCheckFields(problems.length)),
+          ));
+      }
+      return;
+    }
+
+    setState(() {
+      _errors = {};
+      _saving = true;
+    });
     try {
       await ProfileSettingsApiService.edit(
         token: auth.token!,
@@ -173,9 +272,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title: l10n.sectionPersonalInfo,
                       icon: Icons.badge_outlined,
                       children: [
-                        AppTextField(label: l10n.firstName, controller: _firstName, prefixIcon: Icons.person_outline),
+                        AppTextField(
+                          key: _anchors[ProfileField.firstName],
+                          label: l10n.firstName,
+                          controller: _firstName,
+                          focusNode: _focus[ProfileField.firstName],
+                          prefixIcon: Icons.person_outline,
+                          isError: _errors.containsKey(ProfileField.firstName),
+                          errorText: _errors[ProfileField.firstName],
+                          onChanged: (_) => _clearError(ProfileField.firstName),
+                        ),
                         const SizedBox(height: AppSpacing.s4),
-                        AppTextField(label: l10n.lastName, controller: _lastName, prefixIcon: Icons.person_outline),
+                        AppTextField(
+                          key: _anchors[ProfileField.lastName],
+                          label: l10n.lastName,
+                          controller: _lastName,
+                          focusNode: _focus[ProfileField.lastName],
+                          prefixIcon: Icons.person_outline,
+                          isError: _errors.containsKey(ProfileField.lastName),
+                          errorText: _errors[ProfileField.lastName],
+                          onChanged: (_) => _clearError(ProfileField.lastName),
+                        ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.s5),
@@ -184,17 +301,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon: Icons.alternate_email_rounded,
                       children: [
                         AppTextField(
+                          key: _anchors[ProfileField.email],
                           label: l10n.email,
                           controller: _email,
-                          keyboardType: TextInputType.emailAddress,
+                          focusNode: _focus[ProfileField.email],
                           prefixIcon: Icons.mail_outline,
+                          keyboardType: TextInputType.emailAddress,
+                          isError: _errors.containsKey(ProfileField.email),
+                          errorText: _errors[ProfileField.email],
+                          onChanged: (_) => _clearError(ProfileField.email),
                         ),
                         const SizedBox(height: AppSpacing.s4),
                         AppTextField(
+                          key: _anchors[ProfileField.phone],
                           label: l10n.labelPhone,
                           controller: _phone,
-                          keyboardType: TextInputType.phone,
+                          focusNode: _focus[ProfileField.phone],
                           prefixIcon: Icons.call_outlined,
+                          keyboardType: TextInputType.phone,
+                          isError: _errors.containsKey(ProfileField.phone),
+                          errorText: _errors[ProfileField.phone],
+                          onChanged: (_) => _clearError(ProfileField.phone),
                         ),
                       ],
                     ),
@@ -216,10 +343,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon: Icons.lock_outline_rounded,
                       children: [
                         AppTextField(
+                          key: _anchors[ProfileField.password],
                           label: l10n.newPassword,
                           controller: _password,
-                          isPassword: true,
+                          focusNode: _focus[ProfileField.password],
                           prefixIcon: Icons.lock_outline,
+                          isPassword: true,
+                          isError: _errors.containsKey(ProfileField.password),
+                          errorText: _errors[ProfileField.password],
+                          onChanged: (_) => _clearError(ProfileField.password),
                         ),
                         const SizedBox(height: AppSpacing.s2),
                         Text(

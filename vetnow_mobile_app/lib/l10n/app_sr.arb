@@ -28,6 +28,20 @@
   "@sessionExpired": {
     "description": "Shown on the sign-in prompt when the backend refused the saved token."
   },
+  "validationFirstNameRequired": "Unesi ime",
+  "validationLastNameRequired": "Unesi prezime",
+  "validationNameTooShort": "Najmanje 2 slova",
+  "validationEmailRequired": "Unesi email adresu",
+  "validationEmailInvalid": "Ovo ne izgleda kao email adresa",
+  "validationPhoneInvalid": "Samo brojevi, razmaci i +",
+  "validationPhoneTooShort": "Broj je prekratak",
+  "validationPasswordTooShort": "Lozinka mora imati najmanje 8 znakova",
+  "validationCheckFields": "{count, plural, one{Proveri još {count} polje} few{Proveri još {count} polja} other{Proveri još {count} polja}}",
+  "@validationCheckFields": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "allCities": "Svi gradovi",
   "noRatingsYet": "Nova",
   "noReviewsYet": "Još nema recenzija",

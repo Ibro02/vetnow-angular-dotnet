@@ -117,6 +117,9 @@ Widget harness(
       ..token = 'test-token'
       ..userId = 42
       ..displayName = 'Test Korisnik'
+      // The profile-edit endpoint needs this on every save, so a
+      // session without it is not a signed-in session.
+      ..username = 'test.korisnik'
       ..email = 'test@vetnow.ba';
   } else {
     authState
