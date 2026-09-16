@@ -168,7 +168,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
           id: 1,
           name: 'Dr. Amina Hodžić',
           role: ServiceCatalog.roleVeterinarian(context),
-          bio: 'Focuses on internal medicine and preventive care, 9 years in practice.',
+          bio: AppLocalizations.of(context)!.staffBioInternal,
           rating: 4.9,
           reviewCount: 86,
           services: [
@@ -180,7 +180,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
           id: 2,
           name: 'Dr. Emir Kovač',
           role: ServiceCatalog.roleVeterinarian(context),
-          bio: 'Surgical lead, dental and soft-tissue procedures.',
+          bio: AppLocalizations.of(context)!.staffBioSurgery,
           rating: 4.8,
           reviewCount: 54,
           services: [
@@ -192,7 +192,7 @@ class _VetStationDetailScreenState extends State<VetStationDetailScreen> {
           id: 3,
           name: 'Lejla Begić',
           role: ServiceCatalog.roleGroomer(context),
-          bio: 'Grooming and nail care for dogs and cats of all sizes.',
+          bio: AppLocalizations.of(context)!.staffBioGrooming,
           rating: 5.0,
           reviewCount: 41,
           services: [

@@ -819,6 +819,18 @@ class AppLocalizationsHr extends AppLocalizations {
   String get serviceGroomingName => 'Šišanje i njega';
 
   @override
+  String get staffBioInternal =>
+      'Fokus na internu medicinu i preventivnu njegu, 9 godina prakse.';
+
+  @override
+  String get staffBioSurgery =>
+      'Vodeći kirurg — stomatološki i zahvati na mekim tkivima.';
+
+  @override
+  String get staffBioGrooming =>
+      'Šišanje i njega noktiju za pse i mačke svih veličina.';
+
+  @override
   String get serviceGroomingDesc => 'Pranje, šišanje i njega noktiju';
 
   @override

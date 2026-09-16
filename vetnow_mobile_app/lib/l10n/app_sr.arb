@@ -329,6 +329,18 @@
   "serviceDentalName": "Čišćenje zuba",
   "serviceDentalDesc": "Skidanje kamenca i poliranje",
   "serviceGroomingName": "Šišanje i nega",
+  "staffBioInternal": "Fokus na internu medicinu i preventivnu negu, 9 godina prakse.",
+  "@staffBioInternal": {
+    "description": "Placeholder vet bio shown until the backend has staff profiles."
+  },
+  "staffBioSurgery": "Vodeći hirurg — stomatološki i zahvati na mekim tkivima.",
+  "@staffBioSurgery": {
+    "description": "Placeholder vet bio shown until the backend has staff profiles."
+  },
+  "staffBioGrooming": "Šišanje i nega noktiju za pse i mačke svih veličina.",
+  "@staffBioGrooming": {
+    "description": "Placeholder groomer bio shown until the backend has staff profiles."
+  },
   "serviceGroomingDesc": "Pranje, šišanje i nega noktiju",
   "currentAppointment": "Trenutni termin",
   "noFreeSlotsThatDay": "Nema slobodnih termina za taj dan. Probaj drugi datum.",

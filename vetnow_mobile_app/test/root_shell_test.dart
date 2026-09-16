@@ -151,4 +151,59 @@ void main() {
       expect(find.byType(TextField), findsNothing);
     });
   });
+
+  group('the search row', () {
+    // Both of these come from measuring the row rather than looking at
+    // it. Nothing overflowed, nothing threw, and the layout suite was
+    // green the whole time -- the field was simply being squeezed.
+    for (final scale in [1.0, 1.3, 1.6]) {
+      testWidgets('keeps the field usable at text scale $scale',
+          (tester) async {
+        useBackend(healthy());
+        await usePhoneScreen(tester);
+        await tester.pumpWidget(harness(const RootShell(), textScale: scale));
+        await settle(tester);
+
+        final field = tester.getRect(find.byType(TextField));
+        final screen = tester.view.physicalSize.width / tester.view.devicePixelRatio;
+
+        // The city picker used to take whatever its label needed and
+        // Expanded handed over what was left, which at scale 1.3 was 92
+        // logical pixels -- narrower than the search icon and the clear
+        // button together.
+        expect(
+          field.width,
+          greaterThan(screen * 0.45),
+          reason: 'the search field is ${field.width.round()}pt of $screen',
+        );
+
+        // And it has to be reachable without scrolling. At 1.6 the hero
+        // headline grew until the whole row sat below the fold and was
+        // never built at all.
+        expect(field.bottom, lessThan(844));
+      });
+    }
+
+    testWidgets('a long city name is ellipsised, not given the whole row',
+        (tester) async {
+      useBackend(healthy());
+      await usePhoneScreen(tester);
+      await tester.pumpWidget(harness(const RootShell()));
+      await settle(tester);
+
+      final screen =
+          tester.view.physicalSize.width / tester.view.devicePixelRatio;
+
+      await tester.tap(find.byIcon(Icons.location_on));
+      await settle(tester, frames: 8);
+      await tester.tap(find.text('Mostar').last);
+      await settle(tester, frames: 8);
+
+      // A shorter name gives width back to the field, which is right.
+      // What must not happen is the other direction: the floor holds
+      // whatever is chosen.
+      expect(tester.getRect(find.byType(TextField)).width,
+          greaterThan(screen * 0.45));
+    });
+  });
 }

@@ -366,26 +366,42 @@ class _ExploreScreenState extends State<ExploreScreen>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      InkWell(
-                        onTap: _openCityPicker,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(AppRadius.full),
-                            boxShadow: AppShadows.card,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                              const SizedBox(width: 4),
-                              Text(_selectedCity ?? l10n.allCities,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
-                              Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
-                            ],
+                      // Capped, and the name inside it ellipsised.
+                      //
+                      // The picker sized itself to whatever city was
+                      // chosen, and Expanded only ever hands out what is
+                      // left — so a long name left the search field 134
+                      // logical pixels wide, narrower than its own
+                      // placeholder. At larger system text it fell to 92,
+                      // and the field people come to this screen to use
+                      // was the smallest thing on the row.
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 150),
+                        child: InkWell(
+                          onTap: _openCityPicker,
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(AppRadius.full),
+                              boxShadow: AppShadows.card,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.location_on, size: 16, color: AppColors.primary),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(_selectedCity ?? l10n.allCities,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700, fontSize: 12.5, color: AppColors.text)),
+                                ),
+                                Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -577,7 +593,18 @@ class _Hero extends StatelessWidget {
     // The panel itself — sweep, layering, rim light, shadow — is
     // HeroSurface, shared with every other header in the app so they
     // cannot drift apart. Only the content below is Explore's own.
-    return HeroSurface(
+    return MediaQuery.withClampedTextScaling(
+      // The hero, and only the hero.
+      //
+      // Its headline is already 29pt. With the system text size turned
+      // up to 1.6 it became 46pt and the panel grew tall enough to fill
+      // the phone on its own — the search field, which is the reason
+      // anyone opens this screen, sat entirely below the fold and was
+      // not even built. Everything under the hero still scales the
+      // whole way; this is a decorative headline that is already large
+      // before anybody asks it to be.
+      maxScaleFactor: 1.25,
+      child: HeroSurface(
       background: const VetHeroBackground(),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
@@ -697,6 +724,7 @@ class _Hero extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

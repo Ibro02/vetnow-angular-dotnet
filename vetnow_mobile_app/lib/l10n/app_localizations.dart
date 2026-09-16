@@ -1528,6 +1528,24 @@ abstract class AppLocalizations {
   /// **'Šišanje i njega'**
   String get serviceGroomingName;
 
+  /// Placeholder vet bio shown until the backend has staff profiles.
+  ///
+  /// In bs, this message translates to:
+  /// **'Fokus na internu medicinu i preventivnu njegu, 9 godina prakse.'**
+  String get staffBioInternal;
+
+  /// Placeholder vet bio shown until the backend has staff profiles.
+  ///
+  /// In bs, this message translates to:
+  /// **'Vodeći hirurg — stomatološki i zahvati na mekim tkivima.'**
+  String get staffBioSurgery;
+
+  /// Placeholder groomer bio shown until the backend has staff profiles.
+  ///
+  /// In bs, this message translates to:
+  /// **'Šišanje i njega noktiju za pse i mačke svih veličina.'**
+  String get staffBioGrooming;
+
   /// No description provided for @serviceGroomingDesc.
   ///
   /// In bs, this message translates to:
