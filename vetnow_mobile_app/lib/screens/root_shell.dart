@@ -67,7 +67,10 @@ class _RootShellState extends State<RootShell> {
     switch (link) {
       case TabLink(:final destination):
         if (!mounted) return;
-        setState(() => _tabIndex = Destination.values.indexOf(destination));
+        setState(() {
+          _tabIndex = Destination.values.indexOf(destination);
+          _opened.add(_tabIndex);
+        });
 
       case ClinicLink(:final id):
         // Explore first, so backing out of the clinic page lands
@@ -83,28 +86,67 @@ class _RootShellState extends State<RootShell> {
     }
   }
 
-  final List<Widget> _tabs = const [
+  static const List<Widget> _tabs = [
     ExploreScreen(),
     MyAppointmentsScreen(embedded: true),
     ProfileScreen(embedded: true),
   ];
 
+  /// Tabs that have been opened at least once.
+  ///
+  /// An IndexedStack keeps every child it is given alive, which is the
+  /// point — but it also builds all of them on the first frame, so a
+  /// signed-in launch would fire the appointments and profile requests
+  /// before anyone had asked to see either. A tab is built the first
+  /// time it is opened and kept from then on.
+  final Set<int> _opened = {0};
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: AppColors.bgSoft,
-      extendBody: true,
-      body: SafeArea(bottom: false, child: _tabs[_tabIndex]),
-      bottomNavigationBar: LuxuryNavBar(
-        selectedIndex: _tabIndex,
-        onSelect: (i) => setState(() => _tabIndex = i),
-        items: [
-          NavItem(icon: Icons.search_outlined, selectedIcon: Icons.search_rounded, label: l10n.navExplore),
-          NavItem(icon: Icons.event_outlined, selectedIcon: Icons.event_rounded, label: l10n.navAppointments),
-          NavItem(icon: Icons.person_outline, selectedIcon: Icons.person_rounded, label: l10n.navProfile),
-        ],
+    return PopScope(
+      // Back goes to Explore before it leaves the app.
+      //
+      // On Android, back from the Profile tab closed VetNow outright,
+      // which is not what the gesture means anywhere else on the
+      // phone. From Explore it still exits, because there is nowhere
+      // further back to go.
+      canPop: _tabIndex == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        setState(() => _tabIndex = 0);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.bgSoft,
+        extendBody: true,
+        // IndexedStack, not _tabs[_tabIndex]: swapping the child
+        // outright replaced the element, so every tab switch threw away
+        // the screen's State. A search you had typed on Explore was
+        // gone, the scroll position with it, and the clinic list was
+        // fetched again from the top — once per switch, on mobile data.
+        body: SafeArea(
+          bottom: false,
+          child: IndexedStack(
+            index: _tabIndex,
+            children: [
+              for (var i = 0; i < _tabs.length; i++)
+                if (_opened.contains(i)) _tabs[i] else const SizedBox.shrink(),
+            ],
+          ),
+        ),
+        bottomNavigationBar: LuxuryNavBar(
+          selectedIndex: _tabIndex,
+          onSelect: (i) => setState(() {
+            _tabIndex = i;
+            _opened.add(i);
+          }),
+          items: [
+            NavItem(icon: Icons.search_outlined, selectedIcon: Icons.search_rounded, label: l10n.navExplore),
+            NavItem(icon: Icons.event_outlined, selectedIcon: Icons.event_rounded, label: l10n.navAppointments),
+            NavItem(icon: Icons.person_outline, selectedIcon: Icons.person_rounded, label: l10n.navProfile),
+          ],
+        ),
       ),
     );
   }

@@ -40,8 +40,11 @@ void main() {
         'ProfileSettings': (_) => <String, dynamic>{},
       });
 
+  late FakeBackend backend;
+
   Future<void> openShell(WidgetTester tester, {AuthState? auth}) async {
-    useBackend(healthy());
+    backend = healthy();
+    useBackend(backend);
     await usePhoneScreen(tester);
     await tester.pumpWidget(
       harness(const RootShell(), signedIn: auth == null, auth: auth),
@@ -204,6 +207,69 @@ void main() {
       // whatever is chosen.
       expect(tester.getRect(find.byType(TextField)).width,
           greaterThan(screen * 0.45));
+    });
+  });
+
+  group('switching tabs', () {
+    testWidgets('keeps what you typed on Explore', (tester) async {
+      // The shell used to swap the child widget outright, which replaces
+      // the element and throws away the screen's State. Typing a search,
+      // glancing at Appointments and coming back lost the search, the
+      // scroll position, and re-fetched the whole clinic list.
+      await openShell(tester);
+
+      await tester.enterText(find.byType(TextField), 'Mostar');
+      await settle(tester, frames: 4);
+      expect(find.textContaining('Happy Paws'), findsNothing);
+
+      await tester.tap(find.text('Termini'));
+      await settle(tester, frames: 6);
+      await tester.tap(find.text('Istraži'));
+      await settle(tester, frames: 6);
+
+      expect(find.text('Mostar'), findsWidgets);
+      expect(find.textContaining('Happy Paws'), findsNothing);
+    });
+
+    testWidgets('does not build a tab nobody has opened', (tester) async {
+      // An IndexedStack keeps every child alive, which is the point, but
+      // it also builds them all on the first frame -- a signed-in launch
+      // would fire the appointments request before anyone asked for it.
+      await openShell(tester);
+
+      expect(backend.calls.where((c) => c.url.path.contains('Appointment')),
+          isEmpty);
+
+      await tester.tap(find.text('Termini'));
+      await settle(tester, frames: 6);
+
+      expect(backend.calls.where((c) => c.url.path.contains('Appointment')),
+          isNotEmpty);
+    });
+  });
+
+  group('the back gesture', () {
+    testWidgets('returns to Explore before it leaves the app', (tester) async {
+      // On Android, back from Profile closed VetNow outright, which is
+      // not what the gesture means anywhere else on the phone.
+      await openShell(tester);
+
+      await tester.tap(find.text('Profil'));
+      await settle(tester, frames: 6);
+      expect(find.byType(TextField), findsNothing);
+
+      final popped = await tester.binding.handlePopRoute();
+      await settle(tester, frames: 6);
+
+      expect(popped, isTrue, reason: 'the shell handled it rather than exiting');
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('leaves the app when there is nowhere further back',
+        (tester) async {
+      await openShell(tester);
+
+      expect(await tester.binding.handlePopRoute(), isFalse);
     });
   });
 }
