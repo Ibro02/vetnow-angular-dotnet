@@ -14,7 +14,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  cupertino_icons: ^1.0.8
   http: ^1.2.2
   # A testable clock, so the API timeout can be asserted without the test
   # actually waiting it out.

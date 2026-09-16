@@ -399,6 +399,33 @@ class AppTheme {
         color: AppColors.borderLight,
         thickness: 1,
       ),
+      // Every confirmation in the app goes through a SnackBar — the
+      // profile saved, the appointment moved, the log copied — and
+      // they were all landing as Material's untouched default: a
+      // square-cornered slab pinned to the very bottom edge. In dark
+      // mode that default is a *light* panel, because M3 draws it on
+      // inverseSurface, so the one moment the app tells you something
+      // went right was the one moment it did not look like itself.
+      //
+      // Floating with a margin also puts it clear of the nav pill,
+      // which sits in the bottom bar slot with transparent padding
+      // around it.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.ink,
+        contentTextStyle: const TextStyle(
+          fontFamily: AppFonts.body,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        actionTextColor: AppColors.accent,
+        insetPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+      ),
     );
   }
 }

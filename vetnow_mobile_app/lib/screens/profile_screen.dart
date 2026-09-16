@@ -9,6 +9,7 @@ import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
 import '../widgets/hover_card.dart';
+import '../state/resume_refresh.dart';
 import '../widgets/paw_loader.dart';
 import '../widgets/theme_picker.dart';
 import '../widgets/pet_age.dart';
@@ -42,7 +43,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> implements Revisitable {
   bool _loaded = false;
   bool _isLoadingPets = true;
   List<Pet> _pets = [];
@@ -83,6 +84,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
       setState(() => _isLoadingPets = false);
     }
+  }
+
+  /// Coming back to the tab. Quiet on purpose — the pets already on
+  /// screen stay there while the list is re-checked, so a tab switch
+  /// never flashes placeholders at anybody.
+  @override
+  Future<void> onRevisit() async {
+    if (!AuthScope.of(context).isLoggedIn) return;
+    await _loadPets();
   }
 
   Future<void> _refreshAfterAdd() async {
