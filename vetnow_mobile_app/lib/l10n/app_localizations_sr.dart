@@ -566,10 +566,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get addPetFirst => 'Dodaj ljubimca da nastaviš';
 
   @override
-  String get noSlotsToday =>
-      'Nema slobodnih termina danas kod ovog zaposlenog.';
-
-  @override
   String get bookingFailed =>
       'Rezervacija nije uspela — termin je možda upravo zauzet. Pokušaj ponovo.';
 
@@ -584,11 +580,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get bookingSummary => 'Pregled rezervacije';
-
-  @override
-  String todayAtDuration(String slot, int duration) {
-    return 'Danas u $slot · $duration min';
-  }
 
   @override
   String get total => 'Ukupno';

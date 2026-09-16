@@ -1024,12 +1024,6 @@ abstract class AppLocalizations {
   /// **'Dodaj ljubimca da nastaviš'**
   String get addPetFirst;
 
-  /// No description provided for @noSlotsToday.
-  ///
-  /// In bs, this message translates to:
-  /// **'Nema slobodnih termina danas kod ovog zaposlenika.'**
-  String get noSlotsToday;
-
   /// No description provided for @bookingFailed.
   ///
   /// In bs, this message translates to:
@@ -1059,12 +1053,6 @@ abstract class AppLocalizations {
   /// In bs, this message translates to:
   /// **'Pregled rezervacije'**
   String get bookingSummary;
-
-  /// No description provided for @todayAtDuration.
-  ///
-  /// In bs, this message translates to:
-  /// **'Danas u {slot} · {duration} min'**
-  String todayAtDuration(String slot, int duration);
 
   /// No description provided for @total.
   ///
