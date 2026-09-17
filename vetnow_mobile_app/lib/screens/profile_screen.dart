@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
+import '../services/breed_api_service.dart';
 import '../services/pets_api_service.dart';
 import '../services/profile_settings_api_service.dart';
 import '../services/species_api_service.dart';
@@ -82,7 +83,14 @@ class _ProfileScreenState extends State<ProfileScreen> implements Revisitable {
 
       final species = results[0] as List<SpeciesOption>;
       final speciesMap = {for (final s in species) s.id: s.name};
-      final pets = PetsApiService.mapPets(results[1] as List<Map<String, dynamic>>, speciesMap);
+      final rawPets = results[1] as List<Map<String, dynamic>>;
+      final breedMap = await BreedApiService.namesFor(
+        PetsApiService.speciesIdsIn(rawPets),
+        token: auth.token!,
+      ).catchError((_) => <int, String>{});
+
+      final pets =
+          PetsApiService.mapPets(rawPets, speciesMap, breedNames: breedMap);
       if (!mounted) return;
 
       auth.updatePhoto((results[2] as ProfileSettings?)?.picture);

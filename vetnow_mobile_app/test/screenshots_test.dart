@@ -37,6 +37,7 @@ import 'package:vetnow_mobile/screens/explore_screen.dart';
 import 'package:vetnow_mobile/screens/my_appointments_screen.dart';
 import 'package:vetnow_mobile/screens/pets_screen.dart';
 import 'package:vetnow_mobile/screens/profile_screen.dart';
+import 'package:vetnow_mobile/services/breed_api_service.dart';
 import 'package:vetnow_mobile/services/species_api_service.dart';
 import 'package:vetnow_mobile/state/theme_state.dart';
 
@@ -105,6 +106,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     SpeciesApiService.invalidate();
+    BreedApiService.invalidate();
   });
 
   tearDown(() {

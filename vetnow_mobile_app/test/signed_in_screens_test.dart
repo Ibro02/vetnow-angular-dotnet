@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vetnow_mobile/screens/my_appointments_screen.dart';
 import 'package:vetnow_mobile/screens/pets_screen.dart';
 import 'package:vetnow_mobile/screens/profile_screen.dart';
+import 'package:vetnow_mobile/services/breed_api_service.dart';
 import 'package:vetnow_mobile/services/species_api_service.dart';
 import 'package:vetnow_mobile/widgets/state_views.dart';
 
@@ -33,11 +34,13 @@ void main() {
     // The species list is cached for the whole session by design; left
     // alone it would leak one test's answers into the next.
     SpeciesApiService.invalidate();
+    BreedApiService.invalidate();
   });
 
   tearDown(() {
     resetBackend();
     SpeciesApiService.invalidate();
+    BreedApiService.invalidate();
   });
 
   group('Pets', () {

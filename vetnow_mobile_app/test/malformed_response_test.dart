@@ -28,6 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vetnow_mobile/screens/explore_screen.dart';
 import 'package:vetnow_mobile/screens/pets_screen.dart';
 import 'package:vetnow_mobile/services/api_client.dart';
+import 'package:vetnow_mobile/services/breed_api_service.dart';
 import 'package:vetnow_mobile/services/species_api_service.dart';
 import 'package:vetnow_mobile/widgets/state_views.dart';
 
@@ -69,11 +70,13 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     SpeciesApiService.invalidate();
+    BreedApiService.invalidate();
   });
 
   tearDown(() {
     resetBackend();
     SpeciesApiService.invalidate();
+    BreedApiService.invalidate();
   });
 
   group('the species list', () {
@@ -90,6 +93,7 @@ void main() {
     test('dataItems missing, or not a list, yields nothing', () async {
       expect(await fetch({'totalCount': 0}), isEmpty);
       SpeciesApiService.invalidate();
+      BreedApiService.invalidate();
       expect(await fetch({'dataItems': 'oops'}), isEmpty);
     });
 

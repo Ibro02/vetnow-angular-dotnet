@@ -12,7 +12,10 @@ class Pet {
   final String name;
   final String species; // Species.Name (display only — see speciesId)
   final int? speciesId; // AnimalSpeciesId, needed to re-save this pet
-  final String breed; // Breed.Name
+  final String breed; // Breed.Name, joined on the device
+
+  /// Breed.Id, needed to re-save this pet unchanged.
+  final int? breedId;
   final DateTime? birthDate;
   final double? weightKg; // not in backend Animal model yet
   final String? microchipNumber; // not in backend Animal model yet
@@ -41,6 +44,7 @@ class Pet {
     this.microchipNumber,
     this.isFavourite = false,
     this.photoBase64,
+    this.breedId,
   });
 
   Pet copyWith({bool? isFavourite}) => Pet(

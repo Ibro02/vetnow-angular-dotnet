@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
 import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
+import '../services/breed_api_service.dart';
 import '../services/pets_api_service.dart';
 import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
@@ -111,7 +112,17 @@ class _PetsScreenState extends State<PetsScreen> {
       final appointments = results[2] as List<RemoteAppointment>;
 
       final speciesMap = {for (final s in species) s.id: s.name};
-      final pets = PetsApiService.mapPets(rawPets, speciesMap);
+
+      // Breeds are filed under a species, so there is no single call for
+      // them — this asks about the species these pets actually are,
+      // which for most owners is one request. Second, because the ids it
+      // needs come out of the pets response.
+      final breedMap = await BreedApiService.namesFor(
+        PetsApiService.speciesIdsIn(rawPets),
+        token: auth.token!,
+      ).catchError((_) => <int, String>{});
+
+      final pets = PetsApiService.mapPets(rawPets, speciesMap, breedNames: breedMap);
 
       final Map<int, int> counts = {};
       for (final a in appointments) {

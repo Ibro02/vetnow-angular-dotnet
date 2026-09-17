@@ -31,23 +31,41 @@ class PetsApiService {
     return list.cast<Map<String, dynamic>>();
   }
 
-  static List<Pet> mapPets(List<Map<String, dynamic>> raw, Map<int, String>? speciesNames) =>
+  static List<Pet> mapPets(
+    List<Map<String, dynamic>> raw,
+    Map<int, String>? speciesNames, {
+    Map<int, String>? breedNames,
+  }) =>
       parseRows(
         raw,
-        (row) => _petFromAnimalJson(row, speciesNames),
+        (row) => _petFromAnimalJson(row, speciesNames, breedNames),
         context: 'pets',
       );
 
-  static Pet _petFromAnimalJson(Map<String, dynamic> json, Map<int, String>? speciesNames) {
+  /// Which species the rows mention, for fetching their breeds.
+  static Set<int> speciesIdsIn(List<Map<String, dynamic>> raw) => {
+        for (final row in raw)
+          if (row['animalSpeciesId'] is int) row['animalSpeciesId'] as int,
+      };
+
+  static Pet _petFromAnimalJson(
+    Map<String, dynamic> json,
+    Map<int, String>? speciesNames,
+    Map<int, String>? breedNames,
+  ) {
     final speciesId = json['animalSpeciesId'] as int?;
+    final breedId = json['breedId'] as int?;
     return Pet(
       id: json['id'] as int,
       name: json['name'] as String? ?? '',
       species: speciesId != null ? (speciesNames?[speciesId] ?? '') : '',
       speciesId: speciesId,
-      // Breed name isn't included on the Animal entity itself (only
-      // breedId) — showing blank here until we also fetch/join Breed.
-      breed: '',
+      // The entity carries only a breedId, so the name has to be
+      // joined on the device. Blank when nobody looked it up, which is
+      // every caller that has no reason to — the detail screen shows a
+      // dash for it and the list does not show it at all.
+      breed: breedId != null ? (breedNames?[breedId] ?? '') : '',
+      breedId: breedId,
       birthDate: json['birthDate'] != null ? DateTime.tryParse(json['birthDate'] as String) : null,
       isFavourite: json['isFavourite'] as bool? ?? false,
       // byte[] on the entity, base64 on the wire. Blank strings are
