@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../models/vet_station.dart';
+import '../services/photo_bytes.dart';
 
 /// The coloured block that stands in for a clinic's photo.
 ///
@@ -56,6 +57,33 @@ class ClinicAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A clinic's own picture, when it has one.
+    //
+    // Every clinic the backend holds today has stationImage null, which
+    // is why the generated block below exists at all. But the column is
+    // there and an admin panel can fill it, and the day one does the
+    // photo should simply appear rather than waiting for somebody to
+    // notice the app is still drawing initials over it.
+    final photo = decodePhoto(station.stationImage);
+    if (photo != null) {
+      final image = Image.memory(
+        photo,
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+        errorBuilder: (context, _, __) => _generated(),
+      );
+
+      return borderRadius == null
+          ? image
+          : ClipRRect(borderRadius: borderRadius!, child: image);
+    }
+
+    return _generated();
+  }
+
+  /// The gradient block with the clinic's initials, for a clinic with no
+  /// picture of its own — which today is all of them.
+  Widget _generated() {
     final initials = _initials;
 
     final content = Stack(
