@@ -310,12 +310,6 @@ abstract class AppLocalizations {
   /// **'Nema slobodnih termina {date}.'**
   String noSlotsOnDay(Object date);
 
-  /// No description provided for @nextFreeDay.
-  ///
-  /// In bs, this message translates to:
-  /// **'Prvi slobodan: {date}'**
-  String nextFreeDay(Object date);
-
   /// No description provided for @slotAtDuration.
   ///
   /// In bs, this message translates to:

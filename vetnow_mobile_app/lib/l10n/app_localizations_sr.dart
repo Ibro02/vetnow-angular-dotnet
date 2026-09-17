@@ -138,11 +138,6 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
-  String nextFreeDay(Object date) {
-    return 'Prvi slobodan: $date';
-  }
-
-  @override
   String slotAtDuration(Object date, Object slot, Object duration) {
     return '$date u $slot · $duration min';
   }

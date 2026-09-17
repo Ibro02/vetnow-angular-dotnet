@@ -49,7 +49,7 @@ void main() {
 
   FakeBackend healthy() => FakeBackend({
         // The screen asks the trade-specific endpoint for whichever
-        // service is chosen, so the vet one has to be routed too  and
+        // service is chosen, so the vet one has to be routed too — and
         // before the general one, since FakeBackend matches on a path
         // substring in insertion order.
         'Employee/GetVetsByVetStationId': (_) => {
@@ -103,6 +103,28 @@ void main() {
     }
   }
 
+  /// Opens the screen against a backend the caller has already set
+  /// up, for the cases that need an unusual answer from it.
+  Future<void> openBookingWith(WidgetTester tester, FakeBackend prepared) async {
+    useBackend(prepared);
+
+    final rows = stations()['vetStations']! as List<dynamic>;
+    final station = VetStation.fromJson(rows.first as Map<String, dynamic>);
+    await usePhoneScreen(tester);
+    await tester.pumpWidget(harness(
+      Builder(
+        builder: (context) => BookingScreen(
+          station: station,
+          services: [ServiceCatalog.service(context, ServiceKind.checkup)],
+          preselected: ServiceCatalog.service(context, ServiceKind.checkup),
+        ),
+      ),
+    ));
+    for (var i = 0; i < 14; i++) {
+      await tester.pump(const Duration(milliseconds: 120));
+    }
+  }
+
   /// Every date the screen actually asked the backend about.
   List<String> datesAsked() => backend.calls
       .where((c) => c.url.path.contains('TimeSlot'))
@@ -149,12 +171,63 @@ void main() {
     });
   });
 
-  testWidgets('says when the soonest free time is', (tester) async {
+  testWidgets('says nothing about the soonest slot when you are looking at it',
+      (tester) async {
+    // The banner used to announce the first slot of whichever day was
+    // on screen — which is the pill immediately below it. A line that
+    // tells you something you can already see is furniture.
     await at(7, () async {
       await openBooking(tester);
 
-      expect(find.textContaining('Najranije slobodno'), findsOneWidget);
-      expect(find.textContaining('danas 09:00'), findsOneWidget);
+      expect(find.textContaining('Najranije slobodno'), findsNothing);
+      expect(find.textContaining('Prvi termin'), findsNothing);
+    });
+  });
+
+  testWidgets('points at the soonest opening when it is on another day',
+      (tester) async {
+    // Today full, the 18th free. That is worth a line, because it is
+    // the one thing on this screen nobody can work out by looking.
+    backend = healthy();
+    backend.routes['TimeSlot'] = (r) {
+      final date = r.url.queryParameters['date'];
+      return date == '2026-09-18' ? slotsFor(date) : <Map<String, dynamic>>[];
+    };
+
+    await at(7, () async {
+      await openBookingWith(tester, backend);
+
+      expect(find.textContaining('Prvi termin'), findsOneWidget);
+      expect(find.textContaining('09:00'), findsWidgets);
+    });
+  });
+
+  testWidgets('one tap on it moves the day and picks the time',
+      (tester) async {
+    backend = healthy();
+    backend.routes['TimeSlot'] = (r) {
+      final date = r.url.queryParameters['date'];
+      return date == '2026-09-18' ? slotsFor(date) : <Map<String, dynamic>>[];
+    };
+
+    await at(7, () async {
+      await openBookingWith(tester, backend);
+
+      await tester.tap(find.textContaining('Prvi termin'));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 120));
+      }
+
+      expect(datesAsked(), contains('2026-09-18'));
+
+      // And the slot is chosen rather than merely on screen waiting
+      // to be found: the summary at the foot of the form names it.
+      for (var i = 0; i < 14; i++) {
+        await tester.dragFrom(const Offset(200, 700), const Offset(0, -240));
+        await tester.pump(const Duration(milliseconds: 120));
+      }
+      expect(find.textContaining('09:00'), findsWidgets);
+      expect(find.textContaining('septembar'), findsWidgets);
     });
   });
 

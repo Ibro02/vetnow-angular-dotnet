@@ -65,12 +65,6 @@
       "date": {}
     }
   },
-  "nextFreeDay": "Prvi slobodan: {date}",
-  "@nextFreeDay": {
-    "placeholders": {
-      "date": {}
-    }
-  },
   "slotAtDuration": "{date} u {slot} · {duration} min",
   "@slotAtDuration": {
     "placeholders": {

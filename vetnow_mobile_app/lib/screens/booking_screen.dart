@@ -25,6 +25,7 @@ import '../widgets/slot_groups.dart';
 import '../state/auth_state.dart';
 import '../widgets/app_button.dart';
 import '../widgets/gradient_app_bar.dart';
+import '../widgets/pet_strip.dart';
 import '../widgets/paw_loader.dart';
 import 'add_pet_screen.dart';
 import 'login_screen.dart';
@@ -94,6 +95,18 @@ class _BookingScreenState extends State<BookingScreen> {
   /// would be fourteen requests per employee every time this screen
   /// appears, which is not a price worth paying for fourteen dots.
   final Set<DateTime> _daysWithSlots = {};
+
+  /// The soonest opening this clinic has, and the day it falls on.
+  ///
+  /// Found by asking day after day until one answers, capped, and
+  /// stopping at the first hit — so on a clinic with anything free
+  /// today it is one request, and on a clinic booked solid for a week
+  /// it is a handful. That is worth paying for: it is the question
+  /// most people came with, and it is the one thing on this screen
+  /// they cannot answer by looking.
+  DateTime? _firstFreeDay;
+  RemoteTimeSlot? _firstFreeSlot;
+  bool _searchingFirstFree = false;
   int? _selectedRealSlotId;
   List<Pet> _myPets = [];
   int? _selectedPetId;
@@ -105,6 +118,11 @@ class _BookingScreenState extends State<BookingScreen> {
   /// reach the one they came for. The field appears at six.
   final _petSearch = TextEditingController();
 
+  bool _favouritesOnly = false;
+
+  /// Below this the row fits without moving, and a search box and a
+  /// filter are two controls asking to be used on a problem nobody
+  /// has.
   static const int _petSearchThreshold = 6;
 
   /// Favourites first, then alphabetical.
@@ -114,14 +132,13 @@ class _BookingScreenState extends State<BookingScreen> {
   /// because a pet marked favourite is the one being booked for.
   List<Pet> get _visiblePets {
     final query = _petSearch.text.trim().toLowerCase();
-    final matching = query.isEmpty
-        ? [..._myPets]
-        : _myPets
-            .where((p) =>
-                p.name.toLowerCase().contains(query) ||
-                p.species.toLowerCase().contains(query) ||
-                p.breed.toLowerCase().contains(query))
-            .toList();
+    final matching = _myPets.where((p) {
+      if (_favouritesOnly && !p.isFavourite) return false;
+      if (query.isEmpty) return true;
+      return p.name.toLowerCase().contains(query) ||
+          p.species.toLowerCase().contains(query) ||
+          p.breed.toLowerCase().contains(query);
+    }).toList();
 
     matching.sort((a, b) {
       if (a.isFavourite != b.isFavourite) return a.isFavourite ? -1 : 1;
@@ -191,7 +208,10 @@ class _BookingScreenState extends State<BookingScreen> {
         _selectedSlot = null;
         _selectedRealSlotId = null;
       });
-      if (_selectedRealStaffId != null) unawaited(_loadSlotsFor(_selectedRealStaffId!));
+      if (_selectedRealStaffId != null) {
+        unawaited(_loadSlotsFor(_selectedRealStaffId!));
+        unawaited(_findFirstOpening(_selectedRealStaffId!));
+      }
       unawaited(_loadOpeningHours());
     } catch (_) {
       if (!mounted) return;
@@ -280,6 +300,8 @@ class _BookingScreenState extends State<BookingScreen> {
       _selectedSlot = null;
       _realSlots = [];
       _daysWithSlots.clear();
+      _firstFreeDay = null;
+      _firstFreeSlot = null;
     });
 
     if (_usingReal) unawaited(_reloadStaffForService());
@@ -305,6 +327,9 @@ class _BookingScreenState extends State<BookingScreen> {
       });
       if (_selectedRealStaffId != null) {
         unawaited(_loadSlotsFor(_selectedRealStaffId!));
+        // A different trade keeps a different diary, so the soonest
+        // opening has to be found again rather than carried over.
+        unawaited(_findFirstOpening(_selectedRealStaffId!));
       }
     } catch (_) {
       if (!mounted) return;
@@ -314,18 +339,81 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  /// The soonest day after this one that is already known to have
-  /// something free, or null if none is.
+  /// How far ahead to look for the first opening before giving up.
   ///
-  /// Only days that were actually opened count. Searching for the next
-  /// opening would mean asking the server about day after day until
-  /// one answered, and an empty Tuesday does not justify a burst of
-  /// requests — so the offer appears when we happen to know, and
-  /// stays quiet when we do not.
-  DateTime? get _nextKnownFreeDay {
-    final later = _daysWithSlots.where((d) => d.isAfter(_selectedDay)).toList()
-      ..sort();
-    return later.firstOrNull;
+  /// Two weeks. Past that the answer stops being useful — nobody
+  /// books a check-up around a clinic's availability a month out —
+  /// and the cost of asking stops being worth it.
+  static const int _firstFreeHorizon = 14;
+
+  /// Walks forward from today until a day has something free.
+  ///
+  /// Closed days are skipped without asking, since the opening hours
+  /// already say so. Everything it learns on the way is kept, so the
+  /// dots on the strip fill in as a side effect rather than costing a
+  /// second pass.
+  Future<void> _findFirstOpening(int employeeId) async {
+    final auth = AuthScope.of(context);
+    if (auth.token == null || _searchingFirstFree) return;
+
+    setState(() {
+      _searchingFirstFree = true;
+      _firstFreeDay = null;
+      _firstFreeSlot = null;
+    });
+
+    final today = dayOf(clock.now());
+    try {
+      for (var i = 0; i < _firstFreeHorizon; i++) {
+        final day = DateTime(today.year, today.month, today.day + i);
+        if (_closedWeekdays.contains(day.weekday)) continue;
+
+        final slots = upcomingOnly(await TimeSlotApiService.getForEmployee(
+          employeeId: employeeId,
+          date: day,
+          token: auth.token!,
+        ));
+        if (!mounted) return;
+
+        if (slots.isEmpty) {
+          _daysWithSlots.remove(day);
+          continue;
+        }
+
+        setState(() {
+          _daysWithSlots.add(day);
+          _firstFreeDay = day;
+          _firstFreeSlot = earliestOf(slots);
+          _searchingFirstFree = false;
+        });
+        return;
+      }
+    } catch (_) {
+      // Nothing to say. The screen works without this; it is an
+      // shortcut, not a dependency.
+    }
+
+    if (mounted) setState(() => _searchingFirstFree = false);
+  }
+
+  /// Takes the offer in the banner: moves to that day and selects the
+  /// slot, so one tap gets somebody from "when is the soonest" to a
+  /// chosen time.
+  Future<void> _takeFirstOpening() async {
+    final day = _firstFreeDay;
+    final slot = _firstFreeSlot;
+    if (day == null || slot == null || _selectedRealStaffId == null) return;
+
+    setState(() => _selectedDay = day);
+    await _loadSlotsFor(_selectedRealStaffId!, day: day);
+    if (!mounted) return;
+
+    // Only if it is still there. Between the search and the tap
+    // somebody else may have taken it, and silently selecting nothing
+    // is better than selecting a slot that no longer exists.
+    if (_realSlots.any((s) => s.id == slot.id)) {
+      setState(() => _selectedRealSlotId = slot.id);
+    }
   }
 
   /// Moves the whole picker to another day.
@@ -477,10 +565,12 @@ class _BookingScreenState extends State<BookingScreen> {
                 closedWeekdays: _closedWeekdays,
                 daysWithSlots: _daysWithSlots,
                 dayLabel: _dayLabel(context, _selectedDay),
-                nextKnownFreeDay: _nextKnownFreeDay,
-                nextFreeLabel: _nextKnownFreeDay == null
+                firstFreeDay: _firstFreeDay,
+                firstFreeLabel: _firstFreeDay == null
                     ? ''
-                    : _dayLabel(context, _nextKnownFreeDay!),
+                    : _dayLabel(context, _firstFreeDay!),
+                firstFreeTime: _firstFreeSlot?.appointmentTime ?? '',
+                onTakeFirstFree: () => unawaited(_takeFirstOpening()),
               ),
               const SizedBox(height: AppSpacing.s6),
               _StepLabel(number: 4, label: l10n.choosePet),
@@ -494,26 +584,22 @@ class _BookingScreenState extends State<BookingScreen> {
                 })
               else ...[
                 if (_myPets.length >= _petSearchThreshold) ...[
-                  _PetSearchField(
+                  PetFilterBar(
                     controller: _petSearch,
                     onChanged: (_) => setState(() {}),
+                    favouritesOnly: _favouritesOnly,
+                    onFavouritesChanged: (v) =>
+                        setState(() => _favouritesOnly = v),
+                    hasFavourites: _myPets.any((p) => p.isFavourite),
                   ),
-                  const SizedBox(height: AppSpacing.s3),
+                  const SizedBox(height: AppSpacing.s2),
                 ],
-                if (_visiblePets.isEmpty)
-                  _InlineHint(
-                      icon: Icons.search_off_rounded, text: l10n.noPetsMatchFilter)
-                else
-                  ..._visiblePets.map(
-                    (p) => _SelectableCard(
-                      title: p.name,
-                      subtitle: p.species.isNotEmpty ? p.species : l10n.petName,
-                      icon: Icons.pets,
-                      accentColor: AppColors.accent,
-                      selected: _selectedPetId == p.id,
-                      onTap: () => setState(() => _selectedPetId = p.id),
-                    ),
-                  ),
+                PetStrip(
+                  pets: _visiblePets,
+                  selectedPetId: _selectedPetId,
+                  onSelect: (id) => setState(() => _selectedPetId = id),
+                  emptyMessage: l10n.noPetsMatchFilter,
+                ),
               ],
               const SizedBox(height: AppSpacing.s6),
             ] else ...[
@@ -656,8 +742,10 @@ class _RealStaffAndTimeSection extends StatelessWidget {
   final Set<int> closedWeekdays;
   final Set<DateTime> daysWithSlots;
   final String dayLabel;
-  final DateTime? nextKnownFreeDay;
-  final String nextFreeLabel;
+  final DateTime? firstFreeDay;
+  final String firstFreeLabel;
+  final String firstFreeTime;
+  final VoidCallback onTakeFirstFree;
 
   const _RealStaffAndTimeSection({
     required this.staff,
@@ -672,8 +760,10 @@ class _RealStaffAndTimeSection extends StatelessWidget {
     required this.closedWeekdays,
     required this.daysWithSlots,
     required this.dayLabel,
-    required this.nextKnownFreeDay,
-    required this.nextFreeLabel,
+    required this.firstFreeDay,
+    required this.firstFreeLabel,
+    required this.firstFreeTime,
+    required this.onTakeFirstFree,
   });
 
   @override
@@ -710,8 +800,10 @@ class _RealStaffAndTimeSection extends StatelessWidget {
           selectedSlotId: selectedSlotId,
           onSlotTap: onSlotTap,
           dayLabel: dayLabel,
-          nextKnownFreeDay: nextKnownFreeDay,
-          nextFreeLabel: nextFreeLabel,
+          firstFreeDay: firstFreeDay,
+          firstFreeLabel: firstFreeLabel,
+          firstFreeTime: firstFreeTime,
+          onTakeFirstFree: onTakeFirstFree,
         ),
       ],
     );
@@ -996,8 +1088,10 @@ class _DayAndSlotPanel extends StatelessWidget {
   final int? selectedSlotId;
   final ValueChanged<int> onSlotTap;
   final String dayLabel;
-  final DateTime? nextKnownFreeDay;
-  final String nextFreeLabel;
+  final DateTime? firstFreeDay;
+  final String firstFreeLabel;
+  final String firstFreeTime;
+  final VoidCallback onTakeFirstFree;
 
   const _DayAndSlotPanel({
     required this.selectedDay,
@@ -1009,14 +1103,15 @@ class _DayAndSlotPanel extends StatelessWidget {
     required this.selectedSlotId,
     required this.onSlotTap,
     required this.dayLabel,
-    required this.nextKnownFreeDay,
-    required this.nextFreeLabel,
+    required this.firstFreeDay,
+    required this.firstFreeLabel,
+    required this.firstFreeTime,
+    required this.onTakeFirstFree,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final earliest = earliestOf(slots);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
@@ -1028,15 +1123,19 @@ class _DayAndSlotPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // The answer to the question most people actually came with,
-          // before they are asked to pick anything. Free: the day is
-          // already loaded and this is its first slot.
-          if (earliest != null && selectedSlotId == null) ...[
+          // Only when it points at a day you are not looking at.
+          //
+          // It used to announce the first slot of whichever day was on
+          // screen, which is the pill immediately below it — a line
+          // telling you something you can already see. What is worth
+          // saying is where the soonest opening *is*, when it is
+          // somewhere else, and one tap takes you there.
+          if (firstFreeDay != null && !isSameDay(firstFreeDay!, selectedDay)) ...[
             EarliestSlotBanner(
-              dayLabel: dayLabel,
-              time: earliest.appointmentTime,
-              isToday: isSameDay(selectedDay, clock.now()),
-              onTap: () => onSlotTap(earliest.id),
+              dayLabel: firstFreeLabel,
+              time: firstFreeTime,
+              isToday: isSameDay(firstFreeDay!, clock.now()),
+              onTap: onTakeFirstFree,
             ),
             const SizedBox(height: AppSpacing.s5),
           ],
@@ -1056,7 +1155,7 @@ class _DayAndSlotPanel extends StatelessWidget {
                 child: PawLoader(size: 24, color: Colors.white),
               ),
             )
-          else if (slots.isEmpty) ...[
+          else if (slots.isEmpty)
             Row(
               children: [
                 Icon(Icons.event_busy_outlined,
@@ -1070,44 +1169,7 @@ class _DayAndSlotPanel extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-            // Offered only when a free day is already known from a day
-            // that was actually opened. Hunting for the next opening
-            // would mean asking the server about day after day, and an
-            // empty Tuesday is not worth a burst of requests.
-            if (nextKnownFreeDay != null) ...[
-              const SizedBox(height: AppSpacing.s4),
-              InkWell(
-                onTap: () => onSelectDay(nextKnownFreeDay!),
-                borderRadius: BorderRadius.circular(AppRadius.full),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(AppRadius.full),
-                    border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.16)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.arrow_forward_rounded,
-                          size: 15, color: AppColors.accent),
-                      const SizedBox(width: 7),
-                      Text(
-                        l10n.nextFreeDay(nextFreeLabel),
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ]
+            )
           else
             SlotGroups(
               slots: slots,
@@ -1120,62 +1182,3 @@ class _DayAndSlotPanel extends StatelessWidget {
   }
 }
 
-/// A quiet search box above the pet list.
-///
-/// Deliberately not the app's AppTextField: this sits among selectable
-/// cards rather than in a form, and a labelled, bordered form field here
-/// would read as something that has to be filled in before going on. It
-/// is a filter, and it should look like one — which mostly means looking
-/// like almost nothing until it is used.
-class _PetSearchField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  const _PetSearchField({required this.controller, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.bgMuted,
-        borderRadius: BorderRadius.circular(AppRadius.full),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        style: TextStyle(fontSize: 14, color: AppColors.text),
-        // The same manners as the clinic search on Explore: a key that
-        // puts the keyboard away, and no autocorrect, because a pet
-        // called Mica is not a dictionary word.
-        textInputAction: TextInputAction.search,
-        onSubmitted: (_) => FocusScope.of(context).unfocus(),
-        autocorrect: false,
-        enableSuggestions: false,
-        decoration: InputDecoration(
-          isDense: true,
-          hintText: l10n.searchPetsHint,
-          hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13.5),
-          prefixIcon: Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
-          suffixIcon: controller.text.isEmpty
-              ? null
-              : IconButton(
-                  icon: Icon(Icons.close_rounded, size: 17, color: AppColors.textMuted),
-                  tooltip: l10n.clearSearch,
-                  onPressed: () {
-                    controller.clear();
-                    FocusScope.of(context).unfocus();
-                    onChanged('');
-                  },
-                ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-      ),
-    );
-  }
-}
