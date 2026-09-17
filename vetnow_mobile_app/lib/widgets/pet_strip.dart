@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../config/haptics.dart';
 import '../config/theme.dart';
-import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
 import 'pet_avatar.dart';
+import 'pet_search_sheet.dart';
+import 'pet_search_tile.dart';
 
 /// Choosing which animal the appointment is for.
 ///
@@ -31,12 +32,19 @@ class PetStrip extends StatelessWidget {
   /// something rather than looking like the pets have been lost.
   final String emptyMessage;
 
+  /// Every pet, regardless of the filter — what the search sheet
+  /// opens onto. Null hides the search tile, which is what happens
+  /// below a handful of animals: a row that fits on screen does not
+  /// need searching.
+  final List<Pet>? searchable;
+
   const PetStrip({
     super.key,
     required this.pets,
     required this.selectedPetId,
     required this.onSelect,
     required this.emptyMessage,
+    this.searchable,
   });
 
   @override
@@ -73,10 +81,32 @@ class PetStrip extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           clipBehavior: Clip.hardEdge,
           padding: const EdgeInsets.symmetric(vertical: 4),
-          itemCount: pets.length,
+          // The search leads the row rather than trailing it.
+          //
+          // At the tail it was past the right-hand edge behind five
+          // portraits, so the one control that exists for people with
+          // too many pets was the one thing they had to scroll to find.
+          // At the head it is always the first thing under the thumb,
+          // and the row reads as "all of them, then these".
+          //
+          // It is a circle among the portraits either way, not a form
+          // field above them asking to be filled in before you may
+          // carry on.
+          itemCount: pets.length + (searchable == null ? 0 : 1),
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemBuilder: (context, i) {
-            final pet = pets[i];
+            if (searchable != null && i == 0) {
+              return PetSearchTile(
+                onTap: () async {
+                  Haptics.select();
+                  final picked =
+                      await showPetSearchSheet(context, pets: searchable!);
+                  if (picked != null) onSelect(picked);
+                },
+              );
+            }
+
+            final pet = pets[searchable == null ? i : i - 1];
             return _PetTile(
               pet: pet,
               selected: selectedPetId == pet.id,
@@ -141,7 +171,12 @@ class _PetTile extends StatelessWidget {
                             ]
                           : null,
                     ),
-                    child: PetAvatar(species: pet.species, seed: pet.id, size: 54),
+                    child: PetAvatar(
+                      species: pet.species,
+                      seed: pet.id,
+                      size: 54,
+                      name: pet.name,
+                    ),
                   ),
                   if (pet.isFavourite)
                     Positioned(
@@ -180,111 +215,3 @@ class _PetTile extends StatelessWidget {
   }
 }
 
-/// The search field and the favourites toggle that sit above the row.
-///
-/// Both earn their place only once there are enough animals for the row
-/// to need flicking. Below that they are two controls asking to be used
-/// on a problem nobody has.
-class PetFilterBar extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final bool favouritesOnly;
-  final ValueChanged<bool> onFavouritesChanged;
-  final bool hasFavourites;
-
-  const PetFilterBar({
-    super.key,
-    required this.controller,
-    required this.onChanged,
-    required this.favouritesOnly,
-    required this.onFavouritesChanged,
-    required this.hasFavourites,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.bgMuted,
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: TextField(
-              controller: controller,
-              onChanged: onChanged,
-              style: TextStyle(fontSize: 14, color: AppColors.text),
-              // The same manners as the clinic search on Explore: a key
-              // that puts the keyboard away, and no autocorrect, because
-              // a cat called Mica is not a dictionary word.
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => FocusScope.of(context).unfocus(),
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: l10n.searchPetsHint,
-                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13.5),
-                prefixIcon:
-                    Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
-                suffixIcon: controller.text.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: Icon(Icons.close_rounded,
-                            size: 17, color: AppColors.textMuted),
-                        tooltip: l10n.clearSearch,
-                        onPressed: () {
-                          controller.clear();
-                          FocusScope.of(context).unfocus();
-                          onChanged('');
-                        },
-                      ),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-        ),
-        if (hasFavourites) ...[
-          const SizedBox(width: 8),
-          Semantics(
-            button: true,
-            selected: favouritesOnly,
-            label: l10n.favourites,
-            excludeSemantics: true,
-            child: InkWell(
-              onTap: () {
-                Haptics.select();
-                onFavouritesChanged(!favouritesOnly);
-              },
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                height: 44,
-                width: 44,
-                decoration: BoxDecoration(
-                  color: favouritesOnly ? AppColors.goldSoft : AppColors.bgMuted,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: favouritesOnly ? AppColors.gold : AppColors.border,
-                  ),
-                ),
-                child: Icon(
-                  favouritesOnly ? Icons.star_rounded : Icons.star_outline_rounded,
-                  size: 20,
-                  color: favouritesOnly ? AppColors.gold : AppColors.textMuted,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-}

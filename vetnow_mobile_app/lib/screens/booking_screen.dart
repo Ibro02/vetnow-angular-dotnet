@@ -111,15 +111,6 @@ class _BookingScreenState extends State<BookingScreen> {
   List<Pet> _myPets = [];
   int? _selectedPetId;
 
-  /// Narrows the pet list by name.
-  ///
-  /// Somebody with two animals does not need this and should not be
-  /// shown it; somebody boarding eleven scrolls past ten of them to
-  /// reach the one they came for. The field appears at six.
-  final _petSearch = TextEditingController();
-
-  bool _favouritesOnly = false;
-
   /// Below this the row fits without moving, and a search box and a
   /// filter are two controls asking to be used on a problem nobody
   /// has.
@@ -131,14 +122,7 @@ class _BookingScreenState extends State<BookingScreen> {
   /// for anything past a handful is no order at all. Favourites lead
   /// because a pet marked favourite is the one being booked for.
   List<Pet> get _visiblePets {
-    final query = _petSearch.text.trim().toLowerCase();
-    final matching = _myPets.where((p) {
-      if (_favouritesOnly && !p.isFavourite) return false;
-      if (query.isEmpty) return true;
-      return p.name.toLowerCase().contains(query) ||
-          p.species.toLowerCase().contains(query) ||
-          p.breed.toLowerCase().contains(query);
-    }).toList();
+    final matching = [..._myPets];
 
     matching.sort((a, b) {
       if (a.isFavourite != b.isFavourite) return a.isFavourite ? -1 : 1;
@@ -160,7 +144,6 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   void dispose() {
-    _petSearch.dispose();
     super.dispose();
   }
 
@@ -590,25 +573,19 @@ class _BookingScreenState extends State<BookingScreen> {
                   );
                   if (added == true) unawaited(_switchToRealMode());
                 })
-              else ...[
-                if (_myPets.length >= _petSearchThreshold) ...[
-                  PetFilterBar(
-                    controller: _petSearch,
-                    onChanged: (_) => setState(() {}),
-                    favouritesOnly: _favouritesOnly,
-                    onFavouritesChanged: (v) =>
-                        setState(() => _favouritesOnly = v),
-                    hasFavourites: _myPets.any((p) => p.isFavourite),
-                  ),
-                  const SizedBox(height: AppSpacing.s2),
-                ],
+              else
                 PetStrip(
                   pets: _visiblePets,
                   selectedPetId: _selectedPetId,
                   onSelect: (id) => setState(() => _selectedPetId = id),
                   emptyMessage: l10n.noPetsMatchFilter,
+                  // The tile at the end of the row, and the sheet
+                  // behind it, only once the row is long enough to
+                  // need flicking.
+                  searchable: _myPets.length >= _petSearchThreshold
+                      ? _myPets
+                      : null,
                 ),
-              ],
               const SizedBox(height: AppSpacing.s6),
             ] else ...[
               _StepLabel(
@@ -906,8 +883,11 @@ class _StepLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       header: true,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Row(
+            children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOut,
@@ -936,29 +916,30 @@ class _StepLabel extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // The labels are full phrases ("Odaberi uslugu") and the disc
-          // beside them is fixed width, so the label is what gives on a
-          // narrow screen.
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14.5,
-                letterSpacing: -0.1,
-                color: AppColors.text,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // A rule running out to the edge. It costs nothing and it is
-          // what makes each step read as a band across the page rather
-          // than a line of text floating above a list.
           Expanded(
-            child: Container(height: 1, color: AppColors.borderLight),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14.5,
+                    letterSpacing: -0.1,
+                    color: AppColors.text,
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 9),
+          // Under the row, not beside the label.
+          //
+          // It used to share the row with the text, and an Expanded rule
+          // next to a Flexible label splits the space evenly — so
+          // "Odaberi osoblje (opcionalno)" was cut to "Odaberi osoblje
+          // (opciona..." to make room for a decorative line. The line is
+          // decoration; the label is the point.
+          Container(height: 1, color: AppColors.borderLight),
         ],
       ),
     );

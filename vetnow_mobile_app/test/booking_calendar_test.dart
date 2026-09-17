@@ -326,12 +326,13 @@ void main() {
       }
     }
 
-    /// Scrolls until [finder] is on screen.
+    /// Scrolls until [finder] is not merely built but actually on screen.
     ///
-    /// Not scrollToBottom: the form is a lazy ListView, so anything
-    /// scrolled past is disposed and find.text stops seeing it. The pet
-    /// search sits above nine pet cards, which is a long way above the
-    /// bottom of the page.
+    /// Two steps, and both are needed. The form is a lazy ListView, so
+    /// anything scrolled past is disposed and find.text stops seeing it
+    /// — hence the dragging. And a lazy list builds a little way past
+    /// the fold, so the loop stops with the widget in the tree but below
+    /// the bottom of the screen, where a tap lands on nothing at all.
     Future<void> reveal(WidgetTester tester, Finder finder) async {
       for (var i = 0; i < 14 && finder.evaluate().isEmpty; i++) {
         // From a point near the bottom of the screen rather than at
@@ -342,43 +343,68 @@ void main() {
         await tester.dragFrom(const Offset(200, 700), const Offset(0, -240));
         await tester.pump(const Duration(milliseconds: 120));
       }
+
+      if (finder.evaluate().isNotEmpty) {
+        await tester.ensureVisible(finder);
+        await tester.pump(const Duration(milliseconds: 120));
+      }
     }
 
-    testWidgets('a short list gets no search box', (tester) async {
+    Future<void> revealSearchTile(WidgetTester tester) =>
+        reveal(tester, find.text('Svi ljubimci'));
+
+
+    testWidgets('a short row gets no search tile at all', (tester) async {
       // Somebody with two animals does not need one and should not be
       // shown one.
       await at(8, () async {
         await openWith(tester, 2);
         await reveal(tester, find.text('Mica'));
 
+        expect(find.text('Svi ljubimci'), findsNothing);
         expect(find.text(hint), findsNothing);
       });
     });
 
-    testWidgets('a long list does', (tester) async {
+    testWidgets('a long row ends in one', (tester) async {
+      // Not a text field parked above the row. The search rides at the
+      // tail of the portraits as one more circle, so it costs nothing
+      // on a screen that already asks four questions.
       await at(8, () async {
         await openWith(tester, 9);
-        await reveal(tester, find.text(hint));
+        await revealSearchTile(tester);
 
-        expect(find.text(hint), findsOneWidget);
+        expect(find.text('Svi ljubimci'), findsOneWidget);
+        // And no field on the page itself until it is asked for.
+        expect(find.text(hint), findsNothing);
       });
     });
 
-    testWidgets('typing narrows the list', (tester) async {
+    testWidgets('the sheet searches, and picking from it selects',
+        (tester) async {
       await at(8, () async {
         await openWith(tester, 9);
-        await reveal(tester, find.text(hint));
+        await revealSearchTile(tester);
 
-        await tester.enterText(
-            find.widgetWithText(TextField, hint), 'Mica');
-        for (var i = 0; i < 4; i++) {
-          await tester.pump(const Duration(milliseconds: 120));
-        }
+        await tester.tap(find.text('Svi ljubimci'));
+        await tester.pumpAndSettle();
+        expect(find.text(hint), findsOneWidget);
 
-        // findsWidgets, not findsOneWidget: "Mica" is now also the
-        // contents of the field that was typed into.
+        await tester.enterText(find.widgetWithText(TextField, hint), 'Mica');
+        await tester.pumpAndSettle();
+
+        // Scoped to the sheet's own rows. The pet row on the page behind
+        // it is still in the tree, so a bare find.text would be asking
+        // about both at once.
+        expect(find.widgetWithText(ListTile, 'Mica'), findsOneWidget);
+        expect(find.widgetWithText(ListTile, 'Rex1'), findsNothing);
+
+        await tester.tap(find.widgetWithText(ListTile, 'Mica'));
+        await tester.pumpAndSettle();
+
+        // Sheet gone, choice stuck.
+        expect(find.text(hint), findsNothing);
         expect(find.text('Mica'), findsWidgets);
-        expect(find.text('Rex1'), findsNothing);
       });
     });
 
@@ -387,15 +413,16 @@ void main() {
       // pets having been lost.
       await at(8, () async {
         await openWith(tester, 9);
-        await reveal(tester, find.text(hint));
+        await revealSearchTile(tester);
 
-        await tester.enterText(
-            find.widgetWithText(TextField, hint), 'zzz');
-        for (var i = 0; i < 4; i++) {
-          await tester.pump(const Duration(milliseconds: 120));
-        }
+        await tester.tap(find.text('Svi ljubimci'));
+        await tester.pumpAndSettle();
 
-        expect(find.text('Nijedan ljubimac ne odgovara pretrazi.'), findsOneWidget);
+        await tester.enterText(find.widgetWithText(TextField, hint), 'zzz');
+        await tester.pumpAndSettle();
+
+        expect(
+            find.text('Nijedan ljubimac ne odgovara pretrazi.'), findsOneWidget);
       });
     });
 
@@ -403,10 +430,11 @@ void main() {
       // A pet marked favourite is the one being booked for.
       await at(8, () async {
         await openWith(tester, 9);
-        // Revealed by a card rather than by the search box: the box
-        // sits above the list, so stopping there leaves every card
-        // still below the fold and unbuilt.
-        await reveal(tester, find.text('Rex1'));
+        // Revealed by the tile at the head of the row: ensureVisible
+        // walks every enclosing scrollable, so revealing a card in the
+        // middle scrolls the row itself and pushes the first two off
+        // the left-hand edge, which is exactly what is being asserted.
+        await revealSearchTile(tester);
 
         // Read in tree order rather than by position: the list is
         // lazy, so comparing two rectangles only works when both

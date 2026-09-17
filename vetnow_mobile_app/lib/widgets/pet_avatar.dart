@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
@@ -52,13 +53,32 @@ class PetAvatar extends StatelessWidget {
   /// the portrait is the whole tile.
   final bool expand;
 
+  /// When given, the pet's initial is drawn over the silhouette.
+  ///
+  /// Four dogs in a row were four identical portraits in four shades
+  /// of the same green — the silhouette is the species and the
+  /// gradient is a hash, and neither of those is the pet. A letter is.
+  final String? name;
+
   const PetAvatar({
     super.key,
     required this.species,
     required this.seed,
     this.size = 48,
     this.expand = false,
+    this.name,
   });
+
+  /// First letter of the name, upper case. Empty when there is no
+  /// name or it is only punctuation.
+  String get _initial {
+    final trimmed = name?.trim() ?? '';
+    if (trimmed.isEmpty) return '';
+    // substring rather than characters.first: the package is not a
+    // declared dependency here, and a single UTF-16 code unit is the
+    // right answer for every name this app will meet.
+    return trimmed.substring(0, 1).toUpperCase();
+  }
 
   static const _palettes = <List<Color>>[
     [AppColors.primaryLight, AppColors.primary],
@@ -67,6 +87,12 @@ class PetAvatar extends StatelessWidget {
     [AppColors.accentHover, AppColors.primaryDark],
     [AppColors.primaryLight, AppColors.accent],
     [AppColors.accent, AppColors.primary],
+    // Gold and ink as well as the teals. Six variations on one hue is
+    // six portraits nobody can tell apart at 54 pixels.
+    [AppColors.gold, AppColors.primaryDark],
+    [AppColors.ink, AppColors.primary],
+    [AppColors.primaryDark, AppColors.ink],
+    [AppColors.gold, AppColors.accentActive],
   ];
 
   List<Color> get _gradient => _palettes[seed.abs() % _palettes.length];
@@ -88,13 +114,43 @@ class PetAvatar extends StatelessWidget {
         children: [
           // The same top-left light as every other branded surface.
           const DecoratedBox(decoration: BoxDecoration(gradient: AppGradients.inkSheen)),
-          CustomPaint(
-            painter: _PetSilhouettePainter(kind),
-            // Repainting a static silhouette on every frame of a list
-            // scroll is pure waste; the shape only depends on the kind.
-            isComplex: false,
-            willChange: false,
+          // Dimmed to a watermark when a letter is going over it, so
+          // the two do not fight for the same 54 pixels.
+          Opacity(
+            opacity: _initial.isEmpty ? 1 : 0.28,
+            child: CustomPaint(
+              painter: _PetSilhouettePainter(kind),
+              // Repainting a static silhouette on every frame of a list
+              // scroll is pure waste; the shape only depends on the kind.
+              isComplex: false,
+              willChange: false,
+            ),
           ),
+          if (_initial.isNotEmpty)
+            Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    _initial,
+                    style: TextStyle(
+                      fontFamily: AppFonts.display,
+                      fontSize: size * 0.52,
+                      height: 1,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.ink.withValues(alpha: 0.45),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

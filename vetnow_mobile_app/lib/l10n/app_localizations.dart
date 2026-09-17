@@ -322,6 +322,12 @@ abstract class AppLocalizations {
   /// **'Prvi termin'**
   String get firstOnDay;
 
+  /// No description provided for @allPets.
+  ///
+  /// In bs, this message translates to:
+  /// **'Svi ljubimci'**
+  String get allPets;
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

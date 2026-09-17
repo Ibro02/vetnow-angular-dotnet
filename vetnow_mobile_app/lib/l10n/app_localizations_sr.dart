@@ -146,6 +146,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get firstOnDay => 'Prvi termin';
 
   @override
+  String get allPets => 'Svi ljubimci';
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override
