@@ -269,6 +269,10 @@ class _PetsScreenState extends State<PetsScreen> {
                 ],
               ),
               child: FloatingActionButton(
+                // The primary action on this screen, and a bare plus
+                // sign: without this a screen reader announced it as
+                // "button" and left it at that.
+                tooltip: l10n.addPet,
                 onPressed: () async {
                   final added = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(builder: (_) => const AddPetScreen()),

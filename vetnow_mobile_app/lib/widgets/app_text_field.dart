@@ -46,16 +46,35 @@ class _AppTextFieldState extends State<AppTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+        // Excluded, because the field below now carries the same
+        // words as its accessible name. Left in, TalkBack reads
+        // "Ime" and then "Ime, edit box" — the label twice, once
+        // as a heading it cannot act on.
+        ExcludeSemantics(
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
         const SizedBox(height: 6),
-        TextField(
+        // The field's name, which it did not have.
+        //
+        // The label is drawn as a separate Text above the box rather
+        // than through InputDecoration, which looks right and reads as
+        // nothing: a screen reader landing on the field announced
+        // "edit box" with no indication of which one, on every form in
+        // the app. The error, when there is one, is part of the name
+        // too — it is the reason the field is worth returning to.
+        Semantics(
+          label: widget.errorText == null
+              ? widget.label
+              : '${widget.label}. ${widget.errorText}',
+          textField: true,
+          child: TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
           onChanged: widget.onChanged,
@@ -95,6 +114,7 @@ class _AppTextFieldState extends State<AppTextField> {
               ),
             ),
           ),
+        ),
         ),
         if (widget.errorText != null) ...[
           const SizedBox(height: 5),
