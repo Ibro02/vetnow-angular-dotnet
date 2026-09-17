@@ -50,6 +50,12 @@ class PetsApiService {
       breed: '',
       birthDate: json['birthDate'] != null ? DateTime.tryParse(json['birthDate'] as String) : null,
       isFavourite: json['isFavourite'] as bool? ?? false,
+      // byte[] on the entity, base64 on the wire. Blank strings are
+      // treated as no photo, which is what an empty column serialises
+      // to and is not the same thing as a photo of nothing.
+      photoBase64: (json['picture'] as String?)?.trim().isEmpty ?? true
+          ? null
+          : json['picture'] as String?,
     );
   }
 

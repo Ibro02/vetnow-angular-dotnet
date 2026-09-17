@@ -686,7 +686,13 @@ class _PetListCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: PetAvatar(species: pet.species, seed: pet.id, size: 56),
+                      child: PetAvatar(
+                          species: pet.species,
+                          seed: pet.id,
+                          size: 56,
+                          name: pet.name,
+                          photoBase64: pet.photoBase64,
+                        ),
                     ),
                     if (pet.isFavourite)
                       Positioned(
@@ -835,7 +841,13 @@ class _PetGridCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    PetAvatar(species: pet.species, seed: pet.id, expand: true),
+                    PetAvatar(
+                      species: pet.species,
+                      seed: pet.id,
+                      expand: true,
+                      name: pet.name,
+                      photoBase64: pet.photoBase64,
+                    ),
                     Positioned(
                       top: 6,
                       right: 6,

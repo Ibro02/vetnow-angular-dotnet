@@ -5,6 +5,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
 import '../services/pets_api_service.dart';
+import '../services/profile_settings_api_service.dart';
 import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_prompt.dart';
@@ -70,12 +71,21 @@ class _ProfileScreenState extends State<ProfileScreen> implements Revisitable {
       final results = await Future.wait([
         SpeciesApiService.getAll(),
         PetsApiService.getByOwnerRaw(ownerId: auth.userId!, token: auth.token!),
+        // The account's own photograph, which GetUserInfo does not carry
+        // and nothing else on this path asks for. Failing is not worth
+        // surfacing: the header falls back to initials, which is what it
+        // showed before this existed.
+        ProfileSettingsApiService.get(auth.token!)
+            .then<ProfileSettings?>((s) => s)
+            .catchError((_) => null),
       ]);
 
       final species = results[0] as List<SpeciesOption>;
       final speciesMap = {for (final s in species) s.id: s.name};
       final pets = PetsApiService.mapPets(results[1] as List<Map<String, dynamic>>, speciesMap);
       if (!mounted) return;
+
+      auth.updatePhoto((results[2] as ProfileSettings?)?.picture);
       setState(() {
         _pets = pets;
         _isLoadingPets = false;
@@ -216,6 +226,7 @@ class _ProfileHero extends StatelessWidget {
         // question, so the colour is free to match the header.
         child: PersonAvatar(
           name: auth.displayName ?? '',
+          photoBase64: auth.photoBase64,
           size: 47,
           colors: const [AppColors.accent, AppColors.gold],
         ),

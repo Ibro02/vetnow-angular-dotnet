@@ -176,6 +176,7 @@ class _PetTile extends StatelessWidget {
                       seed: pet.id,
                       size: 54,
                       name: pet.name,
+                      photoBase64: pet.photoBase64,
                     ),
                   ),
                   if (pet.isFavourite)

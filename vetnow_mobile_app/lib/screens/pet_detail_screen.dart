@@ -105,7 +105,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           ),
                           // This pet's own portrait, not the generic paw every
                           // pet used to share.
-                          child: PetAvatar(species: pet.species, seed: pet.id, size: 78),
+                          child: PetAvatar(
+                            species: pet.species,
+                            seed: pet.id,
+                            size: 78,
+                            name: pet.name,
+                            photoBase64: pet.photoBase64,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.s3),
                         Text(pet.name,

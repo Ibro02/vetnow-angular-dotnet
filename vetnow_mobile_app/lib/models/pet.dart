@@ -18,6 +18,18 @@ class Pet {
   final String? microchipNumber; // not in backend Animal model yet
   final bool isFavourite;
 
+  /// The pet's photo, base64, exactly as the backend sends it.
+  ///
+  /// Animal.Picture has been on the entity all along and the response
+  /// has always carried it — the app simply never read the field, and
+  /// drew a species silhouette instead. Four dogs therefore looked
+  /// like four copies of the same picture, because that is what they
+  /// were.
+  ///
+  /// Kept as the raw string rather than decoded bytes: most pets have
+  /// no photo, and decoding one on the off chance is work for nothing.
+  final String? photoBase64;
+
   const Pet({
     required this.id,
     required this.name,
@@ -28,6 +40,7 @@ class Pet {
     this.weightKg,
     this.microchipNumber,
     this.isFavourite = false,
+    this.photoBase64,
   });
 
   Pet copyWith({bool? isFavourite}) => Pet(

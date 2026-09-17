@@ -119,6 +119,22 @@ class AuthState extends ChangeNotifier {
   /// requires it on every save, while the GET response doesn't return it.
   String? username;
 
+  /// The account's photograph, base64, once something has fetched it.
+  ///
+  /// Deliberately not filled at sign-in. The login path asks
+  /// GetUserInfo, which does not return a picture, and adding a second
+  /// round-trip to every sign-in for an avatar would be spending time in
+  /// the one place people are watching the clock. Profile fills it in
+  /// when it loads, which is also the first place it is shown.
+  String? photoBase64;
+
+  /// Records a photo fetched elsewhere, or one that was just saved.
+  void updatePhoto(String? base64) {
+    if (base64 == photoBase64) return;
+    photoBase64 = base64;
+    notifyListeners();
+  }
+
   /// Reflects a just-saved profile edit in the session, so the header
   /// stops showing the old name before the next login.
   void updateDisplayName(String name, {String? email}) {
@@ -142,6 +158,7 @@ class AuthState extends ChangeNotifier {
     displayName = null;
     email = null;
     username = null;
+    photoBase64 = null;
     notifyListeners();
 
     // Forget it locally first: even if the network call below fails, the
@@ -172,6 +189,7 @@ class AuthState extends ChangeNotifier {
     displayName = null;
     email = null;
     username = null;
+    photoBase64 = null;
     unawaited(SessionStore.clear());
     notifyListeners();
   }

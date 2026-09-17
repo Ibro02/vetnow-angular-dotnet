@@ -219,6 +219,7 @@ class _PetSearchSheetState extends State<_PetSearchSheet> {
                               seed: pet.id,
                               size: 42,
                               name: pet.name,
+                              photoBase64: pet.photoBase64,
                             ),
                             title: Text(
                               pet.name,

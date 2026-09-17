@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import '../services/photo_bytes.dart';
 
 /// The disc that stands in for a person's photo.
 ///
@@ -25,11 +26,24 @@ class PersonAvatar extends StatelessWidget {
   /// apart from anyone else.
   final List<Color>? colors;
 
+  /// Their own photograph, base64, when the account has one.
+  ///
+  /// Person.Picture has been on the entity since the beginning and
+  /// ProfileSettings has always returned it — the mobile service even
+  /// parses the field. Nothing ever drew it, so everybody has been
+  /// looking at their own initials on a coloured disc while their
+  /// photo sat in the response.
+  ///
+  /// Falls back to the initials on anything unusable rather than to a
+  /// broken-image glyph.
+  final String? photoBase64;
+
   const PersonAvatar({
     super.key,
     required this.name,
     this.size = 52,
     this.colors,
+    this.photoBase64,
   });
 
   static const _palettes = <List<Color>>[
@@ -85,6 +99,41 @@ class PersonAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final photo = decodePhoto(photoBase64);
+    if (photo != null) {
+      return ExcludeSemantics(
+        child: Container(
+          height: size,
+          width: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink.withValues(alpha: 0.22),
+                blurRadius: size * 0.2,
+                offset: Offset(0, size * 0.07),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.memory(
+              photo,
+              fit: BoxFit.cover,
+              width: size,
+              height: size,
+              gaplessPlayback: true,
+              errorBuilder: (context, _, __) => _generated(),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return _generated();
+  }
+
+  /// Initials on a gradient disc, for an account with no photo.
+  Widget _generated() {
     final initials = _initials;
 
     // Excluded: the initials are an abbreviation of the name written

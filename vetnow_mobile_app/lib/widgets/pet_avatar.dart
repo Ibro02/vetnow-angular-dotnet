@@ -1,7 +1,10 @@
 import 'dart:math' as math;
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
+import '../services/photo_bytes.dart';
 
 /// Which silhouette a pet gets. Ten species share six shapes, because a
 /// hamster and a guinea pig read the same at 40 pixels and pretending
@@ -53,6 +56,18 @@ class PetAvatar extends StatelessWidget {
   /// the portrait is the whole tile.
   final bool expand;
 
+  /// The pet's own photo, base64, when it has one.
+  ///
+  /// Takes precedence over everything below it: a real photograph of
+  /// the animal beats a generated monogram on a coloured disc, and
+  /// the backend has been sending these all along.
+  ///
+  /// A photo that will not decode falls back to the monogram rather
+  /// than to a broken-image glyph. The data comes from a column that
+  /// has been written to by several versions of an admin panel, and a
+  /// pet list is not the place to find out that one row is malformed.
+  final String? photoBase64;
+
   /// When given, the pet's initial is drawn over the silhouette.
   ///
   /// Four dogs in a row were four identical portraits in four shades
@@ -67,6 +82,7 @@ class PetAvatar extends StatelessWidget {
     this.size = 48,
     this.expand = false,
     this.name,
+    this.photoBase64,
   });
 
   /// First letter of the name, upper case. Empty when there is no
@@ -97,8 +113,32 @@ class PetAvatar extends StatelessWidget {
 
   List<Color> get _gradient => _palettes[seed.abs() % _palettes.length];
 
+  Uint8List? get _photo => decodePhoto(photoBase64);
+
   @override
   Widget build(BuildContext context) {
+    final photo = _photo;
+    if (photo != null) {
+      final image = Image.memory(
+        photo,
+        fit: BoxFit.cover,
+        width: expand ? null : size,
+        height: expand ? null : size,
+        gaplessPlayback: true,
+        // A row of portraits must not become a row of error glyphs
+        // because one row in the table is bad.
+        errorBuilder: (context, _, __) => _generated(context),
+      );
+      return ExcludeSemantics(
+        child: expand ? image : ClipOval(child: image),
+      );
+    }
+
+    return _generated(context);
+  }
+
+  /// The drawn portrait: gradient, silhouette, and the initial over it.
+  Widget _generated(BuildContext context) {
     final kind = petKindFor(species);
 
     final painted = DecoratedBox(
