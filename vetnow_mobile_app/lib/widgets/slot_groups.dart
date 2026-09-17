@@ -57,25 +57,75 @@ class SlotGroups extends StatelessWidget {
           ),
           if (grouped[part]!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.s3),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final slot in grouped[part]!)
-                  _SlotPill(
-                    label: slot.appointmentTime,
-                    selected: selectedSlotId == slot.id,
-                    onTap: () {
-                      Haptics.select();
-                      onSlotTap(slot.id);
-                    },
-                  ),
-              ],
+            _SlotGrid(
+              slots: grouped[part]!,
+              selectedSlotId: selectedSlotId,
+              onSlotTap: onSlotTap,
             ),
           ],
           const SizedBox(height: AppSpacing.s5),
         ],
       ],
+    );
+  }
+}
+
+/// Times laid out in even columns rather than a ragged wrap.
+///
+/// A busy clinic returns a slot every half hour from eight until
+/// eight, and as a Wrap of pills sized to their own text that is a
+/// dozen rows of uneven blocks — the eye has nowhere to run down. One
+/// width for every pill turns the same list into a grid you read like
+/// a timetable, in a third of the height.
+///
+/// The column count comes from the space available rather than being
+/// fixed at four: on a phone that is four, in a browser window it is
+/// eight, and neither has to be decided here.
+class _SlotGrid extends StatelessWidget {
+  final List<RemoteTimeSlot> slots;
+  final int? selectedSlotId;
+  final ValueChanged<int> onSlotTap;
+
+  const _SlotGrid({
+    required this.slots,
+    required this.selectedSlotId,
+    required this.onSlotTap,
+  });
+
+  static const double _gap = 7;
+
+  /// Narrow enough that four fit on the smallest phone, wide enough
+  /// that "18:30" never has to shrink.
+  static const double _idealWidth = 74;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns =
+            ((constraints.maxWidth + _gap) / (_idealWidth + _gap)).floor().clamp(3, 8);
+        final width =
+            (constraints.maxWidth - _gap * (columns - 1)) / columns;
+
+        return Wrap(
+          spacing: _gap,
+          runSpacing: _gap,
+          children: [
+            for (final slot in slots)
+              SizedBox(
+                width: width,
+                child: _SlotPill(
+                  label: slot.appointmentTime,
+                  selected: selectedSlotId == slot.id,
+                  onTap: () {
+                    Haptics.select();
+                    onSlotTap(slot.id);
+                  },
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -140,9 +190,9 @@ class _SlotPill extends StatelessWidget {
           // 40 tall plus the Wrap spacing clears the 48dp tap target the
           // platform guidelines ask for, without the pills looking like
           // buttons on a remote control.
-          constraints: const BoxConstraints(minHeight: 40),
+          height: 38,
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: selected ? AppColors.accent : Colors.white.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(AppRadius.full),
@@ -150,12 +200,16 @@ class _SlotPill extends StatelessWidget {
               color: Colors.white.withValues(alpha: selected ? 0.3 : 0.16),
             ),
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: selected ? AppColors.ink : Colors.white,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: selected ? AppColors.ink : Colors.white,
+              ),
             ),
           ),
         ),
@@ -175,11 +229,22 @@ class EarliestSlotBanner extends StatelessWidget {
   final String time;
   final VoidCallback onTap;
 
+  /// Whether the day on screen is today.
+  ///
+  /// It changes what the line is allowed to claim. On today it is the
+  /// soonest appointment there is, which is worth calling "najranije
+  /// slobodno". On a Saturday three weeks out it is merely the first
+  /// slot of that Saturday, and saying "earliest available" there
+  /// would be telling somebody there is nothing before it when there
+  /// is a fortnight of openings in between.
+  final bool isToday;
+
   const EarliestSlotBanner({
     super.key,
     required this.dayLabel,
     required this.time,
     required this.onTap,
+    required this.isToday,
   });
 
   @override
@@ -204,7 +269,8 @@ class EarliestSlotBanner extends StatelessWidget {
               child: Text.rich(
                 TextSpan(
                   children: [
-                    TextSpan(text: '${l10n.earliestLabel} — '),
+                    TextSpan(
+                        text: '${isToday ? l10n.earliestLabel : l10n.firstOnDay} — '),
                     TextSpan(
                       text: '$dayLabel $time',
                       style: const TextStyle(

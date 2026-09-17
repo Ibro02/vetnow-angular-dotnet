@@ -79,6 +79,7 @@
       "duration": {}
     }
   },
+  "firstOnDay": "Prvi termin",
   "allCities": "Svi gradovi",
   "noRatingsYet": "Nova",
   "noReviewsYet": "Još nema recenzija",

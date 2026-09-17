@@ -80,15 +80,28 @@ DateTime dayOf(DateTime when) => DateTime(when.year, when.month, when.day);
 /// True when both fall on the same calendar day.
 bool isSameDay(DateTime a, DateTime b) => dayOf(a) == dayOf(b);
 
-/// The [count] days starting today, for the strip above the slots.
-List<DateTime> stripDays({int count = 14}) {
+/// Every bookable day of the month [selected] falls in.
+///
+/// Not a rolling fortnight, which is what this used to be. A rolling
+/// window means the strip and the month sheet disagree about what they
+/// are showing — pick the 28th from the calendar and the strip would
+/// be a list of days around today with the 28th nowhere on it. Tying
+/// the strip to a month makes the two halves the same control: the
+/// sheet chooses the month, the strip walks it.
+///
+/// The current month starts at today rather than at the 1st, because
+/// yesterday is not a thing anyone can book.
+List<DateTime> monthDays(DateTime selected) {
   final today = dayOf(clock.now());
-  // DateTime(y, m, d + i) rather than add(Duration(days: i)): a Duration
-  // is 24 hours of elapsed time, and on the night the clocks move that
-  // is not the same as the next day. It lands an hour off, which is
-  // enough to shift the whole strip by one date for half the year.
+  final lastDay = DateTime(selected.year, selected.month + 1, 0).day;
+
+  final first = (selected.year == today.year && selected.month == today.month)
+      ? today.day
+      : 1;
+
   return [
-    for (var i = 0; i < count; i++)
-      DateTime(today.year, today.month, today.day + i),
+    for (var d = first; d <= lastDay; d++)
+      DateTime(selected.year, selected.month, d),
   ];
 }
+

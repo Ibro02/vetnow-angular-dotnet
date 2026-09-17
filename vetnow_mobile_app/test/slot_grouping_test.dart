@@ -107,41 +107,6 @@ void main() {
     });
   });
 
-  group('stripDays', () {
-    test('starts today and runs two weeks', () {
-      final days = at(10, () => stripDays());
-
-      expect(days, hasLength(14));
-      expect(days.first, DateTime(2026, 9, 16));
-      expect(days.last, DateTime(2026, 9, 29));
-    });
-
-    test('crosses a month boundary without stumbling', () {
-      final days = withClock(
-        Clock.fixed(DateTime(2026, 9, 25, 10)),
-        () => stripDays(),
-      );
-
-      expect(days.last, DateTime(2026, 10, 8));
-    });
-
-    test('every entry is a distinct calendar day', () {
-      // Built with DateTime(y, m, d + i) rather than add(Duration(days:
-      // i)): a Duration is 24 hours of elapsed time, and on the night
-      // the clocks move that is not the next day.
-      final days = withClock(
-        // The weekend European clocks go back in 2026.
-        Clock.fixed(DateTime(2026, 10, 24, 10)),
-        () => stripDays(),
-      );
-
-      expect(days.map((d) => d.day).toSet(), hasLength(14));
-      for (final day in days) {
-        expect(day.hour, 0, reason: '$day is not midnight');
-      }
-    });
-  });
-
   group('isSameDay', () {
     test('ignores the time of day', () {
       expect(
@@ -155,6 +120,51 @@ void main() {
         isSameDay(DateTime(2026, 9, 16, 23, 59), DateTime(2026, 9, 17, 0, 1)),
         isFalse,
       );
+    });
+  });
+
+  group('monthDays', () {
+    test('the current month starts at today, not at the 1st', () {
+      // Yesterday is not a thing anyone can book.
+      final days = at(10, () => monthDays(DateTime(2026, 9, 16)));
+
+      expect(days.first, DateTime(2026, 9, 16));
+      expect(days.last, DateTime(2026, 9, 30));
+      expect(days, hasLength(15));
+    });
+
+    test('a later month is shown whole', () {
+      final days = at(10, () => monthDays(DateTime(2026, 10, 20)));
+
+      expect(days.first, DateTime(2026, 10, 1));
+      expect(days.last, DateTime(2026, 10, 31));
+      expect(days, hasLength(31));
+    });
+
+    test('February knows how long it is', () {
+      final days = at(10, () => monthDays(DateTime(2027, 2, 5)));
+      expect(days.last, DateTime(2027, 2, 28));
+
+      final leap = at(10, () => monthDays(DateTime(2028, 2, 5)));
+      expect(leap.last, DateTime(2028, 2, 29));
+    });
+
+    test('the strip always contains the day that is selected', () {
+      // The whole reason this replaced a rolling fortnight: pick the
+      // 28th from the month sheet and the strip has to be showing it,
+      // not a window of days around today with the 28th nowhere on it.
+      for (final day in [
+        DateTime(2026, 9, 30),
+        DateTime(2026, 10, 1),
+        DateTime(2026, 12, 25),
+      ]) {
+        expect(at(10, () => monthDays(day)), contains(day), reason: '$day');
+      }
+    });
+
+    test('a month entirely in the past comes back empty, not backwards', () {
+      expect(at(10, () => monthDays(DateTime(2026, 9, 1))).first,
+          DateTime(2026, 9, 16));
     });
   });
 }

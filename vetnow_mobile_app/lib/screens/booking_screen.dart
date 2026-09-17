@@ -98,6 +98,38 @@ class _BookingScreenState extends State<BookingScreen> {
   List<Pet> _myPets = [];
   int? _selectedPetId;
 
+  /// Narrows the pet list by name.
+  ///
+  /// Somebody with two animals does not need this and should not be
+  /// shown it; somebody boarding eleven scrolls past ten of them to
+  /// reach the one they came for. The field appears at six.
+  final _petSearch = TextEditingController();
+
+  static const int _petSearchThreshold = 6;
+
+  /// Favourites first, then alphabetical.
+  ///
+  /// The list arrived in whatever order the database felt like, which
+  /// for anything past a handful is no order at all. Favourites lead
+  /// because a pet marked favourite is the one being booked for.
+  List<Pet> get _visiblePets {
+    final query = _petSearch.text.trim().toLowerCase();
+    final matching = query.isEmpty
+        ? [..._myPets]
+        : _myPets
+            .where((p) =>
+                p.name.toLowerCase().contains(query) ||
+                p.species.toLowerCase().contains(query) ||
+                p.breed.toLowerCase().contains(query))
+            .toList();
+
+    matching.sort((a, b) {
+      if (a.isFavourite != b.isFavourite) return a.isFavourite ? -1 : 1;
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
+    return matching;
+  }
+
   bool _isConfirming = false;
   bool _confirmed = false;
   String? _bookingError;
@@ -107,6 +139,12 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
     _selectedService = widget.preselected;
     _selectedStaffId = widget.preselectedStaff?.id ?? 0;
+  }
+
+  @override
+  void dispose() {
+    _petSearch.dispose();
+    super.dispose();
   }
 
   @override
@@ -454,17 +492,29 @@ class _BookingScreenState extends State<BookingScreen> {
                   );
                   if (added == true) unawaited(_switchToRealMode());
                 })
-              else
-                ..._myPets.map(
-                  (p) => _SelectableCard(
-                    title: p.name,
-                    subtitle: p.species.isNotEmpty ? p.species : l10n.petName,
-                    icon: Icons.pets,
-                    accentColor: AppColors.accent,
-                    selected: _selectedPetId == p.id,
-                    onTap: () => setState(() => _selectedPetId = p.id),
+              else ...[
+                if (_myPets.length >= _petSearchThreshold) ...[
+                  _PetSearchField(
+                    controller: _petSearch,
+                    onChanged: (_) => setState(() {}),
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.s3),
+                ],
+                if (_visiblePets.isEmpty)
+                  _InlineHint(
+                      icon: Icons.search_off_rounded, text: l10n.noPetsMatchFilter)
+                else
+                  ..._visiblePets.map(
+                    (p) => _SelectableCard(
+                      title: p.name,
+                      subtitle: p.species.isNotEmpty ? p.species : l10n.petName,
+                      icon: Icons.pets,
+                      accentColor: AppColors.accent,
+                      selected: _selectedPetId == p.id,
+                      onTap: () => setState(() => _selectedPetId = p.id),
+                    ),
+                  ),
+              ],
               const SizedBox(height: AppSpacing.s6),
             ] else ...[
               _StepLabel(number: 2, label: l10n.chooseStaffOptional),
@@ -985,6 +1035,7 @@ class _DayAndSlotPanel extends StatelessWidget {
             EarliestSlotBanner(
               dayLabel: dayLabel,
               time: earliest.appointmentTime,
+              isToday: isSameDay(selectedDay, clock.now()),
               onTap: () => onSlotTap(earliest.id),
             ),
             const SizedBox(height: AppSpacing.s5),
@@ -1064,6 +1115,66 @@ class _DayAndSlotPanel extends StatelessWidget {
               onSlotTap: onSlotTap,
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// A quiet search box above the pet list.
+///
+/// Deliberately not the app's AppTextField: this sits among selectable
+/// cards rather than in a form, and a labelled, bordered form field here
+/// would read as something that has to be filled in before going on. It
+/// is a filter, and it should look like one — which mostly means looking
+/// like almost nothing until it is used.
+class _PetSearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  const _PetSearchField({required this.controller, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.bgMuted,
+        borderRadius: BorderRadius.circular(AppRadius.full),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: TextField(
+        controller: controller,
+        onChanged: onChanged,
+        style: TextStyle(fontSize: 14, color: AppColors.text),
+        // The same manners as the clinic search on Explore: a key that
+        // puts the keyboard away, and no autocorrect, because a pet
+        // called Mica is not a dictionary word.
+        textInputAction: TextInputAction.search,
+        onSubmitted: (_) => FocusScope.of(context).unfocus(),
+        autocorrect: false,
+        enableSuggestions: false,
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: l10n.searchPetsHint,
+          hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13.5),
+          prefixIcon: Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: Icon(Icons.close_rounded, size: 17, color: AppColors.textMuted),
+                  tooltip: l10n.clearSearch,
+                  onPressed: () {
+                    controller.clear();
+                    FocusScope.of(context).unfocus();
+                    onChanged('');
+                  },
+                ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        ),
       ),
     );
   }

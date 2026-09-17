@@ -55,7 +55,7 @@ class DateStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).toLanguageTag();
-    final days = stripDays();
+    final days = monthDays(selected);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,9 +116,15 @@ class DateStrip extends StatelessWidget {
             maxScaleFactor: _maxCapsuleScale,
             child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            // Clip.none so the selected capsule's rim is not shaved off
-            // at either end of the strip.
-            clipBehavior: Clip.none,
+            // Clipped, and this matters more than it sounds. With
+            // Clip.none the capsules carried on drawing past the panel's
+            // rounded edge and sat on the page outside it, which reads as
+            // the strip being broken rather than as something that
+            // scrolls. The panel is the frame; the days stay inside it.
+            clipBehavior: Clip.hardEdge,
+            // A last capsule flush against the edge looks cut off even
+            // when it is whole, so the row ends on a little air.
+            padding: const EdgeInsets.only(right: 2),
             itemCount: days.length,
             separatorBuilder: (_, __) => const SizedBox(width: 7),
             itemBuilder: (context, i) {

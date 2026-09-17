@@ -322,6 +322,12 @@ abstract class AppLocalizations {
   /// **'{date} u {slot} · {duration} min'**
   String slotAtDuration(Object date, Object slot, Object duration);
 
+  /// No description provided for @firstOnDay.
+  ///
+  /// In bs, this message translates to:
+  /// **'Prvi termin'**
+  String get firstOnDay;
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

@@ -148,6 +148,9 @@ class AppLocalizationsBs extends AppLocalizations {
   }
 
   @override
+  String get firstOnDay => 'Prvi termin';
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override

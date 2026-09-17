@@ -211,4 +211,148 @@ void main() {
       expect(find.textContaining('sutra u 09:00'), findsOneWidget);
     });
   });
+
+  group('choosing a pet', () {
+    /// The placeholder inside the pet filter. Shared with the Pets
+    /// screen, which has had the same search for a while  no reason
+    /// for the booking flow to invent a second wording for it.
+    const hint = 'Pretraži po imenu…';
+
+    /// [count] pets, named so the search has something to bite on.
+    List<Map<String, dynamic>> manyPets(int count) => [
+          for (var i = 0; i < count; i++)
+            {
+              'id': 100 + i,
+              'name': i == 0 ? 'Mica' : 'Rex$i',
+              'animalSpeciesId': 1,
+              'birthDate': '2022-01-01T00:00:00',
+              'isFavourite': i == 3,
+            },
+        ];
+
+    Future<void> openWith(WidgetTester tester, int petCount) async {
+      backend = healthy();
+      backend.routes['Animal/GetByOwnerId'] = (_) => manyPets(petCount);
+      useBackend(backend);
+
+      final rows = stations()['vetStations']! as List<dynamic>;
+      final station = VetStation.fromJson(rows.first as Map<String, dynamic>);
+
+      await usePhoneScreen(tester);
+      await tester.pumpWidget(harness(
+        Builder(
+          builder: (context) => BookingScreen(
+            station: station,
+            services: [ServiceCatalog.service(context, ServiceKind.checkup)],
+            preselected: ServiceCatalog.service(context, ServiceKind.checkup),
+          ),
+        ),
+      ));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 120));
+      }
+    }
+
+    /// Scrolls until [finder] is on screen.
+    ///
+    /// Not scrollToBottom: the form is a lazy ListView, so anything
+    /// scrolled past is disposed and find.text stops seeing it. The pet
+    /// search sits above nine pet cards, which is a long way above the
+    /// bottom of the page.
+    Future<void> reveal(WidgetTester tester, Finder finder) async {
+      for (var i = 0; i < 14 && finder.evaluate().isEmpty; i++) {
+        // From a point near the bottom of the screen rather than at
+        // find.byType(Scrollable).first. The day strip is a horizontal
+        // ListView and therefore a Scrollable too, and dragging it
+        // upwards does exactly nothing — which looked like a page that
+        // would not scroll.
+        await tester.dragFrom(const Offset(200, 700), const Offset(0, -240));
+        await tester.pump(const Duration(milliseconds: 120));
+      }
+    }
+
+    testWidgets('a short list gets no search box', (tester) async {
+      // Somebody with two animals does not need one and should not be
+      // shown one.
+      await at(8, () async {
+        await openWith(tester, 2);
+        await reveal(tester, find.text('Mica'));
+
+        expect(find.text(hint), findsNothing);
+      });
+    });
+
+    testWidgets('a long list does', (tester) async {
+      await at(8, () async {
+        await openWith(tester, 9);
+        await reveal(tester, find.text(hint));
+
+        expect(find.text(hint), findsOneWidget);
+      });
+    });
+
+    testWidgets('typing narrows the list', (tester) async {
+      await at(8, () async {
+        await openWith(tester, 9);
+        await reveal(tester, find.text(hint));
+
+        await tester.enterText(
+            find.widgetWithText(TextField, hint), 'Mica');
+        for (var i = 0; i < 4; i++) {
+          await tester.pump(const Duration(milliseconds: 120));
+        }
+
+        // findsWidgets, not findsOneWidget: "Mica" is now also the
+        // contents of the field that was typed into.
+        expect(find.text('Mica'), findsWidgets);
+        expect(find.text('Rex1'), findsNothing);
+      });
+    });
+
+    testWidgets('a search that matches nothing says so', (tester) async {
+      // Rather than an empty gap where the list was, which reads as the
+      // pets having been lost.
+      await at(8, () async {
+        await openWith(tester, 9);
+        await reveal(tester, find.text(hint));
+
+        await tester.enterText(
+            find.widgetWithText(TextField, hint), 'zzz');
+        for (var i = 0; i < 4; i++) {
+          await tester.pump(const Duration(milliseconds: 120));
+        }
+
+        expect(find.text('Nijedan ljubimac ne odgovara pretrazi.'), findsOneWidget);
+      });
+    });
+
+    testWidgets('favourites come first', (tester) async {
+      // A pet marked favourite is the one being booked for.
+      await at(8, () async {
+        await openWith(tester, 9);
+        // Revealed by a card rather than by the search box: the box
+        // sits above the list, so stopping there leaves every card
+        // still below the fold and unbuilt.
+        await reveal(tester, find.text('Rex1'));
+
+        // Read in tree order rather than by position: the list is
+        // lazy, so comparing two rectangles only works when both
+        // happen to be built, and which ones are depends on where the
+        // scroll stopped.
+        final names = tester
+            .widgetList<Text>(find.byType(Text))
+            .map((t) => t.data)
+            .whereType<String>()
+            .where((s) => s == 'Mica' || RegExp(r'^Rex[0-9]+$').hasMatch(s))
+            .toList();
+
+        expect(names, contains('Rex3'), reason: 'built order was $names');
+        expect(
+          names.indexOf('Rex3'),
+          lessThan(names.indexOf('Mica')),
+          reason: 'built order was $names',
+        );
+      });
+    });
+  });
 }
