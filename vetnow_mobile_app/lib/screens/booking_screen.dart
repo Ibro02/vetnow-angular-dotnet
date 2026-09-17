@@ -531,7 +531,11 @@ class _BookingScreenState extends State<BookingScreen> {
             Text(widget.station.name,
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             const SizedBox(height: AppSpacing.s6),
-            _StepLabel(number: 1, label: l10n.chooseService),
+            _StepLabel(
+              number: 1,
+              label: l10n.chooseService,
+              done: _selectedService != null,
+            ),
             const SizedBox(height: AppSpacing.s3),
             ...widget.services.map(
               (s) => _SelectableCard(
@@ -573,7 +577,11 @@ class _BookingScreenState extends State<BookingScreen> {
                 onTakeFirstFree: () => unawaited(_takeFirstOpening()),
               ),
               const SizedBox(height: AppSpacing.s6),
-              _StepLabel(number: 4, label: l10n.choosePet),
+              _StepLabel(
+                number: 4,
+                label: l10n.choosePet,
+                done: _selectedPetId != null,
+              ),
               const SizedBox(height: AppSpacing.s3),
               if (_myPets.isEmpty)
                 _NoPetsCard(onAddPet: () async {
@@ -603,7 +611,11 @@ class _BookingScreenState extends State<BookingScreen> {
               ],
               const SizedBox(height: AppSpacing.s6),
             ] else ...[
-              _StepLabel(number: 2, label: l10n.chooseStaffOptional),
+              _StepLabel(
+                number: 2,
+                label: l10n.chooseStaffOptional,
+                done: _selectedStaffId != null,
+              ),
               const SizedBox(height: AppSpacing.s3),
               ..._mockStaffOptions(context).map(
                 (s) => _SelectableCard(
@@ -617,7 +629,11 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.s6),
-              _StepLabel(number: 3, label: l10n.pickTimeToday),
+              _StepLabel(
+                number: 3,
+                label: l10n.pickTimeToday,
+                done: _selectedSlot != null,
+              ),
               const SizedBox(height: AppSpacing.s3),
               Wrap(
                 spacing: 10,
@@ -772,7 +788,11 @@ class _RealStaffAndTimeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _StepLabel(number: 2, label: l10n.chooseStaffOptional),
+        _StepLabel(
+          number: 2,
+          label: l10n.chooseStaffOptional,
+          done: selectedStaffId != null,
+        ),
         const SizedBox(height: AppSpacing.s3),
         if (staff.isEmpty)
           _InlineHint(icon: Icons.person_off_outlined, text: l10n.noServicesListed)
@@ -788,7 +808,11 @@ class _RealStaffAndTimeSection extends StatelessWidget {
             ),
           ),
         const SizedBox(height: AppSpacing.s6),
-        _StepLabel(number: 3, label: l10n.pickTimeOnDay(dayLabel)),
+        _StepLabel(
+          number: 3,
+          label: l10n.pickTimeOnDay(dayLabel),
+          done: selectedSlotId != null,
+        ),
         const SizedBox(height: AppSpacing.s3),
         _DayAndSlotPanel(
           selectedDay: selectedDay,
@@ -860,37 +884,83 @@ class _NoPetsCard extends StatelessWidget {
   }
 }
 
+/// One of the four questions this screen asks, with its number.
+///
+/// [done] is what turns four stacked lists into something that reads
+/// as a sequence. Every disc was mint before, answered or not, so the
+/// screen looked the same whether you had filled in nothing or
+/// everything and there was no way to see how far along you were
+/// without reading all of it.
 class _StepLabel extends StatelessWidget {
   final int number;
   final String label;
-  const _StepLabel({required this.number, required this.label});
+  final bool done;
+
+  const _StepLabel({
+    required this.number,
+    required this.label,
+    this.done = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          height: 22,
-          width: 22,
-          decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-          child: Center(
-            child: Text('$number',
-                style: const TextStyle(
-                    color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+    return Semantics(
+      header: true,
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            height: 24,
+            width: 24,
+            decoration: BoxDecoration(
+              color: done ? AppColors.accent : Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: done ? AppColors.accent : AppColors.border,
+                width: 1.5,
+              ),
+              boxShadow: done ? AppShadows.glow(AppColors.accent) : null,
+            ),
+            child: Center(
+              child: done
+                  ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+                  : Text(
+                      '$number',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        // The step labels are full phrases ("Choose a service"), and the
-        // numbered disc beside them is fixed width, so the label is what
-        // has to give on a narrow screen.
-        Expanded(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text),
+          const SizedBox(width: 10),
+          // The labels are full phrases ("Odaberi uslugu") and the disc
+          // beside them is fixed width, so the label is what gives on a
+          // narrow screen.
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14.5,
+                letterSpacing: -0.1,
+                color: AppColors.text,
+              ),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          // A rule running out to the edge. It costs nothing and it is
+          // what makes each step read as a band across the page rather
+          // than a line of text floating above a list.
+          Expanded(
+            child: Container(height: 1, color: AppColors.borderLight),
+          ),
+        ],
+      ),
     );
   }
 }
