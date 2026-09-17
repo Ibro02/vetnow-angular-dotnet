@@ -1,0 +1,115 @@
+# The mobile app's tests, run by something other than a person
+# remembering to run them.
+#
+# There are 453 of them and until now they only ever executed when
+# somebody typed `flutter test` — which means a branch could sit for days
+# with a failure in it and look fine. Several of the bugs fixed this week
+# were caught by these tests only because a run happened to be made at
+# the right moment.
+#
+# Deliberately narrow: this watches the Flutter app and nothing else. The
+# backend is a separate project with its own build, and a workflow that
+# tries to cover both ends up failing for reasons neither team can act
+# on.
+name: Mobile
+
+on:
+  push:
+    paths:
+      - 'vetnow_mobile_app/**'
+      - '.github/workflows/mobile.yml'
+  pull_request:
+    paths:
+      - 'vetnow_mobile_app/**'
+      - '.github/workflows/mobile.yml'
+
+# A second push to the same branch cancels the first. A run against code
+# that has already been replaced is burning minutes to answer a question
+# nobody is still asking.
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: vetnow_mobile_app
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          # Pinned rather than "stable". A toolchain that moves on its
+          # own turns an unrelated push into a mystery failure, and the
+          # first thing anyone does then is assume their own change
+          # broke it.
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Generated localisations are up to date
+        # gen-l10n is not run by the analyzer or the tests, so a change
+        # to an .arb file can be committed without the Dart it generates
+        # — which is exactly how three .arb files once sat truncated for
+        # a day with a green suite, until a build finally ran gen-l10n
+        # and refused them.
+        run: |
+          flutter gen-l10n
+          git diff --exit-code lib/l10n/ || {
+            echo "::error::lib/l10n is stale. Run 'flutter gen-l10n' and commit the result."
+            exit 1
+          }
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        # The screenshot suite is excluded by dart_test.yaml: it writes
+        # PNGs rather than asserting anything, and it is a tool for
+        # looking at the app rather than a check on it.
+        run: flutter test
+
+  # Kept separate from the tests on purpose. A failing build and a
+  # failing test are different problems with different owners, and one
+  # job reporting both makes the summary say "Mobile failed" either way.
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # The wrapper jar is a binary in the repository, so its checksum
+      # is checked against Gradle's published releases before anything
+      # runs it. Committing the wrapper is what makes every checkout
+      # build with the same Gradle; this is what keeps that from also
+      # meaning "whatever binary happened to be committed".
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Release APK compiles
+        # Not published anywhere — this is here because a release build
+        # runs R8 and tree-shaking over code that debug builds never
+        # touch, and it has caught things `flutter test` cannot see.
+        # Signing is left to the debug key: this proves the code builds,
+        # not that it is shippable.
+        run: flutter build apk --release

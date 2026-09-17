@@ -1,0 +1,460 @@
+{
+  "@@locale": "hr",
+
+
+  "navExplore": "Istraži",
+  "navAppointments": "Termini",
+  "navProfile": "Profil",
+
+  "exploreHeroTitle": "Pouzdana skrb,\nrezervirana za sekunde.",
+  "exploreHeroSubtitle": "Pregledaj provjerene klinike blizu tebe — bez računa za pregledavanje.",
+  "searchHint": "Pretraži klinike…",
+  "clearSearch": "Obriši pretragu",
+  "@clearSearch": {
+    "description": "Tooltip on the X inside the Explore search field."
+  },
+  "filterRecommended": "Preporučeno",
+  "filterTopRated": "Najbolje ocijenjeno",
+  "clinicsInCity": "{count, plural, one{{count} klinika u {city}} few{{count} klinike u {city}} other{{count} klinika u {city}}}",
+  "@clinicsInCity": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "city": {"type": "String"}
+    }
+  },
+  "noClinicsMatch": "Nijedna klinika ne odgovara tvojim filterima",
+  "chooseCity": "Odaberi grad",
+  "sessionExpired": "Sesija je istekla. Prijavite se ponovo.",
+  "@sessionExpired": {
+    "description": "Shown on the sign-in prompt when the backend refused the saved token."
+  },
+  "validationFirstNameRequired": "Unesi ime",
+  "validationLastNameRequired": "Unesi prezime",
+  "validationNameTooShort": "Najmanje 2 slova",
+  "validationEmailRequired": "Unesi email adresu",
+  "validationEmailInvalid": "Ovo ne izgleda kao email adresa",
+  "validationPhoneInvalid": "Samo brojevi, razmaci i +",
+  "validationPhoneTooShort": "Broj je prekratak",
+  "validationPasswordTooShort": "Lozinka mora imati najmanje 8 znakova",
+  "validationCheckFields": "{count, plural, one{Provjeri još {count} polje} few{Provjeri još {count} polja} other{Provjeri još {count} polja}}",
+  "@validationCheckFields": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "calendarOpen": "Kalendar",
+  "pickDay": "Izaberi dan",
+  "monthSheetTitle": "Izaberi datum",
+  "dayPartMorning": "Jutro",
+  "dayPartAfternoon": "Poslijepodne",
+  "dayPartEvening": "Veče",
+  "dayPartFull": "popunjeno",
+  "closedShort": "zatv.",
+  "earliestLabel": "Najranije slobodno",
+  "todayWord": "danas",
+  "tomorrowWord": "sutra",
+  "pickTimeOnDay": "Odaberi vrijeme {date}",
+  "@pickTimeOnDay": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "noSlotsOnDay": "Nema slobodnih termina {date}.",
+  "@noSlotsOnDay": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "slotAtDuration": "{date} u {slot} · {duration} min",
+  "@slotAtDuration": {
+    "placeholders": {
+      "date": {},
+      "slot": {},
+      "duration": {}
+    }
+  },
+  "firstOnDay": "Prvi termin",
+  "allPets": "Svi ljubimci",
+  "onboardingSkip": "Preskoči",
+  "onboardingNext": "Dalje",
+  "onboardingStart": "Započni",
+  "onboarding1Title": "Pronađi kliniku",
+  "onboarding1Body": "Pregledaj provjerene veterinarske stanice u svom gradu — ocjene, usluge i radno vrijeme na jednom mjestu.",
+  "onboarding2Title": "Rezerviraj u par klikova",
+  "onboarding2Body": "Odaberi uslugu, osobu i termin koji ti odgovara. Bez poziva, bez čekanja.",
+  "onboarding3Title": "Sve o tvom ljubimcu",
+  "onboarding3Body": "Ljubimci, termini i povijest posjeta na dohvat ruke — i kad nema signala.",
+  "petsReportAction": "Preuzmi karton",
+  "petsReportEmpty": "Nemaš nijednog ljubimca za izvještaj.",
+  "petsReportFailed": "Izvještaj nije uspio. Pokušaj ponovo.",
+  "petsReportSubject": "Medicinski karton",
+  "allCities": "Svi gradovi",
+  "noRatingsYet": "Nova",
+  "noReviewsYet": "Još nema recenzija",
+  "beFirstToReview": "Budi prvi koji će ocijeniti ovu kliniku.",
+  "rateYourVisit": "Ocijeni svoju posjetu",
+  "rateVisitHint": "Bio si ovdje — kako je prošlo?",
+  "reviewCommentHint": "Napiši par riječi (nije obavezno)",
+  "submitReview": "Pošalji recenziju",
+  "reviewsCount": "{count, plural, one{{count} recenzija} few{{count} recenzije} other{{count} recenzija}}",
+  "@reviewsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "visitOn": "Posjeta {date}",
+  "@visitOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "clinicReviews": "Recenzije klinike",
+  "pickRating": "Odaberi ocjenu",
+  "couldNotOpenMaps": "Ne mogu otvoriti mape na ovom uređaju.",
+  "ageYears": "{count, plural, one{{count} godina} few{{count} godine} other{{count} godina}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "ageMonths": "{count, plural, one{{count} mjesec} few{{count} mjeseca} other{{count} mjeseci}}",
+  "@ageMonths": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "ageUnknown": "Starost nepoznata",
+  "birthdayToday": "Rođendan danas!",
+  "birthdayInDays": "{count, plural, one{Rođendan za {count} dan} few{Rođendan za {count} dana} other{Rođendan za {count} dana}}",
+  "@birthdayInDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "turnsAge": "{name} puni {age}",
+  "@turnsAge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "age": {"type": "String"}
+    }
+  },
+  "notificationsBirthdays": "Rođendani",
+  "dayMonday": "Ponedjeljak",
+  "dayTuesday": "Utorak",
+  "dayWednesday": "Srijeda",
+  "dayThursday": "Četvrtak",
+  "dayFriday": "Petak",
+  "daySaturday": "Subota",
+  "daySunday": "Nedjelja",
+  "closedDay": "Zatvoreno",
+  "openNowLabel": "Otvoreno sada",
+  "closedNowLabel": "Trenutno zatvoreno",
+  "openingHours": "Radno vrijeme",
+  "noScheduleYet": "Radno vrijeme još nije uneseno.",
+  "notificationsEmpty": "Sve je čisto — nema ničega novog.",
+  "notificationsUpcoming": "Nadolazeći termini",
+  "notificationsAwaitingReview": "Čekaju tvoju ocjenu",
+  "notificationsRateCta": "Ocijeni",
+  "notificationsGuest": "Prijavi se da vidiš svoje termine i podsjetnike.",
+  "todayAt": "Danas u {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "tomorrowAt": "Sutra u {time}",
+  "@tomorrowAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "dateAt": "{date} u {time}",
+  "@dateAt": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "somethingWentWrong": "Nešto je pošlo po zlu",
+  "offlineShowingSaved": "Nema veze sa serverom — prikazane su zadnje sačuvane klinike.",
+  "sortByName": "Po imenu",
+  "sortDefault": "Redoslijed",
+  "filterMostReviewed": "Najviše recenzija",
+  "clinicsFound": "{count, plural, one{{count} pronađena klinika} few{{count} pronađene klinike} other{{count} pronađenih klinika}}",
+  "@clinicsFound": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "loginTitle": "Prijava",
+  "loginBookingGateTitle": "Gotovo",
+  "loginBookingGateSubtitle": "Prijavi se za potvrdu termina — traje sekundu.",
+  "loginWelcomeSubtitle": "Drago nam je da si opet tu! 🐾",
+  "usernameOrEmail": "Korisničko ime / Email",
+  "password": "Lozinka",
+  "keepSignedIn": "Ostani prijavljen/a",
+  "forgotPassword": "Zaboravljena lozinka?",
+  "signIn": "Prijavi se",
+  "loginInvalidCredentials": "Pogrešno korisničko ime ili lozinka.",
+  "loginNeedsVerification": "Račun nije verificiran. Poslali smo novi kod na tvoj email.",
+  "networkError": "Nešto nije uspjelo. Provjeri internetsku vezu i pokušaj ponovno.",
+  "retry": "Pokušaj ponovno",
+  "registerSuccessCheckEmail": "Račun je kreiran! Provjeri email da ga verificiraš, pa se prijavi.",
+  "passwordRequirementsHint": "Najmanje 8 znakova: veliko i malo slovo, broj i specijalni znak.",
+  "noAccount": "Nemaš račun?",
+  "register": "Registriraj se",
+
+  "createAccount": "Izradi račun",
+  "registerSubtitle": "Izradi račun kako bi rezervirao/la termine i upravljao/la ljubimcima.",
+  "firstName": "Ime",
+  "lastName": "Prezime",
+  "email": "Email",
+  "username": "Korisničko ime",
+  "createAccountButton": "Izradi račun",
+  "backToLogin": "Natrag na prijavu",
+
+  "myAppointments": "Moji termini",
+  "appointmentsSubtitle": "Prati svoje nadolazeće i prošle posjete",
+  "upcoming": "Nadolazeći",
+  "pastVisits": "Prošle posjete",
+  "statusCompleted": "Završeno",
+  "statusCancelled": "Otkazano",
+  "noUpcoming": "Nema nadolazećih termina.",
+  "noPast": "Povijest termina još nije dostupna.",
+  "noAppointmentsYet": "Još nema termina",
+
+  "profileTitle": "Profil",
+  "guestTitle": "Pregledavaš kao gost",
+  "guestMessage": "Izradi račun kako bi spremio/la svoje ljubimce, pratio/la povijest posjeta i brže rezervirao/la sljedeći put.",
+  "guestBenefit1": "Spremi podatke o ljubimcima jednom, koristi za svaku rezervaciju",
+  "guestBenefit2": "Vodi evidenciju svake posjete i cijepljenja",
+  "guestBenefit3": "Preskoči ponovno unošenje podataka sljedeći put",
+  "logInRegister": "Prijava / Registracija",
+  "takesLessThanMinute": "Traje manje od minute.",
+
+  "myPets": "Moji ljubimci",
+  "viewAll": "Pogledaj sve",
+  "addPet": "Dodaj ljubimca",
+  "account": "Račun",
+  "personalInfo": "Osobni podaci",
+  "passwordSecurity": "Lozinka i sigurnost",
+  "notifications": "Obavijesti",
+  "helpSupport": "Pomoć i podrška",
+  "logOut": "Odjava",
+  "member": "Član",
+  "memberSince": "Član od",
+  "pets": "Ljubimci",
+
+  "logOutConfirmTitle": "Odjava?",
+  "logOutConfirmMessage": "Uvijek se možeš ponovno prijaviti kako bi vidio/la svoje ljubimce i termine.",
+  "stayLoggedIn": "Ostani prijavljen/a",
+
+  "cancelAppointmentTitle": "Otkazati termin?",
+  "cancelAppointmentMessage": "Ovo se ne može poništiti. Trebat ćeš rezervirati novi termin ako se predomisliš.",
+  "keepIt": "Zadrži",
+  "cancelAppointmentAction": "Otkaži termin",
+  "reschedule": "Promijeni termin",
+  "bookAgain": "Rezerviraj ponovno",
+
+  "bookAppointment": "Rezerviraj termin",
+  "chooseService": "Odaberi uslugu",
+  "chooseStaffOptional": "Odaberi osoblje (neobavezno)",
+  "pickTimeToday": "Odaberi vrijeme — danas",
+  "pickTimeAbove": "Odaberi vrijeme iznad",
+  "choosePet": "Odaberi ljubimca",
+  "noPetsYet": "Nemaš dodanih ljubimaca.",
+  "addPetFirst": "Dodaj ljubimca da nastaviš",
+  "bookingFailed": "Rezervacija nije uspjela — termin je možda upravo zauzet. Pokušaj ponovno.",
+  "anyAvailable": "Bilo tko dostupan",
+  "confirmBooking": "Potvrdi rezervaciju",
+  "selectServiceAndTime": "Odaberi uslugu i vrijeme",
+  "bookingSummary": "Pregled rezervacije",
+  "total": "Ukupno",
+  "youAreBooked": "Rezervirano je!",
+  "bookingConfirmedMessage": "Tvoj termin u {clinicName} je potvrđen. Poslali smo detalje na tvoj email.",
+  "@bookingConfirmedMessage": {
+    "placeholders": {
+      "clinicName": {"type": "String"}
+    }
+  },
+  "backToExplore": "Natrag na Istraži",
+
+  "call": "Nazovi",
+  "book": "Rezerviraj",
+  "verifiedPartner": "Verificirani partner",
+  "whatIsVerifiedPartner": "Što znači Verificirani partner?",
+  "verifiedPartnerExplanation": "Licenca ove klinike provjerena je u registru Veterinarske komore, a njezino osoblje i usluge prikazane ovdje pregledao je VetNow tim.",
+  "gotIt": "Razumijem",
+  "meetTheTeam": "Upoznaj tim",
+  "allServices": "Sve usluge",
+  "reviews": "Recenzije",
+  "openNow": "Otvoreno sada",
+
+  "language": "Jezik",
+  "appearance": "Izgled",
+  "themeSystem": "Kao na uređaju",
+  "themeLight": "Svijetla",
+  "themeDark": "Tamna",
+  "chooseTheme": "Odaberi izgled",
+  "chooseLanguage": "Odaberi jezik",
+  "bosnian": "Bosanski",
+  "croatian": "Hrvatski",
+  "serbian": "Srpski",
+
+  "savePet": "Spremi ljubimca",
+  "saveChanges": "Spremi izmjene",
+  "editPet": "Uredi ljubimca",
+  "favourites": "Omiljeni",
+  "addToFavourites": "Dodaj u omiljene",
+  "removeFromFavourites": "Ukloni iz omiljenih",
+  "mostVisited": "Najčešće dolazi",
+  "visits": "termina",
+  "markFavourite": "Označi kao omiljenog",
+  "unmarkFavourite": "Ukloni iz omiljenih",
+  "petsDashboardSubtitle": "Tvoji ljubimci, na jednom mjestu",
+  "viewList": "Popis",
+  "viewDashboard": "Nadzorna ploča",
+  "searchPetsHint": "Pretraži po imenu…",
+  "filterAllSpecies": "Sve vrste",
+  "noPetsMatchFilter": "Nijedan ljubimac ne odgovara pretrazi.",
+  "dragWholeCardHint": "Drži karticu i povuci za promjenu redoslijeda.",
+  "chooseSpecies": "Odaberi vrstu",
+  "searchSpeciesHint": "Pretraži vrste…",
+  "noSpeciesFound": "Nema pronađenih vrsta.",
+  "approxAge": "Star/a otprilike {age}",
+  "@approxAge": {"placeholders": {"age": {"type": "String"}}},
+  "selectBirthDate": "Odaberi datum",
+  "tellUsAboutFriend": "Reci nam o svom prijatelju",
+  "weightOptional": "Težina (kg) — neobavezno",
+  "breed": "Pasmina",
+  "species": "Vrsta",
+  "petName": "Ime",
+  "petInfoNote": "Cijepljenja i druge detalje možeš dodati kasnije s profila ljubimca.",
+  "deletePet": "Ukloni ljubimca",
+  "deletePetConfirmTitle": "Ukloniti {name}?",
+  "@deletePetConfirmTitle": {"placeholders": {"name": {"type": "String"}}},
+  "deletePetConfirmMessage": "Ovo se ne može poništiti.",
+  "deletePetAction": "Ukloni",
+  "details": "Detalji",
+  "vaccinationHistory": "Povijest cijepljenja",
+  "noVaccinationRecords": "Još nema zapisa o cijepljenju.\nTvoja veterinarska klinika ih može dodati nakon posjeta.",
+  "weight": "Težina",
+  "microchip": "Mikročip",
+  "age": "Dob",
+  "sectionAppointment": "Termin",
+  "appointmentDetails": "Detalji termina",
+  "sectionSpecialist": "Specijalist",
+  "sectionClinic": "Klinika",
+  "labelService": "Usluga",
+  "labelDetails": "Detalji",
+  "labelDuration": "Trajanje",
+  "labelPet": "Ljubimac",
+  "labelPrice": "Cijena",
+  "labelName": "Naziv",
+  "labelAddress": "Adresa",
+  "labelPhone": "Telefon",
+  "servicesWithSpecialist": "Usluge kod ovog specijalista",
+  "noServicesListed": "Još nema navedenih usluga.",
+
+  "amenityInOffice": "Pregledi u ordinaciji",
+  "amenityInOfficeDesc": "Ova klinika prima ljubimce izravno u svojoj ordinaciji.",
+  "amenityOnField": "Terenske posjete",
+  "amenityOnFieldDesc": "Veterinar može doći na vašu kućnu adresu.",
+  "amenityParking": "Parking",
+  "amenityParkingDesc": "Besplatan parking dostupan za posjetitelje.",
+  "amenityWheelchair": "Pristup za invalidska kolica",
+  "amenityWheelchairDesc": "Objekt je prilagođen osobama s invaliditetom.",
+  "amenityWifi": "Besplatan WiFi",
+  "amenityWifiDesc": "Besplatan bežični internet dostupan u čekaonici.",
+  "filterClinics": "Filtriraj klinike",
+  "applyFilters": "Primijeni",
+  "resetFilters": "Poništi",
+  "trustNoAccount": "Bez računa za pregledavanje",
+  "trustFewTaps": "Rezervacija za par klikova",
+
+  "roleVeterinarian": "Veterinar",
+  "roleNurse": "Medicinska sestra",
+  "roleGroomer": "Njegovatelj/ica",
+  "roleNoPreference": "Bez preferencije",
+
+  "serviceVaccinationName": "Cijepljenje",
+  "serviceVaccinationDesc": "Osnovna cjepiva i cjepivo protiv bjesnoće",
+  "serviceCheckupName": "Opći pregled",
+  "serviceCheckupDesc": "Kompletan fizički pregled",
+  "serviceDentalName": "Čišćenje zubi",
+  "serviceDentalDesc": "Skidanje kamenca i poliranje",
+  "serviceGroomingName": "Šišanje i njega",
+  "staffBioInternal": "Fokus na internu medicinu i preventivnu njegu, 9 godina prakse.",
+  "@staffBioInternal": {
+    "description": "Placeholder vet bio shown until the backend has staff profiles."
+  },
+  "staffBioSurgery": "Vodeći kirurg — stomatološki i zahvati na mekim tkivima.",
+  "@staffBioSurgery": {
+    "description": "Placeholder vet bio shown until the backend has staff profiles."
+  },
+  "staffBioGrooming": "Šišanje i njega noktiju za pse i mačke svih veličina.",
+  "@staffBioGrooming": {
+    "description": "Placeholder groomer bio shown until the backend has staff profiles."
+  },
+  "serviceGroomingDesc": "Pranje, šišanje i njega noktiju",
+  "currentAppointment": "Trenutni termin",
+  "noFreeSlotsThatDay": "Nema slobodnih termina za taj dan. Pokušaj s drugim datumom.",
+  "confirmReschedule": "Potvrdi novi termin",
+  "rescheduleSuccess": "Termin je pomaknut.",
+  "editProfile": "Uredi profil",
+  "editProfileSubtitle": "Ažuriraj svoje podatke i lozinku",
+  "profileUpdated": "Profil je ažuriran.",
+  "sectionPersonalInfo": "Osobni podaci",
+  "sectionContact": "Kontakt",
+  "sectionLocation": "Lokacija",
+  "sectionSecurity": "Sigurnost",
+  "labelCity": "Grad",
+  "labelCountry": "Država",
+  "newPassword": "Nova lozinka",
+  "newPasswordHint": "Ostavi prazno ako je ne mijenjaš",
+  "couldNotPlaceCall": "Poziv nije moguće pokrenuti s ovog uređaja.",
+  "verifyAccountTitle": "Potvrda računa",
+  "verifyAccountHeadline": "Provjeri svoj email",
+  "verifyAccountBody": "Poslali smo ti kod za potvrdu. Upiši ga ispod kako bi aktivirao račun.",
+  "verifyAccountBodyFor": "Poslali smo kod za potvrdu na {contact}. Upiši ga ispod kako bi aktivirao račun.",
+  "verifyAccountAction": "Potvrdi račun",
+  "verifyAccountResendHint": "Nisi dobio kod? Pokušaj se prijaviti ponovo — novi kod šaljemo pri svakoj prijavi.",
+  "filterAllStaff": "Svi",
+  "a11yLoading": "Učitavanje",
+  "a11yBack": "Natrag",
+  "a11yClearSearch": "Obriši pretragu",
+  "a11yShowPassword": "Prikaži lozinku",
+  "a11yHidePassword": "Sakrij lozinku",
+  "a11yRateStars": "{count, plural, one{{count} zvjezdica} few{{count} zvjezdice} other{{count} zvjezdica}}",
+  "@a11yRateStars": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "diagnosticsTitle": "Pomoć i dijagnostika",
+  "diagnosticsAbout": "O aplikaciji",
+  "diagnosticsVersion": "Verzija",
+  "diagnosticsBackend": "Poslužitelj",
+  "diagnosticsReports": "Zapisi o greškama",
+  "diagnosticsEmpty": "Nema zabilježenih grešaka. To je dobra vijest.",
+  "diagnosticsExplainer": "Ako nešto krene po zlu, aplikacija to zabilježi ovdje — samo na tvom telefonu, ništa se ne šalje. Kopiraj i pošalji nam kad prijavljuješ problem.",
+  "diagnosticsCopy": "Kopiraj izvještaj",
+  "diagnosticsCopied": "Kopirano",
+  "diagnosticsClear": "Obriši zapise",
+  "diagnosticsCleared": "Zapisi obrisani",
+  "diagnosticsFatal": "Pad",
+  "diagnosticsHandled": "Greška",
+  "configWarningTitle": "Ovaj build nije spreman za objavu",
+  "configWarningBody": "Aplikacija je podešena da razgovara s poslužiteljem koji postoji samo na računalu na kojem je build napravljen, pa ništa neće raditi na telefonu. Ponovno napravi build s --dart-define=API_BASE_URL=https://…",
+  "reportReview": "Prijavi recenziju",
+  "reportReviewTitle": "Prijaviti ovu recenziju?",
+  "reportReviewBody": "Otvorićemo e-mail s detaljima recenzije da ga pošalješ. Pregledamo svaku prijavu i uklanjamo sadržaj koji krši pravila.",
+  "reportReviewSend": "Otvori e-mail",
+  "reportReviewFailed": "Nismo mogli otvoriti e-mail aplikaciju. Kontakt adresa je kopirana.",
+  "forgotPasswordTitle": "Zaboravljena lozinka",
+  "forgotPasswordBody": "Resetiranje lozinke još nije dostupno u aplikaciji. Javi nam se na {email} i vratit ćemo ti pristup.",
+  "copyEmail": "Kopiraj adresu",
+  "copied": "Kopirano",
+  "@forgotPasswordBody": {
+    "placeholders": { "email": { "type": "String" } }
+  }
+}

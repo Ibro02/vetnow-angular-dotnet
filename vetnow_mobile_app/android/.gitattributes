@@ -1,0 +1,11 @@
+# The Gradle wrapper, spelled out rather than left to auto-detection.
+#
+# gradlew is a shell script that Linux runs directly, so it must keep LF
+# endings whatever the machine that committed it uses -- a CRLF gradlew
+# fails on CI with "bad interpreter", which is a confusing way to find
+# out about line endings.
+#
+# The jar is binary and must never be touched by any conversion at all.
+gradlew            text eol=lf
+gradlew.bat        text eol=crlf
+gradle-wrapper.jar binary

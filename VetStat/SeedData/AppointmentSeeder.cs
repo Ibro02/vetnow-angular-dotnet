@@ -18,6 +18,7 @@ public class AppointmentSeeder
         if (_context.Appointment.Any())
         {
             Console.WriteLine("Appointments already exist. Skipping...");
+            await RepairDetachedAppointmentsAsync();
             return;
         }
 
@@ -87,5 +88,57 @@ public class AppointmentSeeder
         _context.Appointment.AddRange(appointments);
         await _context.SaveChangesAsync();
         Console.WriteLine($"Created {appointments.Count} appointments");
+    }
+
+    /// <summary>
+    /// Gives a past time slot back to any appointment that lost one.
+    ///
+    /// Earlier builds deleted expired time slots and nulled the appointment's
+    /// TimeSlotId along with them, so every visit older than a day ended up with
+    /// no date at all — the customer's history looked empty and the visit could
+    /// not be reviewed. The cleanup no longer does that
+    /// (see AppointmentGeneratorService.CleanupOldTimeSlots), but databases that
+    /// already went through it still hold the damage, so this repairs them.
+    ///
+    /// Idempotent: appointments that already have a slot are untouched.
+    /// </summary>
+    private async Task RepairDetachedAppointmentsAsync()
+    {
+        var detached = await _context.Appointment
+            .Where(a => a.TimeSlotId == null && a.EmployeeId != null)
+            .OrderBy(a => a.Id)
+            .ToListAsync();
+
+        if (detached.Count == 0) return;
+
+        Console.WriteLine($"Repairing {detached.Count} appointment(s) left without a time slot...");
+
+        // Spread them backwards over recent weeks so the history reads like a
+        // sequence of real visits rather than a pile stamped with one date.
+        var anchor = DateTime.Now.Date.AddDays(-3).AddHours(10);
+
+        for (int i = 0; i < detached.Count; i++)
+        {
+            var appointment = detached[i];
+            var availability = await _context.Availability
+                .FirstOrDefaultAsync(av => av.EmployeeId == appointment.EmployeeId);
+
+            var slot = new TimeSlot
+            {
+                AvailabilityId = availability?.Id,
+                SlotDateTime = anchor.AddDays(-i * 4).AddHours(i % 6),
+                SlotEmployeeId = appointment.EmployeeId,
+                IsAvailable = false,
+                AppointmentTime = new TimeSpan(0, 30, 0)
+            };
+
+            _context.TimeSlot.Add(slot);
+            await _context.SaveChangesAsync();
+
+            appointment.TimeSlotId = slot.Id;
+        }
+
+        await _context.SaveChangesAsync();
+        Console.WriteLine($"Repaired {detached.Count} appointment(s).");
     }
 }

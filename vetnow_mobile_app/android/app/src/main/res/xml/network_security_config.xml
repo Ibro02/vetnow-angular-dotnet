@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Release network policy: HTTPS only.
+
+  Android has blocked cleartext by default since API 28, but saying it
+  explicitly means a plugin or a redirect cannot quietly reintroduce
+  http:// later. The app carries a session token in every request; on
+  plain HTTP that token is readable by anyone on the same coffee-shop
+  wifi.
+
+  The debug build overrides this file (see src/debug/res/xml) so a dev
+  server on localhost still works.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

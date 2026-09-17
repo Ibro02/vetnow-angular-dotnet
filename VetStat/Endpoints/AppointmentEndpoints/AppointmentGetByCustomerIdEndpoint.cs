@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 
 namespace VetStat.Endpoints.AppointmentEndpoints;
 
@@ -11,18 +12,39 @@ namespace VetStat.Endpoints.AppointmentEndpoints;
 public class AppointmentGetByCustomerIdEndpoint : MyEndpointBase
 {
     private readonly DataContext _db;
+    private readonly AuthService _authService;
 
-    public AppointmentGetByCustomerIdEndpoint(DataContext db)
+    public AppointmentGetByCustomerIdEndpoint(DataContext db, AuthService authService)
     {
         _db = db;
+        _authService = authService;
     }
 
+    /// <summary>
+    /// A customer's appointments.
+    ///
+    /// By default only upcoming ones, which is what the web dashboard has
+    /// always shown. Pass <paramref name="includePast"/> to get the full
+    /// history as well — the mobile app splits it into "upcoming" and "past
+    /// visits" itself.
+    /// </summary>
     [HttpGet("GetByCustomerId")]
-    public ActionResult Handle([FromQuery] int customerId)
+    public ActionResult Handle([FromQuery] int customerId, [FromQuery] bool includePast = false)
     {
+        var currentUserId = _authService.GetCurrentUserId();
+        if (currentUserId == null)
+            return Unauthorized("Invalid token.");
+
+        // Someone's appointment history says where they were, when, and with
+        // which animal. Only they and staff may read it — the customer id
+        // arrives in the query string, so without this check any signed-in
+        // account could simply ask for another person's.
+        if (customerId != currentUserId && !_authService.IsAtLeastEmployee())
+            return Forbid();
+
         try
         {
-            var appointments = _db.Appointment
+            var query = _db.Appointment
                 .Where(a => a.CustomerId == customerId)
                 .Select(a => new
                 {
@@ -62,8 +84,16 @@ public class AppointmentGetByCustomerIdEndpoint : MyEndpointBase
                     VetStationName = _db.VetStation
                         .Where(vs => vs.Id == a.VetStationId)
                         .Select(vs => vs.Name).FirstOrDefault()
-                })
-                .Where(a => a.SlotDateTime >= DateTime.UtcNow.Date)
+                });
+
+            if (!includePast)
+                query = query.Where(a => a.SlotDateTime >= DateTime.UtcNow.Date);
+            else
+                // An appointment with no slot has no date to place it on a
+                // timeline, so it is left out of the history too.
+                query = query.Where(a => a.TimeSlotId != null);
+
+            var appointments = query
                 .OrderBy(a => a.SlotDateTime)
                 .ThenBy(a => a.AppointmentTime)
                 .ToList()
@@ -86,7 +116,7 @@ public class AppointmentGetByCustomerIdEndpoint : MyEndpointBase
 
             return Ok(appointments);
         }
-        catch (Exception ex)
+        catch
         {
             return BadRequest("Could not retrieve the data. Please try again.");
         }

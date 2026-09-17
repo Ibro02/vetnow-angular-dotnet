@@ -58,6 +58,13 @@ namespace VetStat.Controllers
             {
                 Services.AdminValidator(admin);
 
+                // Every write path has to hash. This one stored the password
+                // as typed, which the login fallback used to paper over — with
+                // that fallback gone, an admin created here simply could not
+                // sign in, and until then their password sat in the clear.
+                if (!string.IsNullOrEmpty(admin.Password))
+                    admin.Password = PasswordHasher.Hash(admin.Password);
+
                 _db.Admin.Add(admin);
                 _db.SaveChanges();
                 return Ok(admin.ToDto());

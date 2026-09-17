@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
+using VetStat.Helpers.Services;
 using VetStat.Models;
 
 namespace VetStat.SeedData;
@@ -56,7 +57,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 111 111",
                 RoleId = vetRole.Id,
                 Username = "kenanvet",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Marindvor 5",
@@ -77,7 +78,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 222 222",
                 RoleId = vetRole.Id,
                 Username = "selmavet",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Bascarsija 12",
@@ -98,7 +99,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 333 333",
                 RoleId = vetRole.Id,
                 Username = "adnanvet",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Mostar",
                 Country = "Bosnia and Herzegovina",
                 Address = "Stari Most 3",
@@ -128,7 +129,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 444 444",
                 RoleId = nurseRole.Id,
                 Username = "merimanurse",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Skenderija 7",
@@ -148,7 +149,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 555 555",
                 RoleId = nurseRole.Id,
                 Username = "tariknurse",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Mostar",
                 Country = "Bosnia and Herzegovina",
                 Address = "Alekse Santica 15",
@@ -177,7 +178,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 666 666",
                 RoleId = barberRole.Id,
                 Username = "ajlabarber",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Sarajevo",
                 Country = "Bosnia and Herzegovina",
                 Address = "Ciglane 22",
@@ -196,7 +197,7 @@ public class EmployeeSeeder
                 Phone = "+387 62 777 777",
                 RoleId = barberRole.Id,
                 Username = "harisbarber",
-                Password = "Test1234!",
+                Password = PasswordHasher.Hash("Test1234!"),
                 City = "Tuzla",
                 Country = "Bosnia and Herzegovina",
                 Address = "Solni Trg 9",
@@ -222,7 +223,7 @@ public class EmployeeSeeder
             Phone = "+387 62 888 888",
             RoleId = mainVetRole.Id,
             Username = "faruk.mainvet",
-            Password = "Test1234!",
+            Password = PasswordHasher.Hash("Test1234!"),
             City = "Sarajevo",
             Country = "Bosnia and Herzegovina",
             Address = "Obala Kulina Bana 1",

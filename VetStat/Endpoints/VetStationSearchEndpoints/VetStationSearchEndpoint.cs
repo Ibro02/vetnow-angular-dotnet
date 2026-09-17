@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetStat.Data;
 using VetStat.Helpers.Api;
+using VetStat.Helpers.Services;
 using static VetStat.Endpoints.VetStationSearchEndpoints.VetStationSearchEndpoint;
 
 namespace VetStat.Endpoints.VetStationSearchEndpoints;
@@ -14,10 +15,12 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
     .WithResult<VetStationSearchResponse>
 {
     private readonly DataContext _db;
+    private readonly OpeningHoursService _hours;
 
-    public VetStationSearchEndpoint(DataContext db)
+    public VetStationSearchEndpoint(DataContext db, OpeningHoursService hours)
     {
         _db = db;
+        _hours = hours;
     }
 
     [HttpGet]
@@ -77,12 +80,32 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
             }
         }
 
+        // Location filter. Applied here rather than inside either branch above so
+        // it composes with both the "no facility filters" and the Intersect path —
+        // previously the city was simply never part of the query, and every client
+        // that offered a city picker was filtering against nothing.
+        if (!string.IsNullOrWhiteSpace(request.city))
+        {
+            query = query.Where(x => x.City != null && x.City.Contains(request.city));
+        }
+
         var vetStations = await query
             .Select(x => new VetStationSearchResponseVetStation
             {
                 Id = x.Id,
                 Name = x.Name,
                 ContactNumber = x.ContactNumber,
+                City = x.City,
+                Country = x.Country,
+                Address = x.Address,
+                Email = x.Email,
+                Description = x.Description,
+                StationImage = x.StationImage,
+                // Correlated per clinic rather than joined: the result set is a
+                // page of clinics, and Review is indexed on VetStationId.
+                ReviewCount = _db.Review.Count(r => r.VetStationId == x.Id),
+                AverageRating = _db.Review.Where(r => r.VetStationId == x.Id)
+                    .Select(r => (double?)r.Rating).Average() ?? 0,
                 InOffice = x.InOffice,
                 OnField = x.OnField,
                 Parking = x.Parking,
@@ -90,6 +113,22 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
                 Wifi = x.Wifi
             })
             .ToListAsync(cancellationToken);
+
+        // Rounded once, here, so every client shows the same number instead of
+        // each one rounding a long double its own way.
+        foreach (var station in vetStations)
+            station.AverageRating = Math.Round(station.AverageRating, 1);
+
+        // "Open now" for the whole page in two queries, not one per clinic.
+        // The list used to render an open/closed state the server never sent,
+        // so every clinic silently read as open around the clock.
+        var now = DateTime.Now;
+        var weeks = await _hours.GetWeekAsync(vetStations.Select(s => s.Id).ToList(), cancellationToken);
+        foreach (var station in vetStations)
+        {
+            if (weeks.TryGetValue(station.Id, out var week))
+                station.IsOpenNow = OpeningHoursService.IsOpenAt(week, now);
+        }
 
         return new VetStationSearchResponse
         {
@@ -100,6 +139,8 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
     public class VetStationSearchRequest
     {
         public string? name { get; set; }
+        /// <summary>Case-insensitive substring match on the clinic's city.</summary>
+        public string? city { get; set; }
         public bool? isInOffice { get; set; } = false;
         public bool? isOnField { get; set; } = false;
         public bool? wifi { get; set; } = false;
@@ -125,6 +166,24 @@ public class VetStationSearchEndpoint : MyEndpointBaseAsync
         public int Id { get; set; }
         public string? Name { get; set; }
         public string ContactNumber { get; set; }
+
+        // These live on the entity but used to be dropped by the projection, which
+        // left every consumer with a clinic it could not place on a map, show an
+        // address for, or filter by city.
+        public string? City { get; set; }
+        public string? Country { get; set; }
+        public string? Address { get; set; }
+        public string? Email { get; set; }
+        public string? Description { get; set; }
+        public string? StationImage { get; set; }
+
+        /// <summary>Mean of every review for this clinic, 0 when it has none.</summary>
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
+
+        /// <summary>Whether the clinic is open at the moment of the request.</summary>
+        public bool IsOpenNow { get; set; }
+
         public bool InOffice { get; set; } = false;
         public bool OnField { get; set; } = false;
         public bool Parking { get; set; } = false;

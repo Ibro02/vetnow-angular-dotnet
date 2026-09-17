@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The adaptive icon.
+
+  `monochrome` is what Android 13 and later use for themed icons: when
+  somebody turns on themed icons, every app on the home screen is redrawn
+  in their wallpaper's colours, and an app without this one stays in full
+  colour among them. It does not look like a brand holding its ground; it
+  looks like the one app that was not finished.
+
+  It points at the same foreground as the colour icon, and that is
+  correct rather than lazy: Android uses only the alpha channel of a
+  monochrome drawable and paints the shape itself. The foreground is a
+  paw on transparency (94% of its pixels are clear, all four corners
+  among them), so the silhouette it yields is the paw, which is exactly
+  what is wanted.
+
+  Note for anyone editing this: a double hyphen is illegal inside an XML
+  comment, and aapt fails the whole release build over it. One was left
+  here by accident and cost a build.
+
+  Same inset on all three layers, so the shape does not shift when the
+  launcher switches between them.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/ic_launcher_background"/>
+  <foreground>
+      <inset
+          android:drawable="@drawable/ic_launcher_foreground"
+          android:inset="16%" />
+  </foreground>
+  <monochrome>
+      <inset
+          android:drawable="@drawable/ic_launcher_foreground"
+          android:inset="16%" />
+  </monochrome>
+</adaptive-icon>

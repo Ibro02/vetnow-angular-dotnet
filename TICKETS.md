@@ -47,13 +47,13 @@ Both `frontend/src/enviroment.ts` (typo) and `frontend/src/environment.ts` (corr
 
 ---
 
-[BUG] AdminController.Edit saves password without hashing
-In AdminController.Edit, the password is updated with `_admin.Password = admin.Password` without running it through PasswordHasher.Hash(). This means admin password changes are stored in plain text while all other flows correctly use BCrypt. Fix: Add `_admin.Password = PasswordHasher.Hash(admin.Password)` when the password field is being updated. Files: VetStat/Controllers/AdminController.cs (line ~78-79)
+[DONE] Plain-text passwords — AdminController.Add, the login fallback, and the existing rows
+AdminController.Edit turned out to already hash; the unhashed write was in AdminController.Add, which stored `admin.Password` exactly as posted. Fixed there, and the wider problem was closed with it: all 15 existing Person rows were still plain text, kept working only by a direct-comparison fallback in PasswordHasher.Verify. That fallback is gone, a startup pass (SeedData/PasswordSecuritySeeder.cs) rewrites any remaining plain-text password as BCrypt in every environment, the seeders hash on insert, and Google accounts now store an empty password instead of an unusable random GUID. Files: VetStat/Controllers/AdminController.cs, VetStat/Helpers/Services/PasswordHasher.cs, VetStat/SeedData/PasswordSecuritySeeder.cs, VetStat/SeedData/{UserSeeder,EmployeeSeeder,TestDataSeeder}.cs, VetStat/Endpoints/LoginAuthEndpoints/GoogleAuthEndpoint.cs
 
 ---
 
 [BUG] Person.Password property lacks [JsonIgnore] attribute
-While the DTO pattern prevents password serialization in most endpoints, the Person model itself does not have `[JsonIgnore]` on the Password property. If any endpoint accidentally returns a raw Person entity (or if serialization happens in logging/caching), the password hash would be exposed. Fix: Add `[JsonIgnore]` attribute to `public string Password { get; set; }` on the Person model as defense-in-depth. Files: VetStat/Models/Person.cs (line 34)
+While the DTO pattern prevents password serialization in most endpoints, the Person model itself does not have `[JsonIgnore]` on the Password property. If any endpoint accidentally returns a raw Person entity (or if serialization happens in logging/caching), the password hash would be exposed. Fix: Add `[JsonIgnore]` attribute to `public string Password { get; set; }` on the Person model as defense-in-depth. Checked while fixing the password hashing above: no endpoint returns a raw Person today — AdminPanel, Profile and Person all project to DTOs — so nothing is leaking. The attribute also cannot just be added: PersonAddEndpoint binds a Person straight from the request body, so `[JsonIgnore]` would block the password on the way IN and break registration. The real fix is a PersonCreateRequest DTO for that endpoint first, after which the attribute is safe. Files: VetStat/Models/Person.cs (line 34), VetStat/Endpoints/PersonEndpoints/PersonAddEndpoint.cs
 
 ---
 

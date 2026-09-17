@@ -68,6 +68,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddScoped<OpeningHoursService>();
 //builder.Services.AddScoped<IVetStationSearchRequest,VetStationSearchResponse>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -84,6 +85,19 @@ if (app.Environment.IsDevelopment())
         Console.WriteLine($"Error seeding data: {ex.Message}");
     }
 
+}
+
+// Runs in every environment, not just development: the plain-text fallback in
+// PasswordHasher.Verify has been removed, so any account still stored in plain
+// text has to be hashed before the first login attempt reaches it. Idempotent —
+// rows that already hold a BCrypt hash are skipped.
+try
+{
+    await app.SeedPasswordSecurityAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error hardening passwords: {ex.Message}");
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

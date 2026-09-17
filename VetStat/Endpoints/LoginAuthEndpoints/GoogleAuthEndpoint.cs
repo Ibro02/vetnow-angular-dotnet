@@ -60,7 +60,12 @@ public class GoogleAuthEndpoint : MyEndpointBase
             {
                 Email = email,
                 Username = email, // default username = email; user can change later
-                Password = Guid.NewGuid().ToString(), // random password (user won't need it)
+                // No password at all, rather than a random unusable string.
+                // PasswordHasher.Verify already refuses an empty value, so this
+                // account can only ever sign in through Google — and the
+                // startup password pass leaves it alone instead of hashing a
+                // GUID nobody will ever type.
+                Password = string.Empty,
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
                 GoogleProviderId = googleSubject,

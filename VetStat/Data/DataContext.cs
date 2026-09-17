@@ -79,6 +79,18 @@ namespace VetStat.Data
             modelBuilder.Entity<TwoFaVerificationToken>()
                 .HasIndex(t => t.UserId);
 
+            // Review — the station page reads every review for one clinic, and the
+            // search list reads an average per clinic; both hit VetStationId.
+            modelBuilder.Entity<Review>()
+                .HasIndex(r => r.VetStationId);
+            modelBuilder.Entity<Review>()
+                .HasIndex(r => r.PersonId);
+
+            // One review per visit, enforced by the database rather than by a
+            // check in the endpoint that a concurrent request could race past.
+            modelBuilder.Entity<Review>()
+                .HasIndex(r => r.AppointmentId).IsUnique();
+
             // ─── Relationships ────────────────────────────────────────
 
             modelBuilder.Entity<Appointment>()
@@ -117,6 +129,27 @@ namespace VetStat.Data
                 .HasForeignKey(ewd => ewd.EmployeeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Appointment)
+                .WithMany()
+                .HasForeignKey(r => r.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // A clinic or a customer being removed must not take the whole
+            // cascade chain with it — SQL Server rejects multiple cascade paths
+            // into the same table, and Appointment above already owns one.
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.VetStation)
+                .WithMany()
+                .HasForeignKey(r => r.VetStationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Person)
+                .WithMany()
+                .HasForeignKey(r => r.PersonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<EmployeeWorkingDay>()
            .HasKey(ewd => new { ewd.EmployeeId, ewd.WorkingDayId });
 
@@ -150,6 +183,8 @@ namespace VetStat.Data
         public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
 
         public DbSet<TwoFaVerificationToken> TwoFaVerificationTokens => Set<TwoFaVerificationToken>();
+
+        public DbSet<Review> Review => Set<Review>();
 
     }
 }

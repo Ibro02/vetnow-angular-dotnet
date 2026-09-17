@@ -56,42 +56,34 @@ namespace VetStat.Helpers.Services
         }
 
         /// <summary>
-        /// Deletes old time slots that have passed.
-        /// First detaches any appointments referencing these slots (sets TimeSlotId = null),
-        /// since the FK uses ClientSetNull which doesn't cascade on the DB side.
+        /// Deletes yesterday's unused time slots.
+        ///
+        /// Slots that a customer actually booked are kept forever. This used to
+        /// detach them instead — every appointment had its TimeSlotId nulled the
+        /// day after the visit, which silently erased the date of every visit
+        /// that ever happened: appointment history emptied itself overnight, and
+        /// nothing downstream (a customer's past visits, a clinic's records, a
+        /// review of a visit) could tell when — or whether — a visit took place.
+        ///
+        /// Generation runs 30 days ahead for every employee, so the volume this
+        /// prunes is the unbooked remainder, which is the vast majority of it.
         /// </summary>
         private async Task CleanupOldTimeSlots(DataContext db)
         {
             var today = DateTime.UtcNow.Date;
 
-            var expiredSlotIds = await db.TimeSlot
-                .Where(t => t.SlotDateTime.Date < today)
-                .Select(t => t.Id)
-                .ToListAsync();
-
-            if (!expiredSlotIds.Any())
-                return;
-
-            // Detach appointments from expired time slots (set FK to null)
-            var appointmentsToDetach = await db.Appointment
-                .Where(a => a.TimeSlotId != null && expiredSlotIds.Contains(a.TimeSlotId.Value))
-                .ToListAsync();
-
-            foreach (var appointment in appointmentsToDetach)
-            {
-                appointment.TimeSlotId = null;
-            }
-
-            // Now safe to delete the expired time slots
             var expiredSlots = await db.TimeSlot
-                .Where(t => expiredSlotIds.Contains(t.Id))
+                .Where(t => t.SlotDateTime.Date < today
+                            && !db.Appointment.Any(a => a.TimeSlotId == t.Id))
                 .ToListAsync();
+
+            if (expiredSlots.Count == 0)
+                return;
 
             db.TimeSlot.RemoveRange(expiredSlots);
             await db.SaveChangesAsync();
 
-            _logger.LogInformation("Cleaned up {Count} expired time slots, detached {AppCount} appointments.",
-                expiredSlots.Count, appointmentsToDetach.Count);
+            _logger.LogInformation("Cleaned up {Count} expired unbooked time slots.", expiredSlots.Count);
         }
 
         /// <summary>

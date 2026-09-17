@@ -1,0 +1,13 @@
+# The screenshot suite is a tool for looking at the app, not a check on
+# it. It writes a PNG per screen so the ones behind the login can be
+# reviewed at all — the browser harness will not type into a Flutter text
+# field, so there is no other way to see them.
+#
+# Skipped by default because the images are meant to change: every
+# deliberate design edit would otherwise "fail" the suite and train
+# everyone to ignore it.
+#
+#   flutter test test/screenshots_test.dart --update-goldens --tags screenshots
+tags:
+  screenshots:
+    skip: "run explicitly: --tags screenshots --update-goldens"

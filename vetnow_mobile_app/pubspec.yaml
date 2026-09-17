@@ -1,0 +1,76 @@
+name: vetnow_mobile
+description: VetNow — mobile companion app for the VetNow booking platform.
+publish_to: 'none'
+# versionName+versionCode. Play requires the code to increase with every
+# upload and never repeat, so bump the number after the + on each release.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  http: ^1.2.2
+  # A testable clock, so the API timeout can be asserted without the test
+  # actually waiting it out.
+  clock: ^1.1.1
+  url_launcher: ^6.3.2
+  flutter_secure_storage: ^11.1.1
+  shared_preferences: ^2.5.5
+  app_links: ^7.2.1
+  share_plus: ^13.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  # Used by the API client tests to assert the request timeout without
+  # actually waiting twenty seconds for it.
+  fake_async: ^1.3.1
+  # Generates the Android launcher icons from assets/icon/ — see the
+  # flutter_launcher_icons block at the bottom of this file.
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  # Uncomment once font files are added under assets/fonts/
+  # (see assets/fonts/README.md) to match the Angular app's
+  # Italiana (display) + Inter (body) typography.
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
+  #   - family: Italiana
+  #     fonts:
+  #       - asset: assets/fonts/Italiana-Regular.ttf
+
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
+
+# Launcher icon. Regenerate after changing assets/icon/ with:
+#   dart run flutter_launcher_icons
+#
+# The app shipped with the stock Flutter icon and the label
+# "vetnow_mobile" — the first two things anyone sees on their phone.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+  # Adaptive icons let the launcher apply its own mask, so the paw is
+  # drawn smaller on a flat brand background rather than being cropped.
+  adaptive_icon_background: "#2FA98D"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  min_sdk_android: 21
