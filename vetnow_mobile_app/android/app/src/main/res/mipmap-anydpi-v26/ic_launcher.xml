@@ -11,9 +11,13 @@
   It points at the same foreground as the colour icon, and that is
   correct rather than lazy: Android uses only the alpha channel of a
   monochrome drawable and paints the shape itself. The foreground is a
-  paw on transparency -- 94% of its pixels are clear, all four corners
-  among them -- so the silhouette it yields is the paw, which is exactly
+  paw on transparency (94% of its pixels are clear, all four corners
+  among them), so the silhouette it yields is the paw, which is exactly
   what is wanted.
+
+  Note for anyone editing this: a double hyphen is illegal inside an XML
+  comment, and aapt fails the whole release build over it. One was left
+  here by accident and cost a build.
 
   Same inset on all three layers, so the shape does not shift when the
   launcher switches between them.
