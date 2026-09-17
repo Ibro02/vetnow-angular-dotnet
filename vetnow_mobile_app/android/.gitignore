@@ -1,8 +1,16 @@
-gradle-wrapper.jar
+# The Gradle wrapper is committed, contrary to the Flutter template.
+#
+# Flutter ignores gradlew, gradlew.bat and gradle-wrapper.jar by
+# default, which means a fresh checkout cannot build the Android app at
+# all -- CI failed on exactly that. Gradle's own guidance is the
+# opposite: the wrapper belongs in the repository so every checkout,
+# on every machine, builds with the same Gradle version.
+#
+# The jar is a binary, so CI verifies its checksum against Gradle's
+# published releases before running it.
+
 /.gradle
 /captures/
-/gradlew
-/gradlew.bat
 /local.properties
 GeneratedPluginRegistrant.java
 .cxx/

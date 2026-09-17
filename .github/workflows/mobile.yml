@@ -91,6 +91,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # The wrapper jar is a binary in the repository, so its checksum
+      # is checked against Gradle's published releases before anything
+      # runs it. Committing the wrapper is what makes every checkout
+      # build with the same Gradle; this is what keeps that from also
+      # meaning "whatever binary happened to be committed".
+      - uses: gradle/actions/wrapper-validation@v4
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.8'
