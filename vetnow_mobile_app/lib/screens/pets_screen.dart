@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/pet.dart';
@@ -8,6 +9,7 @@ import '../services/api_client.dart';
 import '../services/appointment_api_service.dart';
 import '../services/breed_api_service.dart';
 import '../services/pets_api_service.dart';
+import '../services/pets_report_api_service.dart';
 import '../services/species_api_service.dart';
 import '../state/auth_state.dart';
 import '../widgets/entrance.dart';
@@ -194,6 +196,61 @@ class _PetsScreenState extends State<PetsScreen> {
     return true;
   }
 
+  bool _downloadingReport = false;
+
+  /// Fetches the PDF and hands it to the system share sheet.
+  ///
+  /// The sheet rather than writing a file: it covers saving, mailing
+  /// and sending in one gesture, and it needs no storage permission
+  /// for a document most people will forward once and never open
+  /// again.
+  Future<void> _shareReport() async {
+    final l10n = AppLocalizations.of(context)!;
+    final auth = AuthScope.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (auth.token == null || auth.userId == null) return;
+
+    // Asked here rather than left to the backend's 'no pets' reply:
+    // it is the one failure that is not a failure, and it deserves a
+    // sentence rather than a red error.
+    if (_pets.isEmpty) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.petsReportEmpty)));
+      return;
+    }
+
+    setState(() => _downloadingReport = true);
+    try {
+      final bytes = await PetsReportApiService.forOwner(
+        ownerId: auth.userId!,
+        token: auth.token!,
+      );
+      if (!mounted) return;
+
+      // XFile.fromData rather than a temp file, so nothing has to be
+      // written to disk or cleaned up afterwards.
+      await SharePlus.instance.share(ShareParams(
+        files: [
+          XFile.fromData(
+            bytes,
+            mimeType: 'application/pdf',
+            name: 'vetnow-karton.pdf',
+          ),
+        ],
+        fileNameOverrides: const ['vetnow-karton.pdf'],
+        subject: l10n.petsReportSubject,
+      ));
+    } catch (_) {
+      if (!mounted) return;
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.petsReportFailed)));
+    } finally {
+      if (mounted) setState(() => _downloadingReport = false);
+    }
+  }
+
   Future<void> _toggleFavourite(Pet pet) async {
     final auth = AuthScope.of(context);
     if (auth.token == null) return;
@@ -293,7 +350,26 @@ class _PetsScreenState extends State<PetsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgSoft,
-      appBar: GradientAppBar(title: l10n.myPets),
+      appBar: GradientAppBar(
+        title: l10n.myPets,
+        actions: [
+          // The backend has printed this since before the app
+          // existed and nothing ever asked for it, so somebody
+          // changing clinics or asked for their animal's details at a
+          // counter had no way to get them out of here at all.
+          IconButton(
+            tooltip: l10n.petsReportAction,
+            onPressed: _downloadingReport ? null : _shareReport,
+            icon: _downloadingReport
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: PawLoader(size: 18, color: Colors.white),
+                  )
+                : const Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+          ),
+        ],
+      ),
       floatingActionButton: _isLoading
           ? null
           : Container(

@@ -179,6 +179,18 @@ class AppLocalizationsSr extends AppLocalizations {
       'Ljubimci, termini i istorija poseta na dohvat ruke — i kad nema signala.';
 
   @override
+  String get petsReportAction => 'Preuzmi karton';
+
+  @override
+  String get petsReportEmpty => 'Nemaš nijednog ljubimca za izveštaj.';
+
+  @override
+  String get petsReportFailed => 'Izveštaj nije uspeo. Pokušaj ponovo.';
+
+  @override
+  String get petsReportSubject => 'Medicinski karton';
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override

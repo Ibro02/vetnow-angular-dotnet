@@ -94,6 +94,10 @@ class ApiConfig {
   static const String petsSave = '/api/PetsUpdateOrInsert/Save';
   static const String petsSoftDelete = '/api/Pets/SoftDelete';
 
+  /// GET — [Authorize]. A PDF of every pet this owner has, built
+  /// server-side with QuestPDF. Answers with a file, not JSON.
+  static const String petsReport = '/api/PetsReport/Generate';
+
   // ─── Species / Breed ────────────────────────────────────
   static const String speciesGetAll = '/api/SpeciesGetAll/Get';
   static const String breedBySpecies = '/api/BreedGetBySpecies/Get';

@@ -167,6 +167,10 @@ Future<AppLocalizations> bosnian() => AppLocalizations.delegate.load(const Local
 /// Installs [backend] for the duration of a test.
 void useBackend(FakeBackend backend) => ApiClient.client = backend;
 
+/// For a test that needs a client which is not a plain route table —
+/// one that answers with bytes, say.
+void useClient(http.BaseClient client) => ApiClient.client = client;
+
 void resetBackend() => ApiClient.client = http.Client();
 
 // ─── Response shapes, matching what the real endpoints return ───

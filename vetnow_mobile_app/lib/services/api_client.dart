@@ -223,6 +223,48 @@ class ApiClient {
     );
   }
 
+  /// A GET whose answer is a file rather than JSON.
+  ///
+  /// Everything else here decodes a body into a Map or a List, which
+  /// a PDF is not — and running one through jsonDecode produces a
+  /// FormatException blaming the parser for a response that was
+  /// perfectly fine.
+  ///
+  /// Shares the auth header and the timeout with the rest, and keeps
+  /// the same rule about errors: a non-2xx is an ApiException carrying
+  /// whatever the backend said, because the backend's own sentence is
+  /// almost always better than anything invented here.
+  static Future<Uint8List> getBytes(
+    String path, {
+    Map<String, dynamic>? query,
+    String? token,
+  }) async {
+    try {
+      final res = await _client
+          .get(_uri(path, query), headers: _headers(token))
+          .timeout(timeout);
+
+      if (res.statusCode >= 200 && res.statusCode < 300) return res.bodyBytes;
+
+      // The same 401 handling the JSON path has: a token the backend
+      // has stopped accepting ends the session rather than showing a
+      // failure the person can only retry into.
+      if (res.statusCode == 401 &&
+          res.request?.headers[ApiConfig.authHeaderName] != null) {
+        onSessionExpired?.call();
+      }
+
+      final message = res.body.isEmpty
+          ? 'Request failed (${res.statusCode}).'
+          : res.body;
+      throw ApiException(res.statusCode, message);
+    } on ApiException {
+      rethrow;
+    } catch (error) {
+      throw NetworkException(error);
+    }
+  }
+
   static Future<dynamic> post(String path, {Object? body, String? token}) {
     return _run(
       () => _client.post(

@@ -382,6 +382,30 @@ abstract class AppLocalizations {
   /// **'Ljubimci, termini i historija posjeta na dohvat ruke — i kad nema signala.'**
   String get onboarding3Body;
 
+  /// No description provided for @petsReportAction.
+  ///
+  /// In bs, this message translates to:
+  /// **'Preuzmi karton'**
+  String get petsReportAction;
+
+  /// No description provided for @petsReportEmpty.
+  ///
+  /// In bs, this message translates to:
+  /// **'Nemaš nijednog ljubimca za izvještaj.'**
+  String get petsReportEmpty;
+
+  /// No description provided for @petsReportFailed.
+  ///
+  /// In bs, this message translates to:
+  /// **'Izvještaj nije uspio. Pokušaj ponovo.'**
+  String get petsReportFailed;
+
+  /// No description provided for @petsReportSubject.
+  ///
+  /// In bs, this message translates to:
+  /// **'Medicinski karton'**
+  String get petsReportSubject;
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:
