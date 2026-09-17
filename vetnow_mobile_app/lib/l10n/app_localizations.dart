@@ -328,6 +328,60 @@ abstract class AppLocalizations {
   /// **'Svi ljubimci'**
   String get allPets;
 
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In bs, this message translates to:
+  /// **'Preskoči'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In bs, this message translates to:
+  /// **'Dalje'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In bs, this message translates to:
+  /// **'Počni'**
+  String get onboardingStart;
+
+  /// No description provided for @onboarding1Title.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pronađi kliniku'**
+  String get onboarding1Title;
+
+  /// No description provided for @onboarding1Body.
+  ///
+  /// In bs, this message translates to:
+  /// **'Pregledaj provjerene veterinarske stanice u svom gradu — ocjene, usluge i radno vrijeme na jednom mjestu.'**
+  String get onboarding1Body;
+
+  /// No description provided for @onboarding2Title.
+  ///
+  /// In bs, this message translates to:
+  /// **'Rezerviši za par klikova'**
+  String get onboarding2Title;
+
+  /// No description provided for @onboarding2Body.
+  ///
+  /// In bs, this message translates to:
+  /// **'Izaberi uslugu, osobu i termin koji ti odgovara. Bez poziva, bez čekanja.'**
+  String get onboarding2Body;
+
+  /// No description provided for @onboarding3Title.
+  ///
+  /// In bs, this message translates to:
+  /// **'Sve o tvom ljubimcu'**
+  String get onboarding3Title;
+
+  /// No description provided for @onboarding3Body.
+  ///
+  /// In bs, this message translates to:
+  /// **'Ljubimci, termini i historija posjeta na dohvat ruke — i kad nema signala.'**
+  String get onboarding3Body;
+
   /// No description provided for @allCities.
   ///
   /// In bs, this message translates to:

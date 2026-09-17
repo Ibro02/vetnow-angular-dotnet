@@ -149,6 +149,36 @@ class AppLocalizationsSr extends AppLocalizations {
   String get allPets => 'Svi ljubimci';
 
   @override
+  String get onboardingSkip => 'Preskoči';
+
+  @override
+  String get onboardingNext => 'Dalje';
+
+  @override
+  String get onboardingStart => 'Počni';
+
+  @override
+  String get onboarding1Title => 'Pronađi kliniku';
+
+  @override
+  String get onboarding1Body =>
+      'Pregledaj proverene veterinarske stanice u svom gradu — ocene, usluge i radno vreme na jednom mestu.';
+
+  @override
+  String get onboarding2Title => 'Rezerviši za par klikova';
+
+  @override
+  String get onboarding2Body =>
+      'Izaberi uslugu, osobu i termin koji ti odgovara. Bez poziva, bez čekanja.';
+
+  @override
+  String get onboarding3Title => 'Sve o tvom ljubimcu';
+
+  @override
+  String get onboarding3Body =>
+      'Ljubimci, termini i istorija poseta na dohvat ruke — i kad nema signala.';
+
+  @override
   String get allCities => 'Svi gradovi';
 
   @override
