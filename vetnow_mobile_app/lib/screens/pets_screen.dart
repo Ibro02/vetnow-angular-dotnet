@@ -18,6 +18,7 @@ import '../widgets/pet_avatar.dart';
 import '../widgets/action_sheet.dart';
 import '../widgets/premium_dialog.dart';
 import '../widgets/section_hero.dart';
+import '../widgets/offline_notice.dart';
 import '../widgets/state_views.dart';
 import 'add_pet_screen.dart';
 import 'pet_detail_screen.dart';
@@ -46,6 +47,10 @@ class PetsScreen extends StatefulWidget {
 class _PetsScreenState extends State<PetsScreen> {
   bool _loaded = false;
   bool _isLoading = true;
+
+  /// True while the pets on screen came off the disk rather than the
+  /// network, so the screen can say so.
+  bool _showingCached = false;
   String? _error;
   List<Pet> _pets = [];
   Map<int, int> _visitCounts = {}; // animalId -> appointment count
@@ -139,20 +144,54 @@ class _PetsScreenState extends State<PetsScreen> {
         _pets = pets;
         _visitCounts = counts;
         _isLoading = false;
+        _showingCached = false;
       });
     } on ApiException catch (e) {
       if (!mounted) return;
+      if (await _showCached(auth.userId!)) return;
       setState(() {
         _isLoading = false;
         _error = e.message;
       });
     } catch (_) {
       if (!mounted) return;
+      if (await _showCached(auth.userId!)) return;
       setState(() {
         _isLoading = false;
         _error = 'network';
       });
     }
+  }
+
+  /// Falls back to the last pets this account saw.
+  ///
+  /// Returns true when it found some, so the caller knows not to put
+  /// an error page over the top of them. Species and breed names are
+  /// whatever happens to be cached — usually nothing, offline — and a
+  /// pet with a blank species still beats an error page when what you
+  /// wanted was to check your dog's name for the receptionist.
+  Future<bool> _showCached(int userId) async {
+    if (_pets.isNotEmpty) {
+      setState(() => _isLoading = false);
+      return true;
+    }
+
+    final rows = await PetsApiService.cachedFor(userId);
+    if (!mounted || rows == null || rows.isEmpty) return false;
+
+    final pets = PetsApiService.mapPets(rows, null);
+    pets.sort((a, b) {
+      if (a.isFavourite != b.isFavourite) return a.isFavourite ? -1 : 1;
+      return 0;
+    });
+
+    setState(() {
+      _pets = pets;
+      _isLoading = false;
+      _error = null;
+      _showingCached = true;
+    });
+    return true;
   }
 
   Future<void> _toggleFavourite(Pet pet) async {
@@ -317,6 +356,12 @@ class _PetsScreenState extends State<PetsScreen> {
                       ),
                     ],
                   ),
+                  if (_showingCached)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding,
+                          AppSpacing.s4, AppSpacing.pagePadding, 0),
+                      child: OfflineNotice(onRetry: _load),
+                    ),
                   if (_pets.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(

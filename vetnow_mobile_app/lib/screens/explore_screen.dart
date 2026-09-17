@@ -7,6 +7,7 @@ import '../services/api_client.dart';
 import '../services/clinic_cache.dart';
 import '../services/vet_station_api_service.dart';
 import '../state/resume_refresh.dart';
+import '../widgets/offline_notice.dart';
 import '../widgets/rating_badge.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/theme_picker.dart';
@@ -453,7 +454,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                   // normal and saying "no connection" would be wrong.
                   if (_refreshFailed && _showingCached) ...[
                     const SizedBox(height: AppSpacing.s4),
-                    _OfflineNotice(onRetry: _loadStations),
+                    OfflineNotice(onRetry: _loadStations),
                   ],
                   const SizedBox(height: AppSpacing.s5),
                   // Hidden while the request is failing: "0 clinics found"
@@ -1288,57 +1289,6 @@ class _AmenitiesFilterSheet extends StatelessWidget {
                 child: AppButton(label: l10n.applyFilters, onPressed: onApply),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Shown above cached clinics when the refresh behind them failed.
-///
-/// Quiet on purpose: the clinics below are real, only slightly old, and
-/// still perfectly usable — this is a note, not an error page. It does
-/// carry a retry, because the one thing someone wants here is to try
-/// again the moment their signal comes back.
-class _OfflineNotice extends StatelessWidget {
-  final VoidCallback onRetry;
-
-  const _OfflineNotice({required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.s3, AppSpacing.s2, AppSpacing.s2, AppSpacing.s2),
-      decoration: BoxDecoration(
-        color: AppColors.warningSoft,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.cloud_off_outlined, size: 15, color: AppColors.warning),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              l10n.offlineShowingSaved,
-              style: TextStyle(fontSize: 11.5, color: AppColors.text, height: 1.35),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Semantics(
-            button: true,
-            label: l10n.retry,
-            child: InkWell(
-              onTap: onRetry,
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              child: const Padding(
-                padding: EdgeInsets.all(6),
-                child: Icon(Icons.refresh_rounded, size: 17, color: AppColors.warning),
-              ),
-            ),
           ),
         ],
       ),

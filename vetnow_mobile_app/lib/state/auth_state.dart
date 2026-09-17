@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../services/account_cache.dart';
 import '../services/auth_api_service.dart';
 import '../services/session_store.dart';
 
@@ -151,6 +152,7 @@ class AuthState extends ChangeNotifier {
   /// can never leave the person stuck in a half-logged-in state.
   Future<void> logOut() async {
     final oldToken = token;
+    final oldUserId = userId;
 
     isLoggedIn = false;
     token = null;
@@ -164,6 +166,10 @@ class AuthState extends ChangeNotifier {
     // Forget it locally first: even if the network call below fails, the
     // next launch must not silently sign this person back in.
     await SessionStore.clear();
+
+    // Somebody else's pets left on a shared phone after they have
+    // signed out is not a caching decision, it is a leak.
+    if (oldUserId != null) await AccountCache.clearFor(oldUserId);
 
     if (oldToken != null) await AuthApiService.logout(oldToken);
   }
@@ -181,6 +187,7 @@ class AuthState extends ChangeNotifier {
   /// a retry button that could only ever fail the same way.
   void expire() {
     if (!isLoggedIn) return;
+    final goneUserId = userId;
 
     isLoggedIn = false;
     sessionExpired = true;
@@ -191,6 +198,7 @@ class AuthState extends ChangeNotifier {
     username = null;
     photoBase64 = null;
     unawaited(SessionStore.clear());
+    if (goneUserId != null) unawaited(AccountCache.clearFor(goneUserId));
     notifyListeners();
   }
 }

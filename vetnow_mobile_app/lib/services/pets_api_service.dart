@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import '../config/api_config.dart';
 import '../models/pet.dart';
+import 'account_cache.dart';
 import 'api_client.dart';
 import 'json_list.dart';
 
@@ -28,8 +31,24 @@ class PetsApiService {
       token: token,
     );
     final list = result as List<dynamic>? ?? [];
-    return list.cast<Map<String, dynamic>>();
+    final rows = list.whereType<Map<String, dynamic>>().toList();
+
+    // Kept for a launch without a connection. Not awaited: the caller
+    // is waiting to render, and writing a cache is housekeeping that
+    // must not add to that wait.
+    unawaited(AccountCache.save('pets', ownerId, rows));
+
+    return rows;
   }
+
+  /// The last rows this account saw, for when the request fails.
+  ///
+  /// Raw rather than mapped, because the names for species and breed
+  /// are fetched separately — the caller joins them with whatever it
+  /// has, which offline is usually nothing, and a pet with a blank
+  /// species still beats an error page.
+  static Future<List<Map<String, dynamic>>?> cachedFor(int ownerId) =>
+      AccountCache.read('pets', ownerId);
 
   static List<Pet> mapPets(
     List<Map<String, dynamic>> raw,

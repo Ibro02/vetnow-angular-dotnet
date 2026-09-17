@@ -12,6 +12,7 @@ import '../widgets/gradient_app_bar.dart';
 import '../widgets/section_hero.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/list_end.dart';
+import '../widgets/offline_notice.dart';
 import '../widgets/state_views.dart';
 import 'appointment_detail_screen.dart';
 
@@ -48,6 +49,11 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
   late final TabController _tabController;
   bool _loaded = false;
   bool _isLoading = true;
+
+  /// True while the list on screen came off the disk rather than the
+  /// network, so the screen can say so instead of quietly presenting
+  /// three-day-old appointments as current.
+  bool _showingCached = false;
   String? _error;
   List<Appointment> _upcoming = [];
   List<Appointment> _past = [];
@@ -112,20 +118,64 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
         _upcoming = upcoming;
         _past = past;
         _isLoading = false;
+        _showingCached = false;
       });
     } on ApiException catch (e) {
       if (!mounted) return;
+      if (await _showCached(auth.userId!)) return;
       setState(() {
         _isLoading = false;
         _error = e.message;
       });
     } catch (_) {
       if (!mounted) return;
+      if (await _showCached(auth.userId!)) return;
       setState(() {
         _isLoading = false;
         _error = 'network';
       });
     }
+  }
+
+  /// Falls back to the last list this account saw.
+  ///
+  /// Returns true when it found something, so the caller knows not to
+  /// show an error over the top of it. A phone in a lift, in a
+  /// basement or out of credit used to get an error page built on data
+  /// the app had already downloaded and then thrown away — and
+  /// somebody at a clinic counter checking when their appointment is
+  /// has precisely the wrong problem for that.
+  ///
+  /// Only when there is nothing on screen already. A refresh that
+  /// fails over a good list should leave the good list alone rather
+  /// than replace it with an older one.
+  Future<bool> _showCached(int userId) async {
+    if (_upcoming.isNotEmpty || _past.isNotEmpty) {
+      setState(() => _isLoading = false);
+      return true;
+    }
+
+    final cached = await AppointmentApiService.cachedFor(userId);
+    if (!mounted || cached == null || cached.isEmpty) return false;
+
+    final now = DateTime.now();
+    final upcoming = <Appointment>[];
+    final past = <Appointment>[];
+    for (final r in cached) {
+      final appointment = _toAppointment(r, now);
+      (appointment.dateTime.isBefore(now) ? past : upcoming).add(appointment);
+    }
+    upcoming.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    past.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+    setState(() {
+      _upcoming = upcoming;
+      _past = past;
+      _isLoading = false;
+      _error = null;
+      _showingCached = true;
+    });
+    return true;
   }
 
   Appointment _toAppointment(RemoteAppointment r, DateTime now) {
@@ -216,6 +266,19 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen>
                 ),
               ),
               const SizedBox(height: AppSpacing.s3),
+              // Only once there is a list to qualify. A cached list
+              // with nothing marking it as cached is worse than an
+              // error page: an error tells you to try again, while
+              // three-day-old appointments shown as current will send
+              // somebody to a clinic on the wrong day.
+              if (_showingCached) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.pagePadding),
+                  child: OfflineNotice(onRetry: _load),
+                ),
+                const SizedBox(height: AppSpacing.s3),
+              ],
               Expanded(
                 child: _isLoading
                     // Scrollable, like the list it stands in for. Three

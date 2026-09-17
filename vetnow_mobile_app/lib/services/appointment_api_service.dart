@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import '../config/api_config.dart';
+import 'account_cache.dart';
 import 'api_client.dart';
 import 'json_list.dart';
 
@@ -72,7 +75,27 @@ class AppointmentApiService {
       },
       token: token,
     );
-    return parseRows(result, RemoteAppointment.fromJson, context: 'appointments');
+    final rows = (result as List<dynamic>? ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .toList();
+
+    // Kept for the next launch without a connection. Not awaited: the
+    // caller is waiting to render, and writing a cache is housekeeping
+    // that must not add to that wait.
+    unawaited(AccountCache.save('appointments', customerId, rows));
+
+    return parseRows(rows, RemoteAppointment.fromJson, context: 'appointments');
+  }
+
+  /// The last list this account saw, for when the request fails.
+  ///
+  /// Null when there is nothing cached, it is older than
+  /// [AccountCache.maxAge], or it cannot be read — all of which the
+  /// caller treats the same as having no cache at all.
+  static Future<List<RemoteAppointment>?> cachedFor(int customerId) async {
+    final rows = await AccountCache.read('appointments', customerId);
+    if (rows == null || rows.isEmpty) return null;
+    return parseRows(rows, RemoteAppointment.fromJson, context: 'appointments');
   }
 
   /// POST /api/Appointment/Add — [Authorize]. CustomerId is set
